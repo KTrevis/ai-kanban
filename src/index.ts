@@ -1,7 +1,13 @@
 import { Elysia } from "elysia";
+import { VIKUNJA_CONTROLLER } from "./vikunja/vikunja.controller";
+import cors from "@elysiajs/cors";
 
-const app = new Elysia().get("/", () => "Hello Elysia").listen(3000);
+export const app = new Elysia()
+  .onAfterResponse(({ request, set }) => {
+    console.log(request.method, request.url, set.status);
+  })
+  .use(cors())
+  .use(VIKUNJA_CONTROLLER)
+  .listen(420);
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+console.log("Server started on port", app.server?.port);
