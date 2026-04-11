@@ -3,10 +3,11 @@
   "version": "1.0.50",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts --env-file=.env"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.1",
+    "@notionhq/client": "^5.17.0",
     "axios": "^1.15.0",
     "elysia": "latest",
     "lodash.debounce": "^4.0.8",
