@@ -1,7 +1,6 @@
 import Elysia from "elysia";
 import z from "zod";
 import { fetchAccessToken } from "./notion.oauth";
-import { getPageDescription, getPageTitle } from "./get-page-description";
 import {
   getProjectFolderByName,
   launchNewTask,
@@ -9,7 +8,7 @@ import {
 
 export const NOTION_CONTROLLER = new Elysia({ prefix: "notion" })
   .post(
-    "webhook",
+    "webhook/ai",
     async ({ body: { data } }) => {
       const project = data.properties["Projet"].select.name;
       const sessionId =

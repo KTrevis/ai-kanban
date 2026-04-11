@@ -1,3 +1,4 @@
+import notifier from "node-notifier";
 import axios from "axios";
 import { buildTaskExecutionPrompt } from "../../api/notion/task-updated.prompt";
 import { ENVIRONMENT } from "../../config/env";
@@ -57,7 +58,7 @@ export async function buildLaunchTaskPrompt(
   );
 
   await axios.post(
-    `${ENVIRONMENT.OPENCODE_URL}/session/${sessionId}/prompt_async`,
+    `${ENVIRONMENT.OPENCODE_URL}/session/${sessionId}/message`,
     {
       parts: [
         {
@@ -103,4 +104,10 @@ export async function launchNewTask(
     description ?? "",
     pageId,
   );
+  notifier.notify({
+    title: "Travaille",
+    message: `Task "${title}" done`,
+    sound: true,
+    wait: false,
+  });
 }
