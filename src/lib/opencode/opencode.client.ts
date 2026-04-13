@@ -97,6 +97,12 @@ export async function launchNewTask(
 ) {
   const description = await getPageDescription(pageId);
   const title = await getPageTitle(pageId);
+  notifier.notify({
+    title: "🔨 Travaille started",
+    message: title ? title : undefined,
+    sound: true,
+    wait: false,
+  });
   await buildLaunchTaskPrompt(
     await getSessionId(worktree, title, sessionId),
     worktree,
@@ -105,8 +111,8 @@ export async function launchNewTask(
     pageId,
   );
   notifier.notify({
-    title: "Travaille",
-    message: `Task "${title}" done`,
+    title: "✅ Travaille done",
+    message: title ? title : undefined,
     sound: true,
     wait: false,
   });
