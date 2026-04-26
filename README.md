@@ -79,7 +79,20 @@ Dans le dossier du projet :
 bun run dev
 ```
 
+Ou seulement le backend avec Turbo :
+
+```bash
+bun run dev:back
+```
+
+Ou seulement le frontend :
+
+```bash
+bun run dev:front
+```
+
 Le serveur démarre sur le port `420`.
+Le frontend utilise `VITE_BACK_URL` pour joindre le backend, avec `http://localhost:420` par défaut.
 
 ## 5) Ouvrir un tunnel ngrok
 

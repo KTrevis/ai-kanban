@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+**/node_modules/
 /.pnp
 .pnp.js
 
@@ -14,6 +15,8 @@
 
 # production
 /build
+dist
+**/dist
 
 # misc
 .DS_Store
@@ -41,3 +44,4 @@ yarn-error.log*
 package-lock.json
 **/*.bun
 .env
+.turbo

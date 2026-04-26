@@ -7,6 +7,3 @@ export const app = new Elysia()
   })
   .onError(({ error }) => console.error(error))
   .use(cors())
-  .listen(420);
-
-console.log("Server started on port", app.server?.port);
