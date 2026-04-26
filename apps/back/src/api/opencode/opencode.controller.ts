@@ -1,4 +1,4 @@
-import Elysia, { t } from 'elysia';
+import Elysia from 'elysia';
 import { createOpencode } from '@opencode-ai/sdk';
 import { getProjectSessions } from './opencode.sessions';
 import { upsertSessionMessage } from './opencode.upsert-session';

@@ -22,7 +22,7 @@ export async function upsertSessionMessage({
     body: {
       parts: [
         {
-          text: message,
+          text: message + `\nSESSION_ID=${targetSessionId}`,
           type: 'text',
         },
       ],

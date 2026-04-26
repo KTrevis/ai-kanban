@@ -11,6 +11,15 @@ import {
   readFileFromRef,
   type VirtualBranchChange,
 } from '../git/virtual-branch-writer';
+import { KanbanColumn } from '../generated/prisma/enums';
+import { prisma } from '../lib/prisma';
+
+const KANBAN_COLUMNS_SCHEMA = z.union([
+  z.literal(KanbanColumn.AI),
+  z.literal(KanbanColumn.DONE),
+  z.literal(KanbanColumn.REVIEW),
+  z.literal(KanbanColumn.TODO),
+]);
 
 const server = new McpServer({
   name: 'travaille-git-tools',
@@ -115,6 +124,61 @@ server.registerTool(
   },
 );
 
+server.registerTool(
+  'get_kanban_card',
+  {
+    description: 'Get a Kanban card by id.',
+    inputSchema: {
+      cardId: z.string(),
+    },
+  },
+  async ({ cardId }) => {
+    const card = await prisma.kanbanCard.findUnique({
+      where: { id: cardId },
+    });
+
+    if (!card) {
+      return textResult(`Kanban card not found: ${cardId}`);
+    }
+
+    return jsonResult(card);
+  },
+);
+
+server.registerTool(
+  'patch_kanban_card',
+  {
+    description:
+      'Patch mutable fields on a Kanban card, such as column, sessionId, branches, title, description, or position.',
+    inputSchema: {
+      baseBranch: z.string().optional(),
+      cardId: z.string(),
+      column: KANBAN_COLUMNS_SCHEMA.optional(),
+      description: z.string().optional(),
+      newBranch: z.string().optional(),
+      position: z.number().int().optional(),
+      sessionId: z.string().nullable().optional(),
+      title: z.string().optional(),
+    },
+  },
+  async ({ cardId, ...data }) => {
+    const patch = Object.fromEntries(
+      Object.entries(data).filter(([, value]) => value !== undefined),
+    );
+
+    if (Object.keys(patch).length === 0) {
+      return textResult('No Kanban card fields provided to patch.');
+    }
+
+    const card = await prisma.kanbanCard.update({
+      where: { id: cardId },
+      data: patch,
+    });
+
+    return jsonResult(card);
+  },
+);
+
 const transport = new StdioServerTransport();
 await server.connect(transport);
 
@@ -127,6 +191,10 @@ function textResult(text: string) {
       },
     ],
   };
+}
+
+function jsonResult(value: unknown) {
+  return textResult(JSON.stringify(value, null, 2));
 }
 
 async function readPendingChanges({

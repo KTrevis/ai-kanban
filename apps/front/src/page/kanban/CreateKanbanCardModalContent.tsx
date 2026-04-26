@@ -22,6 +22,7 @@ export function CreateKanbanCardModalContent({
 }) {
   const [title, setTitle] = useState(card?.title ?? '');
   const [description, setDescription] = useState(card?.description ?? '');
+  const [baseBranch, setBaseBranch] = useState(card?.baseBranch ?? 'HEAD');
   const { isPending: isCreating, mutate: createCard } =
     useCreateKanbanCard(projectId);
   const { isPending: isUpdating, mutate: updateCard } =
@@ -43,6 +44,7 @@ export function CreateKanbanCardModalContent({
   useEffect(() => {
     setTitle(card?.title ?? '');
     setDescription(card?.description ?? '');
+    setBaseBranch(card?.baseBranch ?? 'HEAD');
   }, [card]);
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
@@ -50,12 +52,14 @@ export function CreateKanbanCardModalContent({
 
     const trimmedTitle = title.trim();
     const trimmedDescription = description.trim();
+    const trimmedBaseBranch = baseBranch.trim();
 
-    if (!trimmedTitle) {
+    if (!trimmedTitle || !trimmedBaseBranch) {
       return;
     }
 
     const nextCard = {
+      baseBranch: trimmedBaseBranch,
       column,
       description: trimmedDescription,
       id: card?.id ?? crypto.randomUUID(),
@@ -66,6 +70,7 @@ export function CreateKanbanCardModalContent({
     const onSuccess = () => {
       setTitle('');
       setDescription('');
+      setBaseBranch('HEAD');
       onOpenChange(false);
     };
 
@@ -124,6 +129,16 @@ export function CreateKanbanCardModalContent({
           />
         </label>
 
+        <label className="block space-y-2 text-sm font-medium text-gray-100">
+          <span>Base branch</span>
+          <input
+            className="w-full rounded-lg border border-white/20 bg-gray-800 px-3 py-2 text-sm text-white outline-none placeholder:text-gray-500 focus:border-cyan-400"
+            onChange={(event) => setBaseBranch(event.target.value)}
+            placeholder="HEAD, main, refs/heads/feature..."
+            value={baseBranch}
+          />
+        </label>
+
         <div className="flex justify-between gap-2 pt-2">
           {isEditing ? (
             <Button
@@ -139,16 +154,19 @@ export function CreateKanbanCardModalContent({
           )}
 
           <div className="flex gap-2">
-          <Button
-            onClick={() => onOpenChange(false)}
-            type="button"
-            variant="ghost"
-          >
-            Cancel
-          </Button>
-          <Button disabled={!title.trim() || isPending} type="submit">
-            {submitLabel}
-          </Button>
+            <Button
+              onClick={() => onOpenChange(false)}
+              type="button"
+              variant="ghost"
+            >
+              Cancel
+            </Button>
+            <Button
+              disabled={!title.trim() || !baseBranch.trim() || isPending}
+              type="submit"
+            >
+              {submitLabel}
+            </Button>
           </div>
         </div>
       </form>

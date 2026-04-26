@@ -26,7 +26,10 @@ export function ProjectPage({
         message: `Utilise le MCP travaille pour réaliser la tâche suivante :
         Titre de la tâche : ${card.title}
         Description de la tâches : ${card.description}
-        ID de la carte Kanban : ${card.id}`,
+        Branche sur laquelle te baser : ${card.baseBranch}
+        Nom de la branche à créer (ou simplement à modifier si elle existe déjà) : ${card.newBranch}
+        ID de la carte Kanban : ${card.id}
+        Quand tu as fini, place la carte dans la colonne REVIEW, et rajoute lui le SESSION_ID`,
       });
     }
     moveCards(
