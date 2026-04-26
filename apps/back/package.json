@@ -10,6 +10,7 @@
   },
   "scripts": {
     "dev": "bun run --watch src/index.ts --env-file=../../.env",
+    "mcp:git": "bun run src/mcp/git-tools.mcp.ts",
     "build": "bunx tsc -p ./tsconfig.json",
     "check-types": "bunx tsc --noEmit -p ./tsconfig.json",
     "test": "bunx tsc --noEmit -p ./tsconfig.json",
@@ -19,6 +20,7 @@
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.1",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@notionhq/client": "^5.17.0",
     "@opencode-ai/sdk": "^1.14.25",
     "@types/node-notifier": "^8.0.5",
