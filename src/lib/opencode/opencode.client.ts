@@ -45,7 +45,6 @@ async function createSessionForWorktree(worktree: string, title: string) {
 
 export async function buildLaunchTaskPrompt(
   sessionId: string,
-  worktree: string,
   title: string,
   description: string,
   pageId: string,
@@ -56,23 +55,18 @@ export async function buildLaunchTaskPrompt(
     pageId,
     sessionId,
   );
+  await startTask(prompt, sessionId);
+}
 
-  await axios.post(
-    `${ENVIRONMENT.OPENCODE_URL}/session/${sessionId}/message`,
-    {
-      parts: [
-        {
-          type: "text",
-          text: prompt,
-        },
-      ],
-    },
-    {
-      params: {
-        directory: worktree,
+export async function startTask(prompt: string, sessionId: string) {
+  await axios.post(`${ENVIRONMENT.OPENCODE_URL}/session/${sessionId}/message`, {
+    parts: [
+      {
+        type: "text",
+        text: prompt,
       },
-    },
-  );
+    ],
+  });
 }
 
 async function getSessionId(
@@ -105,7 +99,6 @@ export async function launchNewTask(
   });
   await buildLaunchTaskPrompt(
     await getSessionId(worktree, title, sessionId),
-    worktree,
     title ?? "",
     description ?? "",
     pageId,

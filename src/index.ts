@@ -1,6 +1,7 @@
 import { Elysia } from "elysia";
 import cors from "@elysiajs/cors";
 import { NOTION_CONTROLLER } from "./api/notion/notion.controller";
+import { FORGEJO_CONTROLLER } from "./api/forgejo/forgejo.controller";
 
 export const app = new Elysia()
   .onAfterResponse(({ request, set }) => {
@@ -9,6 +10,7 @@ export const app = new Elysia()
   .onError(({ error }) => console.error(error))
   .use(cors())
   .use(NOTION_CONTROLLER)
+  .use(FORGEJO_CONTROLLER)
   .listen(420);
 
 console.log("Server started on port", app.server?.port);

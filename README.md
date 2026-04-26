@@ -121,7 +121,7 @@ Votre database de tâches doit contenir au minimum :
 
 - une propriété **Projet** (type `Select`) -> nom du projet OpenCode cible
 - une propriété **Session** (type `Text`) -> id de session OpenCode (la laisser vide, le LLM se chargera de la mettre à jour)
-- une propriété **État** (type `Status`) avec **deux statuts obligatoires** :
+- une propriété **État** (type `Status`) avec **au minimum les deux statuts suivants** :
   - **Human** : l'agent est bloqué et a besoin d'une réponse humaine
   - **Review** : l'agent a terminé la tâche et attend votre vérification
 
@@ -132,6 +132,8 @@ Important : sans les statuts **Human** et **Review**, le flux automatique ne peu
 Configurez le webhook Notion vers :
 
 `https://VOTRE-URL-NGROK/notion/webhook/ai`
+
+Important : Dans "Contenu" il faut cocher uniqument "Projet" et "Session"
 
 ## Comment ça fonctionne au quotidien
 
