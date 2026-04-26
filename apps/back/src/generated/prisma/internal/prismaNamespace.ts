@@ -384,7 +384,6 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 
 export const ModelName = {
-  AiRun: 'AiRun',
   KanbanCard: 'KanbanCard'
 } as const
 
@@ -401,84 +400,10 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "aiRun" | "kanbanCard"
+    modelProps: "kanbanCard"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
-    AiRun: {
-      payload: Prisma.$AiRunPayload<ExtArgs>
-      fields: Prisma.AiRunFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.AiRunFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiRunPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.AiRunFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiRunPayload>
-        }
-        findFirst: {
-          args: Prisma.AiRunFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiRunPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.AiRunFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiRunPayload>
-        }
-        findMany: {
-          args: Prisma.AiRunFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiRunPayload>[]
-        }
-        create: {
-          args: Prisma.AiRunCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiRunPayload>
-        }
-        createMany: {
-          args: Prisma.AiRunCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.AiRunCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiRunPayload>[]
-        }
-        delete: {
-          args: Prisma.AiRunDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiRunPayload>
-        }
-        update: {
-          args: Prisma.AiRunUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiRunPayload>
-        }
-        deleteMany: {
-          args: Prisma.AiRunDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.AiRunUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.AiRunUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiRunPayload>[]
-        }
-        upsert: {
-          args: Prisma.AiRunUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AiRunPayload>
-        }
-        aggregate: {
-          args: Prisma.AiRunAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateAiRun>
-        }
-        groupBy: {
-          args: Prisma.AiRunGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AiRunGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.AiRunCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AiRunCountAggregateOutputType> | number
-        }
-      }
-    }
     KanbanCard: {
       payload: Prisma.$KanbanCardPayload<ExtArgs>
       fields: Prisma.KanbanCardFieldRefs
@@ -589,30 +514,18 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
-export const AiRunScalarFieldEnum = {
-  id: 'id',
-  cardId: 'cardId',
-  projectId: 'projectId',
-  sessionId: 'sessionId',
-  branchRef: 'branchRef',
-  baseRef: 'baseRef',
-  status: 'status',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type AiRunScalarFieldEnum = (typeof AiRunScalarFieldEnum)[keyof typeof AiRunScalarFieldEnum]
-
-
 export const KanbanCardScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
+  sessionId: 'sessionId',
   title: 'title',
   description: 'description',
   column: 'column',
   position: 'position',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  newBranch: 'newBranch',
+  baseBranch: 'baseBranch'
 } as const
 
 export type KanbanCardScalarFieldEnum = (typeof KanbanCardScalarFieldEnum)[keyof typeof KanbanCardScalarFieldEnum]
@@ -648,20 +561,6 @@ export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
 
 
 /**
- * Reference to a field of type 'AiRunStatus'
- */
-export type EnumAiRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AiRunStatus'>
-    
-
-
-/**
- * Reference to a field of type 'DateTime'
- */
-export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-/**
  * Reference to a field of type 'KanbanColumn'
  */
 export type EnumKanbanColumnFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'KanbanColumn'>
@@ -672,6 +571,13 @@ export type EnumKanbanColumnFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'DateTime'
+ */
+export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
     
 
 
@@ -791,7 +697,6 @@ export type PrismaClientOptions = ({
   queryPlanCacheMaxSize?: number
 }
 export type GlobalOmitConfig = {
-  aiRun?: Prisma.AiRunOmit
   kanbanCard?: Prisma.KanbanCardOmit
 }
 

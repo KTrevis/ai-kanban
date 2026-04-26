@@ -51,7 +51,6 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  AiRun: 'AiRun',
   KanbanCard: 'KanbanCard'
 } as const
 
@@ -68,30 +67,18 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
-export const AiRunScalarFieldEnum = {
-  id: 'id',
-  cardId: 'cardId',
-  projectId: 'projectId',
-  sessionId: 'sessionId',
-  branchRef: 'branchRef',
-  baseRef: 'baseRef',
-  status: 'status',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type AiRunScalarFieldEnum = (typeof AiRunScalarFieldEnum)[keyof typeof AiRunScalarFieldEnum]
-
-
 export const KanbanCardScalarFieldEnum = {
   id: 'id',
   projectId: 'projectId',
+  sessionId: 'sessionId',
   title: 'title',
   description: 'description',
   column: 'column',
   position: 'position',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  newBranch: 'newBranch',
+  baseBranch: 'baseBranch'
 } as const
 
 export type KanbanCardScalarFieldEnum = (typeof KanbanCardScalarFieldEnum)[keyof typeof KanbanCardScalarFieldEnum]

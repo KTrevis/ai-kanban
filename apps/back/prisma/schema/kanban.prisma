@@ -6,8 +6,9 @@ enum KanbanColumn {
 }
 
 model KanbanCard {
-  id          String       @id
+  id          String       @id @default(uuid())
   projectId   String
+  sessionId   String?
   title       String
   description String
   column      KanbanColumn @default(TODO)

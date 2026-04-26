@@ -9,16 +9,6 @@
 * 🟢 You can import this file directly.
 */
 
-export const AiRunStatus = {
-  RUNNING: 'RUNNING',
-  READY_FOR_REVIEW: 'READY_FOR_REVIEW',
-  APPROVED: 'APPROVED',
-  REJECTED: 'REJECTED'
-} as const
-
-export type AiRunStatus = (typeof AiRunStatus)[keyof typeof AiRunStatus]
-
-
 export const KanbanColumn = {
   TODO: 'TODO',
   AI: 'AI',

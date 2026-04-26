@@ -18,11 +18,6 @@ export { Prisma }
 export * as $Enums from './enums'
 export * from './enums';
 /**
- * Model AiRun
- * 
- */
-export type AiRun = Prisma.AiRunModel
-/**
  * Model KanbanCard
  * 
  */

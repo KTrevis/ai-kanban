@@ -8,6 +8,5 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from './models/AiRun'
 export type * from './models/KanbanCard'
 export type * from './commonInputTypes'
