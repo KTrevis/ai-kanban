@@ -1,19 +1,43 @@
-import { useCreateKanbanCard } from '#/hooks/queries/kanban/kanban.queries';
+import {
+  useCreateKanbanCard,
+  useUpdateKanbanCard,
+} from '#/hooks/queries/kanban/kanban.queries';
 import { Button } from '#/components/ui/button';
 import { DialogDescription, DialogTitle } from '#/components/ui/dialog';
-import { useState, type SubmitEventHandler } from 'react';
-import type { Column } from './kanban.types';
+import { useEffect, useState, type SubmitEventHandler } from 'react';
+import type { Card, Column } from './kanban.types';
 
 export function CreateKanbanCardModalContent({
+  card,
   column,
   onOpenChange,
+  projectId,
 }: {
+  card?: Card;
   column: Column;
   onOpenChange: (open: boolean) => void;
+  projectId: string;
 }) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const { isPending, mutate: createCard } = useCreateKanbanCard();
+  const [title, setTitle] = useState(card?.title ?? '');
+  const [description, setDescription] = useState(card?.description ?? '');
+  const { isPending: isCreating, mutate: createCard } =
+    useCreateKanbanCard(projectId);
+  const { isPending: isUpdating, mutate: updateCard } =
+    useUpdateKanbanCard(projectId);
+  const isEditing = card != null;
+  const isPending = isCreating || isUpdating;
+  const submitLabel = isPending
+    ? isEditing
+      ? 'Saving...'
+      : 'Creating...'
+    : isEditing
+      ? 'Save card'
+      : 'Create card';
+
+  useEffect(() => {
+    setTitle(card?.title ?? '');
+    setDescription(card?.description ?? '');
+  }, [card]);
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
@@ -25,29 +49,37 @@ export function CreateKanbanCardModalContent({
       return;
     }
 
-    createCard(
-      {
-        column,
-        description: trimmedDescription,
-        id: crypto.randomUUID(),
-        title: trimmedTitle,
-      },
-      {
-        onSuccess: () => {
-          setTitle('');
-          setDescription('');
-          onOpenChange(false);
-        },
-      },
-    );
+    const nextCard = {
+      column,
+      description: trimmedDescription,
+      id: card?.id ?? crypto.randomUUID(),
+      title: trimmedTitle,
+    };
+
+    const onSuccess = () => {
+      setTitle('');
+      setDescription('');
+      onOpenChange(false);
+    };
+
+    if (isEditing) {
+      updateCard(nextCard, { onSuccess });
+      return;
+    }
+
+    createCard(nextCard, { onSuccess });
   };
 
   return (
     <div className="space-y-5">
       <div className="space-y-1">
-        <DialogTitle className="text-lg text-white">Create a card</DialogTitle>
+        <DialogTitle className="text-lg text-white">
+          {isEditing ? 'Edit card' : 'Create a card'}
+        </DialogTitle>
         <DialogDescription className="text-gray-300">
-          Add a new card to the {column} column.
+          {isEditing
+            ? `Update this card in the ${column} column.`
+            : `Add a new card to the ${column} column.`}
         </DialogDescription>
       </div>
 
@@ -81,11 +113,8 @@ export function CreateKanbanCardModalContent({
           >
             Cancel
           </Button>
-          <Button
-            disabled={!title.trim() || isPending}
-            type="submit"
-          >
-            {isPending ? 'Creating...' : 'Create card'}
+          <Button disabled={!title.trim() || isPending} type="submit">
+            {submitLabel}
           </Button>
         </div>
       </form>

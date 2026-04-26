@@ -8,11 +8,15 @@ import { SortableKanbanCard } from './SortableKanbanCard';
 import type { Card, Column } from './kanban.types';
 
 export function KanbanColumn({
-  column,
   cards,
+  column,
+  onCardClick,
+  projectId,
 }: {
-  column: Column;
   cards: Card[];
+  column: Column;
+  onCardClick?: (card: Card) => void;
+  projectId: string;
 }) {
   const { isOver, setNodeRef } = useDroppable({ id: column });
 
@@ -31,7 +35,7 @@ export function KanbanColumn({
           <span className="rounded-full bg-white/10 size-5 text-xs text-gray-300 items-center justify-center flex">
             {cards.length}
           </span>
-          <CreateKanbanCardDialog column={column} />
+          <CreateKanbanCardDialog column={column} projectId={projectId} />
         </div>
       </div>
 
@@ -41,7 +45,11 @@ export function KanbanColumn({
       >
         <div className="flex flex-1 flex-col gap-3">
           {cards.map((card) => (
-            <SortableKanbanCard card={card} key={card.id} />
+            <SortableKanbanCard
+              card={card}
+              key={card.id}
+              onClick={onCardClick}
+            />
           ))}
 
           {cards.length === 0 ? (

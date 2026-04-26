@@ -3,7 +3,13 @@ import { CSS } from '@dnd-kit/utilities';
 import { KanbanCard } from './KanbanCard';
 import type { Card } from './kanban.types';
 
-export function SortableKanbanCard({ card }: { card: Card }) {
+export function SortableKanbanCard({
+  card,
+  onClick,
+}: {
+  card: Card;
+  onClick?: (card: Card) => void;
+}) {
   const {
     attributes,
     isDragging,
@@ -24,7 +30,7 @@ export function SortableKanbanCard({ card }: { card: Card }) {
       {...attributes}
       {...listeners}
     >
-      <KanbanCard card={card} />
+      <KanbanCard card={card} onClick={() => onClick?.(card)} />
     </div>
   );
 }

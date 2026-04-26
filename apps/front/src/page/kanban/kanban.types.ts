@@ -7,4 +7,5 @@ export type Card = {
   title: string;
   description: string;
   column: Column;
+  sessionId?: string;
 };

@@ -1,7 +1,6 @@
 import {
   DndContext,
   DragOverlay,
-  KeyboardSensor,
   PointerSensor,
   closestCorners,
   pointerWithin,
@@ -13,10 +12,11 @@ import type {
   DragEndEvent,
   DragStartEvent,
 } from '@dnd-kit/core';
-import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useEffect, useState } from 'react';
+import { Modal } from '#/components/Modal';
 import { KanbanCard } from './KanbanCard';
 import { KanbanColumn } from './KanbanColumn';
+import { CreateKanbanCardModalContent } from './CreateKanbanCardModalContent';
 import { moveCard } from './kanban.move';
 import { KANBAN_COLUMNS } from './kanban.types';
 import type { Card, Column } from './kanban.types';
@@ -33,6 +33,7 @@ export type CardMovedEvent = {
 type KanbanPageProps = {
   onCardMoved?: (event: CardMovedEvent) => void;
   cards: Card[];
+  projectId: string;
 };
 
 const kanbanCollisionDetection: CollisionDetection = (args) => {
@@ -41,15 +42,13 @@ const kanbanCollisionDetection: CollisionDetection = (args) => {
   return pointerCollisions.length > 0 ? pointerCollisions : closestCorners(args);
 };
 
-export function KanbanPage({ onCardMoved, cards }: KanbanPageProps) {
+export function KanbanPage({ onCardMoved, cards, projectId }: KanbanPageProps) {
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const [editingCard, setEditingCard] = useState<Card | null>(null);
   const [visibleCards, setVisibleCards] = useState(cards);
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 6 },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
 
@@ -131,7 +130,13 @@ export function KanbanPage({ onCardMoved, cards }: KanbanPageProps) {
             const columnCards = getColumnCards(column);
 
             return (
-              <KanbanColumn column={column} key={column} cards={columnCards} />
+              <KanbanColumn
+                cards={columnCards}
+                column={column}
+                key={column}
+                onCardClick={setEditingCard}
+                projectId={projectId}
+              />
             );
           })}
         </div>
@@ -140,6 +145,28 @@ export function KanbanPage({ onCardMoved, cards }: KanbanPageProps) {
       <DragOverlay>
         {activeCard ? <KanbanCard card={activeCard} isOverlay /> : null}
       </DragOverlay>
+
+      <Modal
+        open={editingCard != null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingCard(null);
+          }
+        }}
+      >
+        {editingCard ? (
+          <CreateKanbanCardModalContent
+            card={editingCard}
+            column={editingCard.column}
+            onOpenChange={(open) => {
+              if (!open) {
+                setEditingCard(null);
+              }
+            }}
+            projectId={projectId}
+          />
+        ) : null}
+      </Modal>
     </DndContext>
   );
 }
