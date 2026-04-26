@@ -1,8 +1,11 @@
-import { ProjectList } from '#/components/opencode/ProjectList';
-import { SessionList } from '#/components/opencode/SessionList';
 import { SessionMessages } from '#/components/opencode/messages/SessionMessages';
-import { useGetProjectById } from '#/hooks/queries/opencode/project.queries';
-import { useNavigate } from '@tanstack/react-router';
+import { ProjectList } from '#/components/opencode/ProjectList';
+import {
+  KANBAN_CARDS_QUERY_KEY,
+  useGetKanbanCards,
+} from '#/hooks/queries/kanban/kanban.queries';
+import { KanbanPage } from '#/page/kanban/KanbanPage';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function ProjectPage({
   projectId,
@@ -11,13 +14,13 @@ export function ProjectPage({
   projectId: string;
   sessionId?: string;
 }) {
-  const { data } = useGetProjectById(projectId);
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { data: cards } = useGetKanbanCards();
 
   return (
     <div className="flex h-full min-h-0">
       <ProjectList selectedProject={projectId} />
-      {data && (
+      {/*{data && (
         <SessionList
           sessions={data.sessions}
           onSessionClick={(session) =>
@@ -28,8 +31,17 @@ export function ProjectPage({
             })
           }
         />
+      )}*/}
+      {sessionId ? (
+        <SessionMessages id={sessionId} />
+      ) : (
+        <KanbanPage
+          cards={cards ?? []}
+          onCardMoved={({ cards }) =>
+            queryClient.setQueryData(KANBAN_CARDS_QUERY_KEY, cards)
+          }
+        />
       )}
-      {sessionId && <SessionMessages id={sessionId} />}
     </div>
   );
 }
