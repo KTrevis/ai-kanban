@@ -16,7 +16,7 @@ export async function getProjectSessions(projectId: string) {
 
   const filteredSessions =
     sessions?.filter((session) => {
-      return session.projectID === projectId;
+      return session.projectID === projectId && !('archived' in session.time);
     }) ?? [];
   return filteredSessions;
 }

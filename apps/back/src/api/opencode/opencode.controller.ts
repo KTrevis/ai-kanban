@@ -7,11 +7,17 @@ export const opencodeClient = opencode.client;
 
 export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
   .get('projects', async () => {
-    const { data } = await opencodeClient.project.list();
-    return data ?? [];
+    const { data = [] } = await opencodeClient.project.list();
+    return data;
   })
   .get('project/:id', async ({ params: { id } }) => {
     return {
       sessions: await getProjectSessions(id),
     };
+  })
+  .get('session/:id', async ({ params: { id } }) => {
+    const { data: messages } = await opencodeClient.session.messages({
+      path: { id },
+    });
+    return { messages };
   });

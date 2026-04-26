@@ -11,8 +11,8 @@ export const useGetProjects = () => {
 };
 
 export type Session = NonNullable<
-  ReturnType<typeof useGetProjectById>['data']
->['sessions'][number];
+  NonNullable<ReturnType<typeof useGetProjectById>['data']>['sessions']
+>[number];
 
 export const useGetProjectById = (id: string) => {
   const eden = useEden();
