@@ -1,11 +1,6 @@
 import notifier from "node-notifier";
 import axios from "axios";
-import { buildTaskExecutionPrompt } from "../../api/notion/task-updated.prompt";
-import { ENVIRONMENT } from "../../config/env";
-import {
-  getPageDescription,
-  getPageTitle,
-} from "../../api/notion/get-page-description";
+import { ENVIRONMENT } from "../../schema/env.schema";
 
 type OpencodeProject = {
   name?: string;
@@ -43,18 +38,8 @@ async function createSessionForWorktree(worktree: string, title: string) {
   return data;
 }
 
-export async function buildLaunchTaskPrompt(
-  sessionId: string,
-  title: string,
-  description: string,
-  pageId: string,
-) {
-  const prompt = await buildTaskExecutionPrompt(
-    title,
-    description,
-    pageId,
-    sessionId,
-  );
+export async function buildLaunchTaskPrompt(sessionId: string) {
+  const prompt = "TODO";
   await startTask(prompt, sessionId);
 }
 
@@ -89,20 +74,14 @@ export async function launchNewTask(
   pageId: string,
   sessionId?: string,
 ) {
-  const description = await getPageDescription(pageId);
-  const title = await getPageTitle(pageId);
+  const title = "TODO";
   notifier.notify({
     title: "🔨 Travaille started",
-    message: title ? title : undefined,
+    message: title,
     sound: true,
     wait: false,
   });
-  await buildLaunchTaskPrompt(
-    await getSessionId(worktree, title, sessionId),
-    title ?? "",
-    description ?? "",
-    pageId,
-  );
+  await buildLaunchTaskPrompt(await getSessionId(worktree, title, sessionId));
   notifier.notify({
     title: "✅ Travaille done",
     message: title ? title : undefined,
