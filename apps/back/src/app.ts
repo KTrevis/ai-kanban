@@ -1,5 +1,6 @@
-import { Elysia } from "elysia";
-import cors from "@elysiajs/cors";
+import { Elysia } from 'elysia';
+import cors from '@elysiajs/cors';
+import { OPENCODE_CONTROLLER } from './api/opencode/opencode.controller';
 
 export const app = new Elysia()
   .onAfterResponse(({ request, set }) => {
@@ -7,3 +8,4 @@ export const app = new Elysia()
   })
   .onError(({ error }) => console.error(error))
   .use(cors())
+  .use(OPENCODE_CONTROLLER);

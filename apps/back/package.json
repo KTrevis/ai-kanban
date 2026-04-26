@@ -12,11 +12,15 @@
     "dev": "bun run --watch src/index.ts --env-file=../../.env",
     "build": "bunx tsc -p ./tsconfig.json",
     "check-types": "bunx tsc --noEmit -p ./tsconfig.json",
-    "test": "bunx tsc --noEmit -p ./tsconfig.json"
+    "test": "bunx tsc --noEmit -p ./tsconfig.json",
+    "lint": "bunx eslint",
+    "format": "bunx prettier --check .",
+    "check": "bunx prettier --write . && bunx eslint --fix"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.1",
     "@notionhq/client": "^5.17.0",
+    "@opencode-ai/sdk": "^1.14.25",
     "@types/node-notifier": "^8.0.5",
     "axios": "^1.15.0",
     "elysia": "1.4.28",
@@ -26,7 +30,9 @@
   },
   "devDependencies": {
     "@types/lodash.debounce": "^4.0.9",
+    "@tanstack/eslint-config": "latest",
     "bun-types": "latest",
+    "prettier": "^3.8.1",
     "typescript": "^5.8.3"
   }
 }

@@ -14,6 +14,7 @@
       "dependencies": {
         "@elysiajs/cors": "^1.4.1",
         "@notionhq/client": "^5.17.0",
+        "@opencode-ai/sdk": "^1.14.25",
         "@types/node-notifier": "^8.0.5",
         "axios": "^1.15.0",
         "elysia": "1.4.28",
@@ -22,8 +23,10 @@
         "zod": "^4.3.6",
       },
       "devDependencies": {
+        "@tanstack/eslint-config": "latest",
         "@types/lodash.debounce": "^4.0.9",
         "bun-types": "latest",
+        "prettier": "^3.8.1",
         "typescript": "^5.8.3",
       },
     },
@@ -234,6 +237,8 @@
     "@napi-rs/wasm-runtime": ["@napi-rs/wasm-runtime@1.1.4", "", { "dependencies": { "@tybys/wasm-util": "^0.10.1" }, "peerDependencies": { "@emnapi/core": "^1.7.1", "@emnapi/runtime": "^1.7.1" } }, "sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow=="],
 
     "@notionhq/client": ["@notionhq/client@5.17.0", "", {}, "sha512-hSNm3VUW5+Qs9vPOmegS6r1RT8O1jtTE/22wmSmiJc9kkb2YyddWr8SBQruvp06rALn2r2RAh9mLPirUUonsvw=="],
+
+    "@opencode-ai/sdk": ["@opencode-ai/sdk@1.14.25", "", { "dependencies": { "cross-spawn": "7.0.6" } }, "sha512-YSb+77OgIylwnk9aLoIyfr7FOx3MDD1ASEy2cUbOGTnhNqcR7S2sZAWLgkNWBBOkIH4tG6ouOckcG8lg12a3Tg=="],
 
     "@oxc-project/types": ["@oxc-project/types@0.127.0", "", {}, "sha512-aIYXQBo4lCbO4z0R3FHeucQHpF46l2LbMdxRvqvuRuW2OxdnSkcng5B8+K12spgLDj93rtN3+J2Vac/TIO+ciQ=="],
 
