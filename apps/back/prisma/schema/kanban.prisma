@@ -1,0 +1,21 @@
+enum KanbanColumn {
+  TODO
+  AI
+  REVIEW
+  DONE
+}
+
+model KanbanCard {
+  id          String       @id
+  projectId   String
+  title       String
+  description String
+  column      KanbanColumn @default(TODO)
+  position    Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  newBranch   String
+  baseBranch  String
+
+  @@index([projectId, column, position])
+}

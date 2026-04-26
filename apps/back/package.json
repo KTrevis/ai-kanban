@@ -11,6 +11,8 @@
   "scripts": {
     "dev": "bun run --watch src/index.ts --env-file=../../.env",
     "mcp:git": "bun run src/mcp/git-tools.mcp.ts",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
     "build": "bunx tsc -p ./tsconfig.json",
     "check-types": "bunx tsc --noEmit -p ./tsconfig.json",
     "test": "bunx tsc --noEmit -p ./tsconfig.json",
@@ -23,18 +25,22 @@
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@notionhq/client": "^5.17.0",
     "@opencode-ai/sdk": "^1.14.25",
+    "@prisma/adapter-better-sqlite3": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "@types/node-notifier": "^8.0.5",
     "axios": "^1.15.0",
+    "better-sqlite3": "^12.9.0",
     "elysia": "1.4.28",
     "lodash.debounce": "^4.0.8",
     "node-notifier": "^10.0.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/lodash.debounce": "^4.0.9",
     "@tanstack/eslint-config": "latest",
+    "@types/lodash.debounce": "^4.0.9",
     "bun-types": "latest",
     "prettier": "^3.8.1",
+    "prisma": "^7.8.0",
     "typescript": "^5.8.3"
   }
 }

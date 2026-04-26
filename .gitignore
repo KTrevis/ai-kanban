@@ -45,3 +45,7 @@ package-lock.json
 **/*.bun
 .env
 .turbo
+
+# local databases
+*.db
+*.db-journal
