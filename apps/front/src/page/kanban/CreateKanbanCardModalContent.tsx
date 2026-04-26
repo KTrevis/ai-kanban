@@ -1,11 +1,13 @@
 import {
+  type KanbanCard,
   useCreateKanbanCard,
+  useDeleteKanbanCard,
   useUpdateKanbanCard,
 } from '#/hooks/queries/kanban/kanban.queries';
 import { Button } from '#/components/ui/button';
 import { DialogDescription, DialogTitle } from '#/components/ui/dialog';
 import { useEffect, useState, type SubmitEventHandler } from 'react';
-import type { Card, Column } from './kanban.types';
+import type { Column } from './kanban.types';
 
 export function CreateKanbanCardModalContent({
   card,
@@ -13,7 +15,7 @@ export function CreateKanbanCardModalContent({
   onOpenChange,
   projectId,
 }: {
-  card?: Card;
+  card?: KanbanCard;
   column: Column;
   onOpenChange: (open: boolean) => void;
   projectId: string;
@@ -23,9 +25,13 @@ export function CreateKanbanCardModalContent({
   const { isPending: isCreating, mutate: createCard } =
     useCreateKanbanCard(projectId);
   const { isPending: isUpdating, mutate: updateCard } =
-    useUpdateKanbanCard(projectId);
+    useUpdateKanbanCard(card?.id ?? '');
+  const { isPending: isDeleting, mutate: deleteCard } = useDeleteKanbanCard(
+    projectId,
+    card?.id ?? '',
+  );
   const isEditing = card != null;
-  const isPending = isCreating || isUpdating;
+  const isPending = isCreating || isUpdating || isDeleting;
   const submitLabel = isPending
     ? isEditing
       ? 'Saving...'
@@ -53,6 +59,7 @@ export function CreateKanbanCardModalContent({
       column,
       description: trimmedDescription,
       id: card?.id ?? crypto.randomUUID(),
+      projectId,
       title: trimmedTitle,
     };
 
@@ -68,6 +75,18 @@ export function CreateKanbanCardModalContent({
     }
 
     createCard(nextCard, { onSuccess });
+  };
+
+  const handleDelete = () => {
+    if (!card) {
+      return;
+    }
+
+    deleteCard(undefined, {
+      onSuccess: () => {
+        onOpenChange(false);
+      },
+    });
   };
 
   return (
@@ -105,7 +124,21 @@ export function CreateKanbanCardModalContent({
           />
         </label>
 
-        <div className="flex justify-end gap-2 pt-2">
+        <div className="flex justify-between gap-2 pt-2">
+          {isEditing ? (
+            <Button
+              disabled={isPending}
+              onClick={handleDelete}
+              type="button"
+              variant="destructive"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete card'}
+            </Button>
+          ) : (
+            <div />
+          )}
+
+          <div className="flex gap-2">
           <Button
             onClick={() => onOpenChange(false)}
             type="button"
@@ -116,6 +149,7 @@ export function CreateKanbanCardModalContent({
           <Button disabled={!title.trim() || isPending} type="submit">
             {submitLabel}
           </Button>
+          </div>
         </div>
       </form>
     </div>

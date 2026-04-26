@@ -1,81 +1,75 @@
-import type { Card } from '#/page/kanban/kanban.types';
+import { useEden } from '#/lib/eden/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-export const kanbanCardsQueryKey = (projectId: string) =>
-  ['kanban', 'cards', projectId] as const;
-
 export function useGetKanbanCards(projectId: string) {
-  return useQuery({
-    queryFn: () => getStoredKanbanCards(projectId),
-    queryKey: kanbanCardsQueryKey(projectId),
-  });
+  const eden = useEden();
+  return useQuery(eden.kanban.cards({ projectId }).get.queryOptions());
 }
+
+export type KanbanCards = NonNullable<
+  ReturnType<typeof useGetKanbanCards>['data']
+>;
+
+export type KanbanCard = KanbanCards[number];
+
+export type KanbanColumn = KanbanCard['column'];
 
 export function useCreateKanbanCard(projectId: string) {
+  const eden = useEden();
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (card: Card) => createStoredKanbanCard(projectId, card),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: kanbanCardsQueryKey(projectId),
-      });
-    },
-  });
-}
-
-export function useUpdateKanbanCard(projectId: string) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (card: Card) => updateStoredKanbanCard(projectId, card),
-    onSuccess: (card) => {
-      queryClient.setQueryData<Card[]>(kanbanCardsQueryKey(projectId), (cards) =>
-        cards?.map((currentCard) =>
-          currentCard.id === card.id ? card : currentCard,
-        ),
-      );
-    },
-  });
-}
-
-export function setStoredKanbanCards(projectId: string, cards: Card[]) {
-  localStorage.setItem(
-    getKanbanCardsStorageKey(projectId),
-    JSON.stringify(cards),
+  return useMutation(
+    eden.kanban.card.post.mutationOptions({
+      onSuccess() {
+        queryClient.invalidateQueries(
+          eden.kanban.cards({ projectId }).get.queryOptions(),
+        );
+      },
+    }),
   );
 }
 
-function getKanbanCardsStorageKey(projectId: string) {
-  return `kanban.cards.${projectId}`;
-}
+export function useMoveKanbanCards(projectId: string) {
+  const eden = useEden();
+  const queryClient = useQueryClient();
 
-function getStoredKanbanCards(projectId: string) {
-  const storedCards = localStorage.getItem(getKanbanCardsStorageKey(projectId));
-
-  if (!storedCards) {
-    return [];
-  }
-
-  try {
-    return JSON.parse(storedCards) as Card[];
-  } catch {
-    return [];
-  }
-}
-
-async function createStoredKanbanCard(projectId: string, card: Card) {
-  const cards = getStoredKanbanCards(projectId);
-  const newCards: Card[] = [...cards, card];
-  setStoredKanbanCards(projectId, newCards);
-  return card;
-}
-
-async function updateStoredKanbanCard(projectId: string, card: Card) {
-  const cards = getStoredKanbanCards(projectId);
-  const newCards = cards.map((currentCard) =>
-    currentCard.id === card.id ? card : currentCard,
+  return useMutation(
+    eden.kanban.cards.patch.mutationOptions({
+      onSuccess() {
+        queryClient.invalidateQueries(
+          eden.kanban.cards({ projectId }).get.queryOptions(),
+        );
+      },
+    }),
   );
-  setStoredKanbanCards(projectId, newCards);
-  return card;
+}
+
+export function useUpdateKanbanCard(cardId: string) {
+  const eden = useEden();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    eden.kanban.card({ cardId }).patch.mutationOptions({
+      onSuccess(card) {
+        queryClient.invalidateQueries(
+          eden.kanban.cards({ projectId: card.projectId }).get.queryOptions(),
+        );
+      },
+    }),
+  );
+}
+
+export function useDeleteKanbanCard(projectId: string, cardId: string) {
+  const eden = useEden();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    eden.kanban.card({ cardId }).delete.mutationOptions({
+      onSuccess() {
+        queryClient.invalidateQueries(
+          eden.kanban.cards({ projectId }).get.queryOptions(),
+        );
+      },
+    }),
+  );
 }

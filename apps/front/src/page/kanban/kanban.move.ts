@@ -1,5 +1,6 @@
 import { arrayMove } from '@dnd-kit/sortable';
-import type { Card, Column } from './kanban.types';
+import type { KanbanCard } from '#/hooks/queries/kanban/kanban.queries';
+import type { Column } from './kanban.types';
 import { isColumn } from './kanban.utils';
 
 export function moveCard({
@@ -9,7 +10,7 @@ export function moveCard({
   shouldInsertAfter,
 }: {
   activeId: string;
-  cards: Card[];
+  cards: KanbanCard[];
   overId: string;
   shouldInsertAfter: boolean;
 }) {
@@ -53,7 +54,7 @@ export function moveCard({
   return nextCards;
 }
 
-function getTargetColumn(overId: string, cards: Card[]): Column | null {
+function getTargetColumn(overId: string, cards: KanbanCard[]): Column | null {
   if (isColumn(overId)) {
     return overId;
   }
@@ -67,7 +68,7 @@ function getInsertIndex({
   shouldInsertAfter,
   targetColumn,
 }: {
-  cards: Card[];
+  cards: KanbanCard[];
   overId: string;
   shouldInsertAfter: boolean;
   targetColumn: Column;

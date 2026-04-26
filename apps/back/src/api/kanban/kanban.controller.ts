@@ -1,62 +1,120 @@
 import Elysia from 'elysia';
-import { KanbanColumn } from '../../generated/prisma/enums';
 import { prisma } from '../../lib/prisma';
-import z from 'zod';
+import z from 'zod/v3';
+import { KanbanColumn } from '../../generated/prisma/enums';
 
-const KANBAN_COLUMN_SCHEMA = z.union([
-  z.literal(KanbanColumn.TODO),
+const KANBAN_COLUMNS_SCHEMA = z.union([
   z.literal(KanbanColumn.AI),
-  z.literal(KanbanColumn.REVIEW),
   z.literal(KanbanColumn.DONE),
+  z.literal(KanbanColumn.REVIEW),
+  z.literal(KanbanColumn.TODO),
 ]);
 
+const KANBAN_CARD_SCHEMA = z.object({
+  id: z.string().optional(),
+  projectId: z.string(),
+  sessionId: z.string().nullable().optional(),
+  title: z.string(),
+  description: z.string(),
+  column: KANBAN_COLUMNS_SCHEMA,
+  position: z.number().int().optional(),
+  baseBranch: z.string().optional(),
+});
+
+const UPDATE_KANBAN_CARD_SCHEMA = z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+  column: KANBAN_COLUMNS_SCHEMA.optional(),
+  position: z.number().int().optional(),
+  sessionId: z.string().nullable().optional(),
+  baseBranch: z.string().optional(),
+});
+
 export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
-  .get(
-    'project/:projectId/cards',
-    async ({ params: { projectId } }) => {
-      return prisma.kanbanCard.findMany({
-        orderBy: [{ column: 'asc' }, { position: 'asc' }, { createdAt: 'asc' }],
-        where: { projectId },
-      });
+  .get('cards/:projectId', ({ params: { projectId } }) => {
+    return getProjectCards(projectId);
+  })
+  .patch(
+    'cards',
+    async ({ body }) => {
+      await prisma.$transaction(
+        body.map((card) =>
+          prisma.kanbanCard.update({
+            where: { id: card.id },
+            data: {
+              column: card.column,
+              position: card.position,
+            },
+          }),
+        ),
+      );
     },
     {
-      params: z.object({
-        projectId: z.string(),
-      }),
+      body: z
+        .object({
+          id: z.string(),
+          column: KANBAN_COLUMNS_SCHEMA,
+          position: z.number().int(),
+        })
+        .array(),
     },
   )
   .post(
-    'project/:projectId/cards',
-    async ({ body, params: { projectId } }) => {
-      const column = body.column ?? KanbanColumn.TODO;
+    'card',
+    async ({ body }) => {
+      const id = body.id ?? crypto.randomUUID();
       const lastCard = await prisma.kanbanCard.findFirst({
-        orderBy: { position: 'desc' },
-        select: { position: true },
-        where: { column, projectId },
+        where: {
+          column: body.column,
+          projectId: body.projectId,
+        },
+        orderBy: {
+          position: 'desc',
+        },
       });
+      const position = body.position ?? (lastCard?.position ?? -1) + 1;
 
       return prisma.kanbanCard.create({
         data: {
-          baseBranch: body.baseBranch,
-          newBranch: body.newBranch,
-          column,
+          id,
+          baseBranch: body.baseBranch ?? 'HEAD',
+          column: body.column,
           description: body.description,
-          position: (lastCard?.position ?? -1) + 1,
-          projectId,
+          newBranch: `refs/heads/ai/card-${id}`,
+          position,
+          projectId: body.projectId,
+          sessionId: body.sessionId,
           title: body.title,
         },
       });
     },
     {
-      body: z.object({
-        baseBranch: z.string(),
-        column: z.optional(KANBAN_COLUMN_SCHEMA),
-        description: z.string(),
-        newBranch: z.string(),
-        title: z.string(),
-      }),
-      params: z.object({
-        projectId: z.string(),
-      }),
+      body: KANBAN_CARD_SCHEMA,
     },
-  );
+  )
+  .patch(
+    'card/:cardId',
+    async ({ body, params: { cardId } }) => {
+      return prisma.kanbanCard.update({
+        where: { id: cardId },
+        data: body,
+      });
+    },
+    {
+      body: UPDATE_KANBAN_CARD_SCHEMA,
+    },
+  )
+  .delete('card/:cardId', ({ params: { cardId } }) => {
+    return prisma.kanbanCard.delete({
+      where: { id: cardId },
+    });
+  });
+
+function getProjectCards(projectId: string) {
+  return prisma.kanbanCard.findMany({
+    where: {
+      projectId,
+    },
+    orderBy: [{ column: 'asc' }, { position: 'asc' }],
+  });
+}

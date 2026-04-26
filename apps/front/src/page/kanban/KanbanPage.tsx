@@ -12,6 +12,7 @@ import type {
   DragEndEvent,
   DragStartEvent,
 } from '@dnd-kit/core';
+import type { KanbanCard as KanbanCardType } from '#/hooks/queries/kanban/kanban.queries';
 import { useEffect, useState } from 'react';
 import { Modal } from '#/components/Modal';
 import { KanbanCard } from './KanbanCard';
@@ -19,11 +20,11 @@ import { KanbanColumn } from './KanbanColumn';
 import { CreateKanbanCardModalContent } from './CreateKanbanCardModalContent';
 import { moveCard } from './kanban.move';
 import { KANBAN_COLUMNS } from './kanban.types';
-import type { Card, Column } from './kanban.types';
+import type { Column } from './kanban.types';
 
 export type CardMovedEvent = {
-  card: Card;
-  cards: Card[];
+  card: KanbanCardType;
+  cards: KanbanCardType[];
   fromColumn: Column;
   fromIndex: number;
   toColumn: Column;
@@ -32,19 +33,21 @@ export type CardMovedEvent = {
 
 type KanbanPageProps = {
   onCardMoved?: (event: CardMovedEvent) => void;
-  cards: Card[];
+  cards: KanbanCardType[];
   projectId: string;
 };
 
 const kanbanCollisionDetection: CollisionDetection = (args) => {
   const pointerCollisions = pointerWithin(args);
 
-  return pointerCollisions.length > 0 ? pointerCollisions : closestCorners(args);
+  return pointerCollisions.length > 0
+    ? pointerCollisions
+    : closestCorners(args);
 };
 
 export function KanbanPage({ onCardMoved, cards, projectId }: KanbanPageProps) {
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
-  const [editingCard, setEditingCard] = useState<Card | null>(null);
+  const [editingCard, setEditingCard] = useState<KanbanCardType | null>(null);
   const [visibleCards, setVisibleCards] = useState(cards);
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -124,7 +127,7 @@ export function KanbanPage({ onCardMoved, cards, projectId }: KanbanPageProps) {
       onDragStart={handleDragStart}
       sensors={sensors}
     >
-      <div className="h-full overflow-auto p-6 text-white">
+      <div className="h-full overflow-auto p-6 text-white flex-1">
         <div className="grid min-w-220 grid-cols-4 gap-4">
           {KANBAN_COLUMNS.map((column) => {
             const columnCards = getColumnCards(column);

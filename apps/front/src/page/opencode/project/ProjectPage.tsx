@@ -1,12 +1,11 @@
 import { SessionMessages } from '#/components/opencode/messages/SessionMessages';
 import { ProjectList } from '#/components/opencode/ProjectList';
+import { useSendSessionMessage } from '#/hooks/mutations/opencode/session.mutations';
 import {
-  kanbanCardsQueryKey,
-  setStoredKanbanCards,
   useGetKanbanCards,
+  useMoveKanbanCards,
 } from '#/hooks/queries/kanban/kanban.queries';
-import { KanbanPage } from '#/page/kanban/KanbanPage';
-import { useQueryClient } from '@tanstack/react-query';
+import { KanbanPage, type CardMovedEvent } from '#/page/kanban/KanbanPage';
 
 export function ProjectPage({
   projectId,
@@ -15,8 +14,30 @@ export function ProjectPage({
   projectId: string;
   sessionId?: string;
 }) {
-  const queryClient = useQueryClient();
   const { data: cards } = useGetKanbanCards(projectId);
+  const { mutate: moveCards } = useMoveKanbanCards(projectId);
+  const { mutate: sendSessionMessage } = useSendSessionMessage();
+
+  function onCardMoved({ card, cards }: CardMovedEvent) {
+    if (card.column === 'AI') {
+      sendSessionMessage({
+        projectId,
+        sessionId: card.sessionId ?? undefined,
+        message: `Utilise le MCP travaille pour réaliser la tâche suivante :
+        Titre de la tâche : ${card.title}
+        Description de la tâches : ${card.description}
+        ID de la carte Kanban : ${card.id}`,
+      });
+    }
+    moveCards(
+      cards.map((card, position) => ({
+        column: card.column,
+        id: card.id,
+        position,
+        projectId: card.projectId,
+      })),
+    );
+  }
 
   return (
     <div className="flex h-full min-h-0">
@@ -27,10 +48,7 @@ export function ProjectPage({
         <KanbanPage
           cards={cards ?? []}
           projectId={projectId}
-          onCardMoved={({ cards }) => {
-            queryClient.setQueryData(kanbanCardsQueryKey(projectId), cards);
-            setStoredKanbanCards(projectId, cards);
-          }}
+          onCardMoved={onCardMoved}
         />
       )}
     </div>

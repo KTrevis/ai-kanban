@@ -3,9 +3,10 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import type { KanbanCard as KanbanCardType } from '#/hooks/queries/kanban/kanban.queries';
 import { CreateKanbanCardDialog } from './CreateKanbanCardModal';
 import { SortableKanbanCard } from './SortableKanbanCard';
-import type { Card, Column } from './kanban.types';
+import type { Column } from './kanban.types';
 
 export function KanbanColumn({
   cards,
@@ -13,9 +14,9 @@ export function KanbanColumn({
   onCardClick,
   projectId,
 }: {
-  cards: Card[];
+  cards: KanbanCardType[];
   column: Column;
-  onCardClick?: (card: Card) => void;
+  onCardClick?: (card: KanbanCardType) => void;
   projectId: string;
 }) {
   const { isOver, setNodeRef } = useDroppable({ id: column });

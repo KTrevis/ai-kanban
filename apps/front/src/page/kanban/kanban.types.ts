@@ -1,11 +1,10 @@
-export const KANBAN_COLUMNS = ['TODO', 'AI', 'Review', 'Done'] as const;
+import type { KanbanColumn } from '#/hooks/queries/kanban/kanban.queries';
+
+export const KANBAN_COLUMNS = [
+  'TODO',
+  'AI',
+  'REVIEW',
+  'DONE',
+] as const satisfies readonly KanbanColumn[];
 
 export type Column = (typeof KANBAN_COLUMNS)[number];
-
-export type Card = {
-  id: string;
-  title: string;
-  description: string;
-  column: Column;
-  sessionId?: string;
-};

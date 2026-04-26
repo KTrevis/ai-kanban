@@ -1,11 +1,11 @@
-import type { Card } from './kanban.types';
+import type { KanbanCard as KanbanCardType } from '#/hooks/queries/kanban/kanban.queries';
 
 export function KanbanCard({
   card,
   isOverlay,
   onClick,
 }: {
-  card: Card;
+  card: KanbanCardType;
   isOverlay?: boolean;
   onClick?: () => void;
 }) {
