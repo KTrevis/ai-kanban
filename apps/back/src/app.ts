@@ -1,6 +1,7 @@
 import { Elysia } from 'elysia';
 import cors from '@elysiajs/cors';
 import { OPENCODE_CONTROLLER } from './api/opencode/opencode.controller';
+import { WS_CONTROLLER } from './api/ws/ws.controller';
 
 export const app = new Elysia()
   .onAfterResponse(({ request, set }) => {
@@ -8,4 +9,5 @@ export const app = new Elysia()
   })
   .onError(({ error }) => console.error(error))
   .use(cors())
-  .use(OPENCODE_CONTROLLER);
+  .use(OPENCODE_CONTROLLER)
+  .use(WS_CONTROLLER);

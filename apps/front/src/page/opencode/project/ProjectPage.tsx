@@ -16,7 +16,7 @@ export function ProjectPage({
 
   return (
     <div className="flex h-full min-h-0">
-      <ProjectList />
+      <ProjectList selectedProject={projectId} />
       {data && (
         <SessionList
           sessions={data.sessions}
