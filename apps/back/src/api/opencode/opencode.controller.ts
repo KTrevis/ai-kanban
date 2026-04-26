@@ -1,6 +1,7 @@
-import Elysia from 'elysia';
+import Elysia, { t } from 'elysia';
 import { createOpencode } from '@opencode-ai/sdk';
 import { getProjectSessions } from './opencode.sessions';
+import { upsertSessionMessage } from './opencode.upsert-session';
 import { websockets } from '../ws/ws.controller';
 
 const opencode = await createOpencode();
@@ -44,4 +45,23 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
       path: { id },
     });
     return { messages };
-  });
+  })
+  .post(
+    'session/message',
+    async ({ body: { message, projectId, sessionId } }) => {
+      const result = await upsertSessionMessage({
+        message,
+        projectId,
+        sessionId,
+      });
+
+      return { sessionId: result.sessionId };
+    },
+    {
+      body: t.Object({
+        message: t.String(),
+        projectId: t.String(),
+        sessionId: t.Optional(t.String()),
+      }),
+    },
+  );
