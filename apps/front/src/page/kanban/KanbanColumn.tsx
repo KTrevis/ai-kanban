@@ -12,11 +12,13 @@ export function KanbanColumn({
   cards,
   column,
   onCardClick,
+  onCardCreated,
   projectId,
 }: {
   cards: KanbanCardType[];
   column: Column;
   onCardClick?: (card: KanbanCardType) => void;
+  onCardCreated?: (card: KanbanCardType) => void;
   projectId: string;
 }) {
   const { isOver, setNodeRef } = useDroppable({ id: column });
@@ -36,7 +38,11 @@ export function KanbanColumn({
           <span className="rounded-full bg-white/10 size-5 text-xs text-gray-300 items-center justify-center flex">
             {cards.length}
           </span>
-          <CreateKanbanCardDialog column={column} projectId={projectId} />
+          <CreateKanbanCardDialog
+            column={column}
+            onCardCreated={onCardCreated}
+            projectId={projectId}
+          />
         </div>
       </div>
 

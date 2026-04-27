@@ -12,11 +12,13 @@ import type { Column } from './kanban.types';
 export function CreateKanbanCardModalContent({
   card,
   column,
+  onCardCreated,
   onOpenChange,
   projectId,
 }: {
   card?: KanbanCard;
   column: Column;
+  onCardCreated?: (card: KanbanCard) => void;
   onOpenChange: (open: boolean) => void;
   projectId: string;
 }) {
@@ -79,7 +81,12 @@ export function CreateKanbanCardModalContent({
       return;
     }
 
-    createCard(nextCard, { onSuccess });
+    createCard(nextCard, {
+      onSuccess(createdCard) {
+        onCardCreated?.(createdCard);
+        onSuccess();
+      },
+    });
   };
 
   const handleDelete = () => {

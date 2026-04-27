@@ -32,6 +32,7 @@ export type CardMovedEvent = {
 };
 
 type KanbanPageProps = {
+  onCardCreated?: (card: KanbanCardType) => void;
   onCardMoved?: (event: CardMovedEvent) => void;
   cards: KanbanCardType[];
   projectId: string;
@@ -45,7 +46,12 @@ const kanbanCollisionDetection: CollisionDetection = (args) => {
     : closestCorners(args);
 };
 
-export function KanbanPage({ onCardMoved, cards, projectId }: KanbanPageProps) {
+export function KanbanPage({
+  onCardCreated,
+  onCardMoved,
+  cards,
+  projectId,
+}: KanbanPageProps) {
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [editingCard, setEditingCard] = useState<KanbanCardType | null>(null);
   const [visibleCards, setVisibleCards] = useState(cards);
@@ -138,6 +144,7 @@ export function KanbanPage({ onCardMoved, cards, projectId }: KanbanPageProps) {
                 column={column}
                 key={column}
                 onCardClick={setEditingCard}
+                onCardCreated={onCardCreated}
                 projectId={projectId}
               />
             );
