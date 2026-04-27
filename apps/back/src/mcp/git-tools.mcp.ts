@@ -12,9 +12,6 @@ import {
   type VirtualBranchChange,
 } from '../git/virtual-branch-writer';
 import { KanbanColumn } from '../generated/prisma/enums';
-import { prisma } from '../lib/prisma';
-import { notifyAgentTaskFinished } from '../lib/notifications';
-import { websockets } from '../api/ws/ws.controller';
 
 const KANBAN_COLUMNS_SCHEMA = z.union([
   z.literal(KanbanColumn.AI),
@@ -22,6 +19,16 @@ const KANBAN_COLUMNS_SCHEMA = z.union([
   z.literal(KanbanColumn.REVIEW),
   z.literal(KanbanColumn.TODO),
 ]);
+
+type KanbanCardPatch = {
+  baseBranch?: string;
+  column?: z.infer<typeof KANBAN_COLUMNS_SCHEMA>;
+  description?: string;
+  newBranch?: string;
+  position?: number;
+  sessionId?: string | null;
+  title?: string;
+};
 
 const server = new McpServer({
   name: 'travaille-git-tools',
@@ -135,15 +142,13 @@ server.registerTool(
     },
   },
   async ({ cardId }) => {
-    const card = await prisma.kanbanCard.findUnique({
-      where: { id: cardId },
-    });
+    const response = await fetchKanbanApi(`kanban/card/${encodeURIComponent(cardId)}`);
 
-    if (!card) {
-      return textResult(`Kanban card not found: ${cardId}`);
+    if (!response.ok) {
+      return textResult(await getApiErrorMessage(response));
     }
 
-    return jsonResult(card);
+    return jsonResult(await response.json());
   },
 );
 
@@ -166,32 +171,26 @@ server.registerTool(
   async ({ cardId, ...data }) => {
     const patch = Object.fromEntries(
       Object.entries(data).filter(([, value]) => value !== undefined),
-    );
+    ) as KanbanCardPatch;
 
     if (Object.keys(patch).length === 0) {
       return textResult('No Kanban card fields provided to patch.');
     }
 
-    const previousCard = await prisma.kanbanCard.findUnique({
-      where: { id: cardId },
-    });
-    const card = await prisma.kanbanCard.update({
-      where: { id: cardId },
-      data: patch,
-    });
+    const response = await fetchKanbanApi(
+      `kanban/card/${encodeURIComponent(cardId)}`,
+      {
+        body: JSON.stringify(patch),
+        headers: { 'content-type': 'application/json' },
+        method: 'PATCH',
+      },
+    );
 
-    if (
-      previousCard?.column !== KanbanColumn.REVIEW &&
-      card.column === KanbanColumn.REVIEW
-    ) {
-      notifyAgentTaskFinished(card.title);
-      websockets.sendMessage({
-        type: 'cards.updated',
-        projectId: card.projectId,
-      });
+    if (!response.ok) {
+      return textResult(await getApiErrorMessage(response));
     }
 
-    return jsonResult(card);
+    return jsonResult(await response.json());
   },
 );
 
@@ -211,6 +210,21 @@ function textResult(text: string) {
 
 function jsonResult(value: unknown) {
   return textResult(JSON.stringify(value, null, 2));
+}
+
+async function fetchKanbanApi(path: string, init?: RequestInit) {
+  return fetch(new URL(path, getBackendUrl()), init);
+}
+
+async function getApiErrorMessage(response: Response) {
+  const body = await response.text();
+  return `Kanban API request failed: ${response.status} ${response.statusText}${
+    body ? `\n${body}` : ''
+  }`;
+}
+
+function getBackendUrl() {
+  return process.env.TRAVAILLE_API_URL ?? 'http://localhost:420/';
 }
 
 async function readPendingChanges({

@@ -2,6 +2,8 @@ import Elysia from 'elysia';
 import { prisma } from '../../lib/prisma';
 import z from 'zod/v3';
 import { KanbanColumn } from '../../generated/prisma/enums';
+import { notifyAgentTaskFinished } from '../../lib/notifications';
+import { websockets } from '../ws/ws.controller';
 
 const KANBAN_COLUMNS_SCHEMA = z.union([
   z.literal(KanbanColumn.AI),
@@ -28,11 +30,24 @@ const UPDATE_KANBAN_CARD_SCHEMA = z.object({
   position: z.number().int().optional(),
   sessionId: z.string().nullable().optional(),
   baseBranch: z.string().optional(),
+  newBranch: z.string().optional(),
 });
 
 export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
   .get('cards/:projectId', ({ params: { projectId } }) => {
     return getProjectCards(projectId);
+  })
+  .get('card/:cardId', async ({ params: { cardId }, set }) => {
+    const card = await prisma.kanbanCard.findUnique({
+      where: { id: cardId },
+    });
+
+    if (!card) {
+      set.status = 404;
+      return { error: 'Kanban card not found' };
+    }
+
+    return card;
   })
   .patch(
     'cards',
@@ -95,10 +110,26 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
   .patch(
     'card/:cardId',
     async ({ body, params: { cardId } }) => {
-      return prisma.kanbanCard.update({
+      const previousCard = await prisma.kanbanCard.findUnique({
+        where: { id: cardId },
+      });
+      const card = await prisma.kanbanCard.update({
         where: { id: cardId },
         data: body,
       });
+
+      if (
+        previousCard?.column !== KanbanColumn.REVIEW &&
+        card.column === KanbanColumn.REVIEW
+      ) {
+        notifyAgentTaskFinished(card.title);
+        websockets.sendMessage({
+          type: 'cards.updated',
+          projectId: card.projectId,
+        });
+      }
+
+      return card;
     },
     {
       body: UPDATE_KANBAN_CARD_SCHEMA,
