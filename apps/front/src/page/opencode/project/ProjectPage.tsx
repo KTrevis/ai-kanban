@@ -23,6 +23,7 @@ export function ProjectPage({
       sendSessionMessage({
         projectId,
         sessionId: card.sessionId ?? undefined,
+        taskTitle: card.title,
         message: `Utilise le MCP travaille pour réaliser la tâche suivante :
         Titre de la tâche : ${card.title}
         Description de la tâches : ${card.description}

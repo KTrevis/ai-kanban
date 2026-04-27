@@ -13,6 +13,7 @@ import {
 } from '../git/virtual-branch-writer';
 import { KanbanColumn } from '../generated/prisma/enums';
 import { prisma } from '../lib/prisma';
+import { notifyAgentTaskFinished } from '../lib/notifications';
 
 const KANBAN_COLUMNS_SCHEMA = z.union([
   z.literal(KanbanColumn.AI),
@@ -170,10 +171,20 @@ server.registerTool(
       return textResult('No Kanban card fields provided to patch.');
     }
 
+    const previousCard = await prisma.kanbanCard.findUnique({
+      where: { id: cardId },
+    });
     const card = await prisma.kanbanCard.update({
       where: { id: cardId },
       data: patch,
     });
+
+    if (
+      previousCard?.column !== KanbanColumn.REVIEW &&
+      card.column === KanbanColumn.REVIEW
+    ) {
+      notifyAgentTaskFinished(card.title);
+    }
 
     return jsonResult(card);
   },

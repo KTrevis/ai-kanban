@@ -1,13 +1,16 @@
 import { opencodeClient } from './opencode.controller';
+import { notifyAgentTaskStarted } from '../../lib/notifications';
 
 export async function upsertSessionMessage({
   message,
   projectId,
   sessionId,
+  taskTitle,
 }: {
   message: string;
   projectId: string;
   sessionId?: string;
+  taskTitle?: string;
 }) {
   const { data: projects } = await opencodeClient.project.list();
   const project = projects?.find((project) => project.id === projectId);
@@ -30,6 +33,7 @@ export async function upsertSessionMessage({
     path: { id: targetSessionId },
     query: { directory: project.worktree },
   });
+  notifyAgentTaskStarted(taskTitle);
 
   return { sessionId: targetSessionId };
 }

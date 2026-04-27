@@ -25,11 +25,12 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
   })
   .post(
     'session/message',
-    async ({ body: { message, projectId, sessionId } }) => {
+    async ({ body: { message, projectId, sessionId, taskTitle } }) => {
       const result = await upsertSessionMessage({
         message,
         projectId,
         sessionId,
+        taskTitle,
       });
 
       return { sessionId: result.sessionId };
@@ -39,6 +40,7 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
         message: z.string(),
         projectId: z.string(),
         sessionId: z.optional(z.string()),
+        taskTitle: z.optional(z.string()),
       }),
     },
   );
