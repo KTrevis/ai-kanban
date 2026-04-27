@@ -2,19 +2,25 @@ import notifier from 'node-notifier';
 
 export function notifyAgentTaskStarted(taskTitle?: string) {
   notifyAgentTask({
-    message: taskTitle ? `Tache lancee : ${taskTitle}` : 'Tache lancee',
-    title: 'Agent demarre',
+    title: '🔨 Travaille started',
+    message: taskTitle ? taskTitle : '',
   });
 }
 
 export function notifyAgentTaskFinished(taskTitle?: string) {
   notifyAgentTask({
-    message: taskTitle ? `Tache terminee : ${taskTitle}` : 'Tache terminee',
-    title: 'Agent termine',
+    title: '✅ Travaille done',
+    message: taskTitle ? `${taskTitle}` : '',
   });
 }
 
-function notifyAgentTask({ message, title }: { message: string; title: string }) {
+function notifyAgentTask({
+  message,
+  title,
+}: {
+  message: string;
+  title: string;
+}) {
   notifier.notify({ message, title }, (error) => {
     if (error) {
       console.error('Failed to display agent notification', error);
