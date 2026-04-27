@@ -6,6 +6,7 @@ import { queryClient } from '#/lib/query-client';
 import { useEden, websocket } from '#/lib/eden/client';
 
 import '../styles.css';
+import { Toaster } from '#/components/ui/sonner';
 
 type WebsocketData = Parameters<
   Parameters<typeof websocket.subscribe>[0]
@@ -17,20 +18,18 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const eden = useEden();
+
+  // TODO: separate hook to handle incoming ws messages
   useEffect(() => {
     const handleMessage = ({ data }: { data: WebsocketData }) => {
-      if (data.type === 'message.part.updated') {
+      if (data.type === 'cards.updated') {
+        console.log('card updated');
         queryClient.invalidateQueries(
-          eden.opencode.session({ id: data.sessionId }).get.queryOptions(),
-        );
-        queryClient.invalidateQueries(
-          eden.opencode.projects.get.queryOptions(),
+          eden.kanban.cards({ projectId: data.projectId }).get.queryOptions(),
         );
       }
     };
-
     websocket.on('message', handleMessage);
-
     return () => {
       websocket.off('message', handleMessage);
     };
@@ -40,6 +39,7 @@ function RootComponent() {
     <div className="bg-gray-800 h-dvh overflow-hidden text-white">
       <main className="h-full min-h-0 overflow-hidden">
         <Outlet />
+        <Toaster richColors />
       </main>
       <TanStackDevtools
         config={{

@@ -95,7 +95,7 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
           baseBranch: body.baseBranch ?? 'HEAD',
           column: body.column,
           description: body.description,
-          newBranch: `refs/heads/ai/card-${id}`,
+          newBranch: `ai/card-${id}`,
           position,
           projectId: body.projectId,
           sessionId: body.sessionId,
