@@ -142,7 +142,9 @@ server.registerTool(
     },
   },
   async ({ cardId }) => {
-    const response = await fetchKanbanApi(`kanban/card/${encodeURIComponent(cardId)}`);
+    const response = await fetchKanbanApi(
+      `kanban/card/${encodeURIComponent(cardId)}`,
+    );
 
     if (!response.ok) {
       return textResult(await getApiErrorMessage(response));
@@ -224,7 +226,8 @@ async function getApiErrorMessage(response: Response) {
 }
 
 function getBackendUrl() {
-  return process.env.TRAVAILLE_API_URL ?? 'http://localhost:420/';
+  const backendUrl = process.env.TRAVAILLE_API_URL ?? 'http://localhost:420/';
+  return backendUrl.endsWith('/') ? backendUrl : `${backendUrl}/`;
 }
 
 async function readPendingChanges({
