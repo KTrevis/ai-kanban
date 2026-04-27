@@ -14,6 +14,7 @@ import {
 import { KanbanColumn } from '../generated/prisma/enums';
 import { prisma } from '../lib/prisma';
 import { notifyAgentTaskFinished } from '../lib/notifications';
+import { websockets } from '../api/ws/ws.controller';
 
 const KANBAN_COLUMNS_SCHEMA = z.union([
   z.literal(KanbanColumn.AI),
@@ -184,6 +185,7 @@ server.registerTool(
       card.column === KanbanColumn.REVIEW
     ) {
       notifyAgentTaskFinished(card.title);
+      websockets.sendMessage({ type: 'cards.updated', projectId: card.projectId });
     }
 
     return jsonResult(card);
