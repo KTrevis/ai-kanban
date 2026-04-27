@@ -1,11 +1,38 @@
 import Elysia from 'elysia';
-import { createOpencode } from '@opencode-ai/sdk';
+import {
+  createOpencode,
+  createOpencodeClient,
+  type OpencodeClient,
+} from '@opencode-ai/sdk';
+import { ENVIRONMENT } from '../../schema/env.schema';
 import { getProjectSessions } from './opencode.sessions';
 import { upsertSessionMessage } from './opencode.upsert-session';
 import z from 'zod/v3';
 
-const opencode = await createOpencode();
-export const opencodeClient = opencode.client;
+async function canReachOpencode(url: string) {
+  try {
+    await fetch(url, { signal: AbortSignal.timeout(1_000) });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function createClient(): Promise<OpencodeClient> {
+  if (await canReachOpencode(ENVIRONMENT.OPENCODE_URL)) {
+    return createOpencodeClient({ baseUrl: ENVIRONMENT.OPENCODE_URL });
+  }
+
+  const url = new URL(ENVIRONMENT.OPENCODE_URL);
+  const opencode = await createOpencode({
+    hostname: url.hostname,
+    port: url.port ? Number(url.port) : undefined,
+  });
+
+  return opencode.client;
+}
+
+export const opencodeClient = await createClient();
 
 export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
   .get('projects', async () => {
