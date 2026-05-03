@@ -1,7 +1,5 @@
 import { useGetProjects } from '#/hooks/queries/opencode/project.queries';
 import type { KanbanCard as KanbanCardType } from '#/hooks/queries/kanban/kanban.queries';
-import { toast } from 'sonner';
-
 const OPENCODE_URL =
   import.meta.env.VITE_OPENCODE_URL ?? 'http://localhost:4096';
 
@@ -24,7 +22,7 @@ export function KanbanCard({
   return (
     <article
       onClick={onClick}
-      className={`cursor-grab rounded-xl border border-white/10 bg-gray-800 p-4 shadow-lg shadow-black/20 active:cursor-grabbing ${
+      className={`cursor-grab rounded-xl border border-white/10 bg-gray-800 p-4 shadow-lg shadow-black/20 active:cursor-grabbing text-sm ${
         isOverlay ? 'rotate-2 ring-2 ring-cyan-300' : ''
       }`}
     >
@@ -32,7 +30,7 @@ export function KanbanCard({
       <p className="mt-2 text-sm leading-5 text-gray-400">{card.description}</p>
       {sessionUrl && (
         <a
-          className="mt-3 inline-flex text-sm font-medium text-cyan-300 hover:text-cyan-200"
+          className="mt-3 inline-flex font-medium text-cyan-300 hover:text-cyan-200"
           href={sessionUrl}
           onClick={(event) => event.stopPropagation()}
           rel="noreferrer"
@@ -41,16 +39,6 @@ export function KanbanCard({
           Open session
         </a>
       )}
-      <div
-        className="text-sm text-cyan-300 hover:text-cyan-200"
-        onClick={(event) => {
-          event.stopPropagation();
-          navigator.clipboard.writeText(card.newBranch);
-          toast.info(`${card.newBranch} copied to clipboard`);
-        }}
-      >
-        Copy branch name
-      </div>
     </article>
   );
 }

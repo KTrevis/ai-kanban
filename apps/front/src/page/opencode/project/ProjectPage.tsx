@@ -28,8 +28,13 @@ export function ProjectPage({
         Titre de la tâche : ${card.title}
         Description de la tâches : ${card.description}
         Branche sur laquelle te baser : ${card.baseBranch}
-        Nom de la branche à créer (ou simplement à modifier si elle existe déjà) : ${card.newBranch}
         ID de la carte Kanban : ${card.id}
+
+        Interdiction stricte : ne crée pas et n'utilise pas de git worktree.
+        Pour lire, modifier, committer ou comparer du code sur la branche cible, utilise les outils MCP travaille : travaille_read_file, travaille_write_file, travaille_commit_changes et travaille_get_diff.
+        Choisis un nom de branche court et descriptif au format ai/<slug>, par exemple ai/fix-login ou ai/add-kanban-filter.
+        Avant de modifier le code, mets à jour la carte Kanban avec travaille_patch_kanban_card en définissant newBranch avec le nom de branche choisi.
+        Utilise ensuite exactement ce même nom de branche pour tous les outils MCP travaille qui demandent branchRef.
         Quand tu as fini, place la carte dans la colonne REVIEW, et rajoute lui le SESSION_ID`,
     });
   }

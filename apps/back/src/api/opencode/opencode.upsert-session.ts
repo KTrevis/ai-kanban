@@ -19,7 +19,9 @@ export async function upsertSessionMessage({
     return { error: 'Project not found' as const, status: 404 as const };
   }
 
-  const targetSessionId = sessionId ?? (await createSession(project.worktree));
+  const targetSessionId = sessionId?.length
+    ? sessionId
+    : await createSession(project.worktree);
 
   opencodeClient.session.promptAsync({
     body: {

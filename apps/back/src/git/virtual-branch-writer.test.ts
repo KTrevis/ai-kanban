@@ -74,6 +74,48 @@ describe('virtual branch writer', () => {
       await rm(repoPath, { force: true, recursive: true });
     }
   });
+
+  test('normalizes short branch names to local branch refs', async () => {
+    const repoPath = await mkdtemp(join(tmpdir(), 'travaille-git-repo-'));
+
+    try {
+      await initTestRepo(repoPath);
+
+      const result = await commitVirtualChanges({
+        branchRef: 'ai/short-name-test',
+        changes: [
+          {
+            content: 'created from short branch name\n',
+            path: 'README.md',
+            type: 'write',
+          },
+        ],
+        message: 'AI short branch test',
+        repoPath,
+      });
+
+      const branchOid = await runGit(
+        ['rev-parse', '--verify', 'refs/heads/ai/short-name-test'],
+        { cwd: repoPath },
+      );
+      const listedBranch = await runGit(
+        ['branch', '--list', 'ai/short-name-test'],
+        { cwd: repoPath },
+      );
+      const diff = await getDiff({
+        baseRef: 'main',
+        branchRef: 'ai/short-name-test',
+        repoPath,
+      });
+
+      expect(result.branchRef).toBe('refs/heads/ai/short-name-test');
+      expect(branchOid.stdout.trim()).toBe(result.commitOid);
+      expect(listedBranch.stdout).toContain('ai/short-name-test');
+      expect(diff).toContain('+created from short branch name');
+    } finally {
+      await rm(repoPath, { force: true, recursive: true });
+    }
+  });
 });
 
 async function initTestRepo(repoPath: string) {

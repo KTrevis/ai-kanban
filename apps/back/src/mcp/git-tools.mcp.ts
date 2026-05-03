@@ -8,6 +8,7 @@ import { z } from 'zod';
 import {
   commitVirtualChanges,
   getDiff,
+  normalizeBranchRef,
   readFileFromRef,
   type VirtualBranchChange,
 } from '../git/virtual-branch-writer';
@@ -28,6 +29,17 @@ type KanbanCardPatch = {
   position?: number;
   sessionId?: string | null;
   title?: string;
+};
+
+type KanbanCardCreate = {
+  baseBranch?: string;
+  column: z.infer<typeof KANBAN_COLUMNS_SCHEMA>;
+  description: string;
+  id?: string;
+  position?: number;
+  projectId: string;
+  sessionId?: string | null;
+  title: string;
 };
 
 const server = new McpServer({
@@ -65,15 +77,23 @@ server.registerTool(
     },
   },
   async ({ branchRef, content, path, repoPath }) => {
-    const changes = await readPendingChanges({ branchRef, repoPath });
+    const normalizedBranchRef = normalizeBranchRef(branchRef);
+    const changes = await readPendingChanges({
+      branchRef: normalizedBranchRef,
+      repoPath,
+    });
     const nextChanges = upsertPendingChange(changes, {
       content,
       path,
       type: 'write',
     });
-    await writePendingChanges({ branchRef, changes: nextChanges, repoPath });
+    await writePendingChanges({
+      branchRef: normalizedBranchRef,
+      changes: nextChanges,
+      repoPath,
+    });
 
-    return textResult(`Queued write for ${path}`);
+    return textResult(`Queued write for ${path} on ${normalizedBranchRef}`);
   },
 );
 
@@ -90,7 +110,11 @@ server.registerTool(
     },
   },
   async ({ baseRef, branchRef, message, repoPath }) => {
-    const changes = await readPendingChanges({ branchRef, repoPath });
+    const normalizedBranchRef = normalizeBranchRef(branchRef);
+    const changes = await readPendingChanges({
+      branchRef: normalizedBranchRef,
+      repoPath,
+    });
 
     if (changes.length === 0) {
       return textResult('No pending changes to commit.');
@@ -98,12 +122,12 @@ server.registerTool(
 
     const result = await commitVirtualChanges({
       baseRef,
-      branchRef,
+      branchRef: normalizedBranchRef,
       changes,
       message,
       repoPath,
     });
-    await clearPendingChanges({ branchRef, repoPath });
+    await clearPendingChanges({ branchRef: normalizedBranchRef, repoPath });
 
     return textResult(
       [
@@ -127,9 +151,48 @@ server.registerTool(
     },
   },
   async ({ baseRef, branchRef, repoPath }) => {
-    const diff = await getDiff({ baseRef, branchRef, repoPath });
+    const diff = await getDiff({
+      baseRef,
+      branchRef: normalizeBranchRef(branchRef),
+      repoPath,
+    });
 
     return textResult(diff || 'No committed diff.');
+  },
+);
+
+server.registerTool(
+  'create_kanban_card',
+  {
+    description:
+      'Create a Kanban card. Position is optional and defaults to the end of the target column.',
+    inputSchema: {
+      baseBranch: z.string().optional(),
+      column: KANBAN_COLUMNS_SCHEMA,
+      description: z.string(),
+      id: z.string().optional(),
+      position: z.number().int().optional(),
+      projectId: z.string(),
+      sessionId: z.string().nullable().optional(),
+      title: z.string(),
+    },
+  },
+  async (data) => {
+    const body = Object.fromEntries(
+      Object.entries(data).filter(([, value]) => value !== undefined),
+    ) as KanbanCardCreate;
+
+    const response = await fetchKanbanApi('kanban/card', {
+      body: JSON.stringify(body),
+      headers: { 'content-type': 'application/json' },
+      method: 'POST',
+    });
+
+    if (!response.ok) {
+      return textResult(await getApiErrorMessage(response));
+    }
+
+    return jsonResult(await response.json());
   },
 );
 

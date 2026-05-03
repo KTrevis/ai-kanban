@@ -29,6 +29,10 @@ export type GitIdentity = {
   name: string;
 };
 
+export function normalizeBranchRef(ref: string) {
+  return ref.startsWith('refs/') ? ref : `refs/heads/${ref}`;
+}
+
 export async function ensureBranch({
   baseRef = 'HEAD',
   branchRef,
@@ -38,8 +42,10 @@ export async function ensureBranch({
   branchRef: string;
   repoPath: string;
 }) {
+  const normalizedBranchRef = normalizeBranchRef(branchRef);
+
   try {
-    return await resolveRef({ ref: branchRef, repoPath });
+    return await resolveRef({ ref: normalizedBranchRef, repoPath });
   } catch (error) {
     if (!isGitRefNotFoundError(error)) {
       throw error;
@@ -47,7 +53,7 @@ export async function ensureBranch({
   }
 
   const baseOid = await resolveRef({ ref: baseRef, repoPath });
-  await runGit(['update-ref', branchRef, baseOid], { cwd: repoPath });
+  await runGit(['update-ref', normalizedBranchRef, baseOid], { cwd: repoPath });
 
   return baseOid;
 }
@@ -77,9 +83,12 @@ export async function getDiff({
   branchRef: string;
   repoPath: string;
 }) {
-  const { stdout } = await runGit(['diff', `${baseRef}...${branchRef}`], {
-    cwd: repoPath,
-  });
+  const { stdout } = await runGit(
+    ['diff', `${baseRef}...${normalizeBranchRef(branchRef)}`],
+    {
+      cwd: repoPath,
+    },
+  );
 
   return stdout;
 }
@@ -96,7 +105,12 @@ export async function commitVirtualChanges({
     throw new Error('Cannot commit without changes');
   }
 
-  const parentOid = await ensureBranch({ baseRef, branchRef, repoPath });
+  const normalizedBranchRef = normalizeBranchRef(branchRef);
+  const parentOid = await ensureBranch({
+    baseRef,
+    branchRef: normalizedBranchRef,
+    repoPath,
+  });
   const tempDir = await mkdtemp(join(tmpdir(), 'travaille-git-index-'));
   const indexPath = join(tempDir, 'index');
   const env = { GIT_INDEX_FILE: indexPath };
@@ -149,12 +163,12 @@ export async function commitVirtualChanges({
     );
 
     const nextOid = commitOid.trim();
-    await runGit(['update-ref', branchRef, nextOid, parentOid], {
+    await runGit(['update-ref', normalizedBranchRef, nextOid, parentOid], {
       cwd: repoPath,
     });
 
     return {
-      branchRef,
+      branchRef: normalizedBranchRef,
       commitOid: nextOid,
       parentOid,
       treeOid: treeOid.trim(),
