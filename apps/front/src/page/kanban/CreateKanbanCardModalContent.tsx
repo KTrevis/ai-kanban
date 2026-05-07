@@ -6,8 +6,20 @@ import {
 } from '#/hooks/queries/kanban/kanban.queries';
 import { Button } from '#/components/ui/button';
 import { DialogDescription, DialogTitle } from '#/components/ui/dialog';
-import { useEffect, useState, type SubmitEventHandler } from 'react';
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useState,
+  type SubmitEventHandler,
+} from 'react';
 import type { Column } from './kanban.types';
+
+const MarkdownDescriptionEditor = lazy(() =>
+  import('./MarkdownDescriptionEditor').then((module) => ({
+    default: module.MarkdownDescriptionEditor,
+  })),
+);
 
 export function CreateKanbanCardModalContent({
   card,
@@ -44,8 +56,10 @@ export function CreateKanbanCardModalContent({
       : 'Create card';
 
   useEffect(() => {
+    const nextDescription = card?.description ?? '';
+
     setTitle(card?.title ?? '');
-    setDescription(card?.description ?? '');
+    setDescription(nextDescription);
     setBaseBranch(card?.baseBranch ?? 'HEAD');
   }, [card]);
 
@@ -128,12 +142,19 @@ export function CreateKanbanCardModalContent({
 
         <label className="block space-y-2 text-sm font-medium text-gray-100">
           <span>Description</span>
-          <textarea
-            className="min-h-24 w-full resize-none rounded-lg border border-white/20 bg-gray-800 px-3 py-2 text-sm text-white outline-none placeholder:text-gray-500 focus:border-cyan-400"
-            onChange={(event) => setDescription(event.target.value)}
-            placeholder="Add a bit of context"
-            value={description}
-          />
+          <Suspense
+            fallback={
+              <div className="min-h-56 rounded-lg border border-white/20 bg-gray-800 px-3 py-2 text-sm text-gray-400">
+                Loading Markdown editor...
+              </div>
+            }
+          >
+            <MarkdownDescriptionEditor
+              initialValue={description}
+              key={card?.id ?? 'new-card'}
+              onChange={setDescription}
+            />
+          </Suspense>
         </label>
 
         <label className="block space-y-2 text-sm font-medium text-gray-100">

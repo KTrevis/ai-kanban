@@ -3,6 +3,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@uiw/react-markdown-preview/markdown.css";
+@import "@mdxeditor/editor/style.css";
 @import "@fontsource-variable/inter";
 
 @custom-variant dark (&:is(.dark *));
@@ -152,5 +153,68 @@ body {
 
   .markdown-content.wmde-markdown {
     @apply bg-transparent;
+  }
+
+  .kanban-card-markdown.wmde-markdown {
+    @apply text-sm leading-5 text-gray-400;
+  }
+
+  .kanban-card-markdown.wmde-markdown p,
+  .kanban-card-markdown.wmde-markdown ul,
+  .kanban-card-markdown.wmde-markdown ol,
+  .kanban-card-markdown.wmde-markdown pre,
+  .kanban-card-markdown.wmde-markdown blockquote {
+    @apply my-2;
+  }
+
+  .kanban-card-markdown.wmde-markdown code,
+  .kanban-card-markdown.wmde-markdown pre {
+    @apply whitespace-pre-wrap break-words [overflow-wrap:anywhere];
+  }
+
+  .kanban-description-editor {
+    --basePageBg: rgb(31 41 55);
+    --baseBgSubtle: rgb(17 24 39);
+    --baseBg: rgb(55 65 81);
+    --baseBgHover: rgb(75 85 99);
+    --baseBgActive: rgb(75 85 99);
+    --baseLine: rgb(75 85 99);
+    --baseBorder: rgb(75 85 99);
+    --baseBorderHover: rgb(103 232 249);
+    --baseText: rgb(209 213 219);
+    --baseTextContrast: rgb(243 244 246);
+
+    @apply min-h-56 overflow-hidden rounded-lg border border-white/20 bg-gray-800 text-white;
+  }
+
+  .kanban-description-editor .mdxeditor-root-contenteditable {
+    @apply min-h-56 px-4 py-3 text-sm leading-6 text-gray-100;
+  }
+
+  .kanban-description-editor .mdxeditor-root-contenteditable > div {
+    @apply min-h-52;
+  }
+
+  .kanban-description-editor .mdxeditor-root-contenteditable p,
+  .kanban-description-editor .mdxeditor-root-contenteditable li,
+  .kanban-description-editor .mdxeditor-root-contenteditable blockquote {
+    @apply text-gray-100;
+  }
+
+  .kanban-description-editor .mdxeditor-root-contenteditable code,
+  .kanban-description-editor [class*="_code_"] {
+    background-color: rgb(15 23 42) !important;
+    color: rgb(207 250 254) !important;
+    @apply rounded px-1 py-0.5 font-mono;
+  }
+
+  .kanban-description-editor .mdxeditor-root-contenteditable code::selection,
+  .kanban-description-editor [class*="_code_"]::selection {
+    background-color: rgb(8 145 178) !important;
+    color: white !important;
+  }
+
+  .kanban-description-editor .mdxeditor-root-contenteditable a {
+    @apply text-cyan-300 underline underline-offset-2;
   }
 }

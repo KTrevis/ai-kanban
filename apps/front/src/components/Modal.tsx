@@ -12,7 +12,7 @@ export function Modal({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-gray-700 text-white border border-white">
+      <DialogContent className="bg-gray-700 text-white border border-white sm:max-w-2xl">
         {children}
       </DialogContent>
     </Dialog>
