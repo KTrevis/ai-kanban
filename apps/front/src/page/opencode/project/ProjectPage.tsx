@@ -9,9 +9,13 @@ import {
 import { KanbanPage, type CardMovedEvent } from '#/page/kanban/KanbanPage';
 
 export function ProjectPage({
+  cardId,
+  onCardIdChange,
   projectId,
   sessionId,
 }: {
+  cardId?: string;
+  onCardIdChange: (cardId?: string) => void;
   projectId: string;
   sessionId?: string;
 }) {
@@ -20,6 +24,9 @@ export function ProjectPage({
   const { mutate: sendSessionMessage } = useSendSessionMessage();
 
   function startAgentSession(card: KanbanCard) {
+    const cardUrl = new URL(`/project/${projectId}`, window.location.origin);
+    cardUrl.searchParams.set('cardId', card.id);
+
     sendSessionMessage({
       projectId,
       sessionId: card.sessionId ?? undefined,
@@ -29,6 +36,7 @@ export function ProjectPage({
         Description de la tâches : ${card.description}
         Branche sur laquelle te baser : ${card.baseBranch}
         ID de la carte Kanban : ${card.id}
+        Lien direct vers la carte Kanban : ${cardUrl.toString()}
 
         Interdiction stricte : ne crée pas et n'utilise pas de git worktree.
         Pour lire, modifier, committer ou comparer du code sur la branche cible, utilise les outils MCP travaille : travaille_read_file, travaille_write_file, travaille_commit_changes et travaille_get_diff.
@@ -67,7 +75,9 @@ export function ProjectPage({
       ) : (
         <KanbanPage
           cards={cards ?? []}
+          cardId={cardId}
           projectId={projectId}
+          onCardIdChange={onCardIdChange}
           onCardCreated={onCardCreated}
           onCardMoved={onCardMoved}
         />

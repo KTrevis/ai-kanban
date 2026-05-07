@@ -32,6 +32,8 @@ export type CardMovedEvent = {
 };
 
 type KanbanPageProps = {
+  cardId?: string;
+  onCardIdChange: (cardId?: string) => void;
   onCardCreated?: (card: KanbanCardType) => void;
   onCardMoved?: (event: CardMovedEvent) => void;
   cards: KanbanCardType[];
@@ -47,13 +49,14 @@ const kanbanCollisionDetection: CollisionDetection = (args) => {
 };
 
 export function KanbanPage({
+  cardId,
+  onCardIdChange,
   onCardCreated,
   onCardMoved,
   cards,
   projectId,
 }: KanbanPageProps) {
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
-  const [editingCard, setEditingCard] = useState<KanbanCardType | null>(null);
   const [visibleCards, setVisibleCards] = useState(cards);
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -67,6 +70,7 @@ export function KanbanPage({
 
   const activeCard =
     visibleCards.find((card) => card.id === activeCardId) ?? null;
+  const editingCard = visibleCards.find((card) => card.id === cardId) ?? null;
 
   const getColumnCards = (column: Column) =>
     visibleCards.filter((card) => card.column === column);
@@ -143,7 +147,7 @@ export function KanbanPage({
                 cards={columnCards}
                 column={column}
                 key={column}
-                onCardClick={setEditingCard}
+                onCardClick={(card) => onCardIdChange(card.id)}
                 onCardCreated={onCardCreated}
                 projectId={projectId}
               />
@@ -160,7 +164,7 @@ export function KanbanPage({
         open={editingCard != null}
         onOpenChange={(open) => {
           if (!open) {
-            setEditingCard(null);
+            onCardIdChange(undefined);
           }
         }}
       >
@@ -170,7 +174,7 @@ export function KanbanPage({
             column={editingCard.column}
             onOpenChange={(open) => {
               if (!open) {
-                setEditingCard(null);
+                onCardIdChange(undefined);
               }
             }}
             projectId={projectId}

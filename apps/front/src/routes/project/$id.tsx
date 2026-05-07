@@ -5,12 +5,29 @@ import z from 'zod/v3';
 export const Route = createFileRoute('/project/$id')({
   component: RouteComponent,
   validateSearch: z.object({
+    cardId: z.string().optional(),
     sessionId: z.string().optional(),
   }),
 });
 
 function RouteComponent() {
   const { id } = Route.useParams();
-  const { sessionId } = Route.useSearch();
-  return <ProjectPage projectId={id} sessionId={sessionId} />;
+  const { cardId, sessionId } = Route.useSearch();
+  const navigate = Route.useNavigate();
+
+  function setCardId(nextCardId?: string) {
+    navigate({
+      search: (search) => ({ ...search, cardId: nextCardId }),
+      replace: true,
+    });
+  }
+
+  return (
+    <ProjectPage
+      cardId={cardId}
+      projectId={id}
+      sessionId={sessionId}
+      onCardIdChange={setCardId}
+    />
+  );
 }
