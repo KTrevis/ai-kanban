@@ -184,11 +184,11 @@ body {
     --baseText: rgb(209 213 219);
     --baseTextContrast: rgb(243 244 246);
 
-    @apply min-h-56 overflow-hidden rounded-lg border border-white/20 bg-gray-800 text-white;
+    @apply max-h-96 min-h-56 overflow-hidden rounded-lg border border-white/20 bg-gray-800 text-white;
   }
 
   .kanban-description-editor .mdxeditor-root-contenteditable {
-    @apply min-h-56 px-4 py-3 text-sm leading-6 text-gray-100;
+    @apply max-h-96 min-h-56 overflow-y-auto px-4 py-3 text-sm leading-6 text-gray-100;
   }
 
   .kanban-description-editor .mdxeditor-root-contenteditable > div {

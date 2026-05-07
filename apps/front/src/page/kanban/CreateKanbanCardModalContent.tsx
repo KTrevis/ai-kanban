@@ -6,20 +6,9 @@ import {
 } from '#/hooks/queries/kanban/kanban.queries';
 import { Button } from '#/components/ui/button';
 import { DialogDescription, DialogTitle } from '#/components/ui/dialog';
-import {
-  lazy,
-  Suspense,
-  useEffect,
-  useState,
-  type SubmitEventHandler,
-} from 'react';
+import { useEffect, useState, type SubmitEventHandler } from 'react';
+import { MarkdownDescriptionEditor } from './MarkdownDescriptionEditor';
 import type { Column } from './kanban.types';
-
-const MarkdownDescriptionEditor = lazy(() =>
-  import('./MarkdownDescriptionEditor').then((module) => ({
-    default: module.MarkdownDescriptionEditor,
-  })),
-);
 
 export function CreateKanbanCardModalContent({
   card,
@@ -142,19 +131,11 @@ export function CreateKanbanCardModalContent({
 
         <label className="block space-y-2 text-sm font-medium text-gray-100">
           <span>Description</span>
-          <Suspense
-            fallback={
-              <div className="min-h-56 rounded-lg border border-white/20 bg-gray-800 px-3 py-2 text-sm text-gray-400">
-                Loading Markdown editor...
-              </div>
-            }
-          >
-            <MarkdownDescriptionEditor
-              initialValue={description}
-              key={card?.id ?? 'new-card'}
-              onChange={setDescription}
-            />
-          </Suspense>
+          <MarkdownDescriptionEditor
+            initialValue={description}
+            key={card?.id ?? 'new-card'}
+            onChange={setDescription}
+          />
         </label>
 
         <label className="block space-y-2 text-sm font-medium text-gray-100">
