@@ -1,6 +1,5 @@
 import {
   codeBlockPlugin,
-  codeMirrorPlugin,
   headingsPlugin,
   linkPlugin,
   listsPlugin,
@@ -16,20 +15,7 @@ const DESCRIPTION_EDITOR_PLUGINS = [
   quotePlugin(),
   thematicBreakPlugin(),
   linkPlugin(),
-  codeBlockPlugin({ defaultCodeBlockLanguage: 'ts' }),
-  codeMirrorPlugin({
-    codeBlockLanguages: {
-      bash: 'Bash',
-      css: 'CSS',
-      js: 'JavaScript',
-      json: 'JSON',
-      md: 'Markdown',
-      sql: 'SQL',
-      ts: 'TypeScript',
-      tsx: 'TypeScript React',
-      txt: 'Plain text',
-    },
-  }),
+  codeBlockPlugin(),
   markdownShortcutPlugin(),
 ];
 

@@ -1,9 +1,10 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
-@import '@uiw/react-markdown-preview/markdown.css';
-@import '@mdxeditor/editor/style.css';
-@import '@fontsource-variable/inter';
+
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@uiw/react-markdown-preview/markdown.css";
+@import "@mdxeditor/editor/style.css";
+@import "@fontsource-variable/inter";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -201,40 +202,16 @@ body {
   }
 
   .kanban-description-editor .mdxeditor-root-contenteditable code,
-  .kanban-description-editor [class*='_code_'] {
+  .kanban-description-editor [class*="_code_"] {
     background-color: rgb(15 23 42) !important;
     color: rgb(207 250 254) !important;
     @apply rounded px-1 py-0.5 font-mono;
   }
 
   .kanban-description-editor .mdxeditor-root-contenteditable code::selection,
-  .kanban-description-editor [class*='_code_']::selection {
+  .kanban-description-editor [class*="_code_"]::selection {
     background-color: rgb(8 145 178) !important;
     color: white !important;
-  }
-
-  .kanban-description-editor .cm-editor {
-    @apply rounded-md border border-white/10 bg-slate-950 text-sm text-cyan-50;
-  }
-
-  .kanban-description-editor .cm-scroller {
-    @apply px-2 py-2 font-mono;
-  }
-
-  .kanban-description-editor .cm-gutters {
-    background-color: rgb(15 23 42) !important;
-    color: rgb(148 163 184) !important;
-    border-right-color: rgb(51 65 85) !important;
-  }
-
-  .kanban-description-editor .cm-activeLine,
-  .kanban-description-editor .cm-activeLineGutter {
-    background-color: rgb(30 41 59) !important;
-  }
-
-  .kanban-description-editor .cm-selectionBackground,
-  .kanban-description-editor .cm-content ::selection {
-    background-color: rgb(8 145 178) !important;
   }
 
   .kanban-description-editor .mdxeditor-root-contenteditable a {

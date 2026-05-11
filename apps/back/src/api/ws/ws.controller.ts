@@ -1,7 +1,7 @@
 import Elysia from 'elysia';
 import type { ElysiaWS } from 'elysia/ws';
-import { WS_SERVER_PAYLOAD_SCHEMA } from './response.schema';
-import type { WsServerPayload } from './response.schema';
+import { WS_SERVER_PAYLOAD_SCHEMA } from './server-ws.schema';
+import type { WsServerPayload } from './server-ws.schema';
 
 class WebSockets {
   private websockets = new Map<string, ElysiaWS>();

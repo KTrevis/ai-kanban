@@ -1,8 +1,6 @@
-import { useGetProjects } from '#/hooks/queries/opencode/project.queries';
 import type { KanbanCard as KanbanCardType } from '#/hooks/queries/kanban/kanban.queries';
+import { useNavigate } from '@tanstack/react-router';
 import MarkdownPreview from '@uiw/react-markdown-preview';
-const OPENCODE_URL =
-  import.meta.env.VITE_OPENCODE_URL ?? 'http://localhost:4096';
 
 export function KanbanCard({
   card,
@@ -13,12 +11,19 @@ export function KanbanCard({
   isOverlay?: boolean;
   onClick?: () => void;
 }) {
-  const { data: projects = [] } = useGetProjects();
-  const project = projects.find((project) => project.id === card.projectId);
-  const sessionUrl =
-    card.sessionId && project?.worktree
-      ? `${OPENCODE_URL}/${encodeBase64Url(project.worktree)}/session/${card.sessionId}`
-      : null;
+  const navigate = useNavigate();
+
+  function openSession() {
+    if (!card.sessionId) {
+      return;
+    }
+
+    navigate({
+      to: '/project/$id',
+      params: { id: card.projectId },
+      search: { sessionId: card.sessionId },
+    });
+  }
 
   return (
     <article
@@ -35,26 +40,18 @@ export function KanbanCard({
           style={{ background: 'transparent' }}
         />
       </div>
-      {sessionUrl && (
-        <a
+      {card.sessionId && (
+        <button
           className="mt-3 inline-flex font-medium text-cyan-300 hover:text-cyan-200"
-          href={sessionUrl}
-          onClick={(event) => event.stopPropagation()}
-          rel="noreferrer"
-          target="_blank"
+          onClick={(event) => {
+            event.stopPropagation();
+            openSession();
+          }}
+          type="button"
         >
           Open session
-        </a>
+        </button>
       )}
     </article>
   );
-}
-
-function encodeBase64Url(value: string) {
-  const bytes = new TextEncoder().encode(value);
-  const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join(
-    '',
-  );
-
-  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }

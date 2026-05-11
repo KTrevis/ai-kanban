@@ -14,7 +14,10 @@ export function SessionMessagePart({ part }: { part: MessagePart }) {
     return <div className="text-gray-400">Thinking...</div>;
   }
   if (part.type === 'tool') {
-    return <div className="text-gray-400">Exploring...</div>;
+    if (part.state.status === 'error') {
+      return <div className="text-red-500">Error : {part.state.error}</div>;
+    }
+    return <div className="text-gray-400">Tool call : {part.tool} </div>;
   }
   return null;
 }
