@@ -6,6 +6,7 @@ export type SessionMessage = NonNullable<
 >[number];
 
 export type MessagePart = SessionMessage['parts'][number];
+export type MessagePartType = MessagePart['type'];
 
 export function useGetSession(sessionId: string) {
   const eden = useEden();
