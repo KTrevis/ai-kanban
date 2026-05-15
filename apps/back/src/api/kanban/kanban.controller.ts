@@ -3,7 +3,10 @@ import { prisma } from '../../lib/prisma';
 import z from 'zod/v3';
 import { KanbanColumn } from '../../generated/prisma/enums';
 import { notifyAgentTaskFinished } from '../../lib/notifications';
-import { getDiff } from '../../git/virtual-branch-writer';
+import {
+  getCommittedReviewDiff,
+  getUncommittedReviewDiff,
+} from '../../git/review-diff';
 import { opencodeClient } from '../opencode/opencode.controller';
 import { websockets } from '../ws/ws.controller';
 
@@ -75,7 +78,12 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
       return { error: 'OpenCode project not found' };
     }
 
-    const diff = await getDiff({
+    const diff = await getCommittedReviewDiff({
+      baseRef: card.baseBranch,
+      branchRef: newBranch,
+      repoPath: project.worktree,
+    });
+    const uncommittedDiff = await getUncommittedReviewDiff({
       baseRef: card.baseBranch,
       branchRef: newBranch,
       repoPath: project.worktree,
@@ -89,6 +97,8 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
       newBranch,
       projectId: card.projectId,
       sessionId: card.sessionId,
+      uncommittedDiff,
+      uncommittedIsEmpty: uncommittedDiff.trim().length === 0,
     };
   })
   .patch(

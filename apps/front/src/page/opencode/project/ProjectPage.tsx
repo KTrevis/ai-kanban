@@ -12,13 +12,11 @@ export function ProjectPage({
   cardId,
   onCardIdChange,
   projectId,
-  reviewCardId,
   sessionId,
 }: {
   cardId?: string;
   onCardIdChange: (cardId?: string) => void;
   projectId: string;
-  reviewCardId?: string;
   sessionId?: string;
 }) {
   const { data: cards } = useGetKanbanCards(projectId);
@@ -75,7 +73,6 @@ export function ProjectPage({
         cards={cards ?? []}
         cardId={cardId}
         projectId={projectId}
-        reviewCardId={reviewCardId}
         sessionId={sessionId}
         onCardCreated={onCardCreated}
         onCardIdChange={onCardIdChange}

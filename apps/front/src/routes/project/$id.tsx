@@ -6,14 +6,13 @@ export const Route = createFileRoute('/project/$id')({
   component: RouteComponent,
   validateSearch: z.object({
     cardId: z.string().optional(),
-    reviewCardId: z.string().optional(),
     sessionId: z.string().optional(),
   }),
 });
 
 function RouteComponent() {
   const { id } = Route.useParams();
-  const { cardId, reviewCardId, sessionId } = Route.useSearch();
+  const { cardId, sessionId } = Route.useSearch();
   const navigate = Route.useNavigate();
 
   function setCardId(nextCardId?: string) {
@@ -27,7 +26,6 @@ function RouteComponent() {
     <ProjectPage
       cardId={cardId}
       projectId={id}
-      reviewCardId={reviewCardId}
       sessionId={sessionId}
       onCardIdChange={setCardId}
     />

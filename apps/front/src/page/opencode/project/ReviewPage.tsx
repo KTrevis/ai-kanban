@@ -28,18 +28,16 @@ function formatComments(comments: ReviewComment[]) {
   );
 }
 
-export function ReviewPage({
-  cardId,
-  projectId,
-}: {
-  cardId: string;
-  projectId: string;
-}) {
+export function ReviewPage({ cardId }: { cardId: string }) {
   const { data, error, isLoading } = useGetKanbanCardReview(cardId);
+  const projectId = data?.projectId;
   const [mode, setMode] = useState<DiffModeEnum>(DiffModeEnum.Unified);
   const [comments, setComments] = useState<ReviewComment[]>([]);
   const { mutate: sendMessage } = useSendSessionMessage();
-  const files = useMemo(() => splitGitDiff(data?.diff ?? ''), [data?.diff]);
+  const files = useMemo(
+    () => splitGitDiff(data?.uncommittedDiff ?? ''),
+    [data?.uncommittedDiff],
+  );
   const navigate = useNavigate();
 
   return (
@@ -50,7 +48,11 @@ export function ReviewPage({
         newBranch={data?.newBranch}
         projectId={projectId}
         onModeChange={setMode}
-        onSendReview={() =>
+        onSendReview={() => {
+          if (!projectId) {
+            return;
+          }
+
           sendMessage(
             {
               projectId,
@@ -60,19 +62,10 @@ export function ReviewPage({
             {
               onSuccess() {
                 toast.success('Review comments sent');
-                navigate({
-                  to: '/project/$id',
-                  params: {
-                    id: projectId,
-                  },
-                  search: {
-                    sessionId: data?.sessionId ?? undefined,
-                  },
-                });
               },
             },
-          )
-        }
+          );
+        }}
       />
 
       <div className="min-h-0 flex-1 overflow-auto p-6">
@@ -80,7 +73,7 @@ export function ReviewPage({
           error={error}
           comments={comments}
           files={files}
-          isEmpty={data?.isEmpty}
+          isEmpty={data?.uncommittedIsEmpty}
           isLoading={isLoading}
           mode={mode}
           onCommentsChange={setComments}

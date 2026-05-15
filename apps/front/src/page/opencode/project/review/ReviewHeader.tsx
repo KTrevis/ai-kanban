@@ -18,19 +18,21 @@ export function ReviewHeader({
   newBranch?: string;
   onModeChange: (mode: DiffModeEnum) => void;
   onSendReview: () => void;
-  projectId: string;
+  projectId?: string;
 }) {
   return (
     <header className="border-b border-white/10 px-6 py-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
-          <Link
-            to="/project/$id"
-            params={{ id: projectId }}
-            className="text-sm font-medium text-cyan-300 hover:text-cyan-200"
-          >
-            Back to board
-          </Link>
+          {projectId && (
+            <Link
+              to="/project/$id"
+              params={{ id: projectId }}
+              className="text-sm font-medium text-cyan-300 hover:text-cyan-200"
+            >
+              Back to board
+            </Link>
+          )}
           <h1 className="mt-2 truncate text-xl font-semibold text-white">
             Review changes
           </h1>
@@ -40,7 +42,7 @@ export function ReviewHeader({
             </p>
           ) : null}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
           <Button onClick={onSendReview} type="button">
             Send Review
           </Button>

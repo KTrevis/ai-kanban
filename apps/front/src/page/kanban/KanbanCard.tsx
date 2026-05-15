@@ -40,9 +40,8 @@ export function KanbanCard({
         )}
         {card.newBranch && (
           <Link
-            to={`/project/$id`}
-            params={{ id: card.projectId }}
-            search={{ reviewCardId: card.id }}
+            to="/review/$cardId"
+            params={{ cardId: card.id }}
             className="inline-flex font-medium text-violet-300 hover:text-violet-200"
             onClick={(event) => event.stopPropagation()}
           >

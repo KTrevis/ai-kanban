@@ -1,12 +1,16 @@
+import type { KanbanCard } from '#/hooks/queries/kanban/kanban.queries';
 import { SessionMessages } from '#/components/opencode/messages/SessionMessages';
 import { useAppEvent } from '#/hooks/use-app-event';
 import { useEffect, useState } from 'react';
 import { ProjectSessionInput } from './ProjectSessionInput';
+import { ProjectSessionReviewBar } from './ProjectSessionReviewBar';
 
 export function ProjectSessionPanel({
+  card,
   projectId,
   sessionId,
 }: {
+  card?: KanbanCard;
   projectId: string;
   sessionId: string;
 }) {
@@ -25,7 +29,8 @@ export function ProjectSessionPanel({
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">
-      <div className="min-h-0 flex-1 overflow-hidden">
+      <div className="relative min-h-0 flex-1 overflow-hidden">
+        <ProjectSessionReviewBar card={card} />
         <SessionMessages
           id={sessionId}
           waitingForResponse={waitingForSessionResponse}

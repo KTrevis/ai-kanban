@@ -1,7 +1,6 @@
 import type { KanbanCard } from '#/hooks/queries/kanban/kanban.queries';
 import { KanbanPage, type CardMovedEvent } from '#/page/kanban/KanbanPage';
 import { ProjectSessionPanel } from './ProjectSessionPanel';
-import { ReviewPage } from './ReviewPage';
 
 export function ProjectContent({
   cardId,
@@ -10,7 +9,6 @@ export function ProjectContent({
   onCardIdChange,
   onCardMoved,
   projectId,
-  reviewCardId,
   sessionId,
 }: {
   cardId?: string;
@@ -19,15 +17,18 @@ export function ProjectContent({
   onCardIdChange: (cardId?: string) => void;
   onCardMoved: (event: CardMovedEvent) => void;
   projectId: string;
-  reviewCardId?: string;
   sessionId?: string;
 }) {
-  if (reviewCardId) {
-    return <ReviewPage cardId={reviewCardId} projectId={projectId} />;
-  }
-
   if (sessionId) {
-    return <ProjectSessionPanel projectId={projectId} sessionId={sessionId} />;
+    const sessionCard = cards.find((card) => card.sessionId === sessionId);
+
+    return (
+      <ProjectSessionPanel
+        card={sessionCard}
+        projectId={projectId}
+        sessionId={sessionId}
+      />
+    );
   }
 
   return (

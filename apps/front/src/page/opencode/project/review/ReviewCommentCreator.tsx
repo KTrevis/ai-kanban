@@ -31,7 +31,7 @@ export function ReviewCommentCreator({
             }
           }}
           autoFocus
-          className="min-h-24 w-full resize-y rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm !text-white outline-none placeholder:!text-gray-500 focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
+          className="text-xs min-h-24 w-full resize-y rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm !text-white outline-none placeholder:!text-gray-500 focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
           onChange={(event) => setComment(event.target.value)}
           placeholder="Add a review comment..."
           value={comment}
