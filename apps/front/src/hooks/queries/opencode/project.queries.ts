@@ -1,5 +1,5 @@
 import { useEden } from '#/lib/eden/client';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 export type Project = NonNullable<
   ReturnType<typeof useGetProjects>['data']
@@ -26,4 +26,14 @@ export type Command = NonNullable<
 export const useGetProjectCommands = (id: string) => {
   const eden = useEden();
   return useQuery(eden.opencode.project({ id }).commands.get.queryOptions());
+};
+
+export const useGetProjectFiles = (id: string, q: string, enabled: boolean) => {
+  const eden = useEden();
+
+  return useQuery({
+    ...eden.opencode.project({ id }).files.get.queryOptions({ q }),
+    enabled,
+    placeholderData: keepPreviousData,
+  });
 };

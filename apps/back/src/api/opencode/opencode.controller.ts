@@ -49,6 +49,43 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
 
     return { commands };
   })
+  .get(
+    'project/:id/files',
+    async ({ params: { id }, query: { q } }) => {
+      const { data: projects = [] } = await opencodeClient.project.list();
+      const project = projects.find((curr) => curr.id === id);
+
+      if (!project) {
+        return { files: [] };
+      }
+
+      const process = Bun.spawn(
+        ['git', '-C', project.worktree, 'ls-files', '-co', '--exclude-standard'],
+        { stdout: 'pipe' },
+      );
+      const output = await new Response(process.stdout).text();
+      const exitCode = await process.exited;
+
+      if (exitCode !== 0) {
+        return { files: [] };
+      }
+
+      const search = q.toLowerCase();
+
+      return {
+        files: output
+          .split('\n')
+          .filter(Boolean)
+          .filter((file) => file.toLowerCase().includes(search))
+          .slice(0, 50),
+      };
+    },
+    {
+      query: z.object({
+        q: z.string().default(''),
+      }),
+    },
+  )
   .get('project/:id', async ({ params: { id } }) => {
     return {
       sessions: await getProjectSessions(id),

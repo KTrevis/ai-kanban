@@ -4,10 +4,20 @@ import {
   useExecuteSessionCommand,
   useSendSessionMessage,
 } from '#/hooks/mutations/opencode/session.mutations';
-import { useGetProjectCommands } from '#/hooks/queries/opencode/project.queries';
+import {
+  useGetProjectCommands,
+  useGetProjectFiles,
+} from '#/hooks/queries/opencode/project.queries';
 import type { KeyboardEvent } from 'react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+
+function getCurrentFileToken(text: string) {
+  const split = text.split(' ');
+  const lastToken = split.at(-1);
+  if (lastToken?.startsWith('@')) {
+    return lastToken.slice(1);
+  }
+}
 
 export function ProjectSessionInput({
   onWaitingForResponseChange,
@@ -18,13 +28,20 @@ export function ProjectSessionInput({
   projectId: string;
   sessionId: string;
 }) {
-  const [autoComplete, setAutoComplete] = useState<string[]>([]);
+  const [commandAutoComplete, setCommandAutoComplete] = useState<string[]>([]);
+  const [fileSearch, setFileSearch] = useState<string | null>(null);
   const [sessionMessage, setSessionMessage] = useState('');
   const { data: { commands } = { commands: [] } } =
     useGetProjectCommands(projectId);
+  const { data: { files } = { files: [] } } = useGetProjectFiles(
+    projectId,
+    fileSearch ?? '',
+    fileSearch !== null,
+  );
   const { mutate: executeCommand } = useExecuteSessionCommand(projectId);
   const { isPending: isSendingSessionMessage, mutate: sendSessionMessage } =
     useSendSessionMessage();
+  const autoComplete = fileSearch !== null ? files : commandAutoComplete;
 
   function sendCurrentSessionMessage() {
     const message = sessionMessage.trim();
@@ -78,15 +95,25 @@ export function ProjectSessionInput({
   function onInputChange(text: string) {
     setSessionMessage(text);
 
-    if (text.startsWith('/')) {
+    const fileToken = getCurrentFileToken(text);
+    if (fileToken) {
+      setFileSearch(fileToken);
+      setCommandAutoComplete([]);
+      return;
+    }
+
+    setFileSearch(null);
+
+    if (text.startsWith('/') && !text.includes(' ')) {
       text = text.slice(1);
       const filtered = commands
         .filter((curr) => curr.name.includes(text))
         .map((curr) => curr.name);
-      setAutoComplete(filtered);
+      setCommandAutoComplete(filtered);
       return;
     }
-    setAutoComplete([]);
+
+    setCommandAutoComplete([]);
   }
 
   return (
