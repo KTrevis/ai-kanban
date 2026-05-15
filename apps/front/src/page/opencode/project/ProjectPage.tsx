@@ -7,6 +7,8 @@ import {
   useMoveKanbanCards,
 } from '#/hooks/queries/kanban/kanban.queries';
 import { KanbanPage, type CardMovedEvent } from '#/page/kanban/KanbanPage';
+import type { KeyboardEvent } from 'react';
+import { useState } from 'react';
 
 export function ProjectPage({
   cardId,
@@ -19,9 +21,11 @@ export function ProjectPage({
   projectId: string;
   sessionId?: string;
 }) {
+  const [sessionMessage, setSessionMessage] = useState('');
   const { data: cards } = useGetKanbanCards(projectId);
   const { mutate: moveCards } = useMoveKanbanCards(projectId);
-  const { mutate: sendSessionMessage } = useSendSessionMessage();
+  const { isPending: isSendingSessionMessage, mutate: sendSessionMessage } =
+    useSendSessionMessage();
 
   function startAgentSession(card: KanbanCard) {
     sendSessionMessage({
@@ -63,11 +67,55 @@ export function ProjectPage({
     }
   }
 
+  function sendCurrentSessionMessage() {
+    const message = sessionMessage.trim();
+
+    if (!sessionId || !message || isSendingSessionMessage) {
+      return;
+    }
+
+    sendSessionMessage(
+      {
+        message,
+        projectId,
+        sessionId,
+      },
+      {
+        onSuccess: () => setSessionMessage(''),
+      },
+    );
+  }
+
+  function onSessionMessageKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key !== 'Enter' || (!event.metaKey && !event.ctrlKey)) {
+      return;
+    }
+
+    event.preventDefault();
+    sendCurrentSessionMessage();
+  }
+
   return (
     <div className="flex h-full min-h-0">
       <ProjectList selectedProject={projectId} />
       {sessionId ? (
-        <SessionMessages id={sessionId} />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <SessionMessages id={sessionId} />
+          </div>
+          <div
+            className="flex gap-3 border-white/10 border-t bg-gray-950/80 p-4"
+          >
+            <textarea
+              className="min-h-24 flex-1 resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-gray-500 focus:border-cyan-400"
+              disabled={isSendingSessionMessage}
+              onChange={(event) => setSessionMessage(event.target.value)}
+              onKeyDown={onSessionMessageKeyDown}
+              placeholder="Envoyer un message dans la session..."
+              value={sessionMessage}
+            />
+          </div>
+        </div>
       ) : (
         <KanbanPage
           cards={cards ?? []}

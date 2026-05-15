@@ -19,7 +19,8 @@ export async function upsertSessionMessage({
     return { error: 'Project not found' as const, status: 404 as const };
   }
 
-  const targetSessionId = sessionId?.length
+  const sessionExists = sessionId?.length;
+  const targetSessionId = sessionExists
     ? sessionId
     : await createSession(project.worktree);
 
@@ -27,7 +28,8 @@ export async function upsertSessionMessage({
     body: {
       parts: [
         {
-          text: message + `\nSESSION_ID=${targetSessionId}`,
+          text:
+            message + (!sessionExists ? `\nSESSION_ID=${targetSessionId}` : ''),
           type: 'text',
         },
       ],

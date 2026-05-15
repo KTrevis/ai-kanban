@@ -218,6 +218,27 @@ server.registerTool(
 );
 
 server.registerTool(
+  'list_kanban_cards',
+  {
+    description: 'List Kanban cards for a project, ordered by column and position.',
+    inputSchema: {
+      projectId: z.string(),
+    },
+  },
+  async ({ projectId }) => {
+    const response = await fetchKanbanApi(
+      `kanban/cards/${encodeURIComponent(projectId)}`,
+    );
+
+    if (!response.ok) {
+      return textResult(await getApiErrorMessage(response));
+    }
+
+    return jsonResult(await response.json());
+  },
+);
+
+server.registerTool(
   'patch_kanban_card',
   {
     description:

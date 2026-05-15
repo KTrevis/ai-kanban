@@ -23,9 +23,17 @@ function RootComponent() {
   useEffect(() => {
     const handleMessage = ({ data }: { data: WebsocketData }) => {
       if (data.type === 'cards.updated') {
-        console.log('card updated');
         queryClient.invalidateQueries(
           eden.kanban.cards({ projectId: data.projectId }).get.queryOptions(),
+        );
+      }
+
+      if (
+        data.type === 'opencode.message.updated' ||
+        data.type === 'opencode.message.part.updated'
+      ) {
+        queryClient.invalidateQueries(
+          eden.opencode.session({ id: data.sessionId }).get.queryOptions(),
         );
       }
     };
