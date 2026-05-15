@@ -19,3 +19,22 @@ export function useSendSessionMessage() {
     }),
   );
 }
+
+export function useExecuteSessionCommand() {
+  const eden = useEden();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    eden.opencode.session.command.post.mutationOptions({
+      onSuccess({ sessionId }) {
+        if (!sessionId) {
+          return;
+        }
+
+        queryClient.invalidateQueries(
+          eden.opencode.session({ id: sessionId }).get.queryOptions(),
+        );
+      },
+    }),
+  );
+}

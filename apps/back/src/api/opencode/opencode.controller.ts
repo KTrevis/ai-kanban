@@ -6,7 +6,10 @@ import {
 } from '@opencode-ai/sdk';
 import { ENVIRONMENT } from '../../schema/env.schema';
 import { getProjectSessions } from './opencode.sessions';
-import { upsertSessionMessage } from './opencode.upsert-session';
+import {
+  executeSessionCommand,
+  upsertSessionMessage,
+} from './opencode.upsert-session';
 import z from 'zod/v3';
 
 async function canReachOpencode(url: string) {
@@ -77,6 +80,32 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
         projectId: z.string(),
         sessionId: z.optional(z.string()),
         taskTitle: z.optional(z.string()),
+      }),
+    },
+  )
+  .post(
+    'session/command',
+    async ({ body: { args, command, projectId, sessionId }, set }) => {
+      const result = await executeSessionCommand({
+        args,
+        command,
+        projectId,
+        sessionId,
+      });
+
+      if ('error' in result) {
+        set.status = result.status;
+        return { error: result.error };
+      }
+
+      return { sessionId: result.sessionId };
+    },
+    {
+      body: z.object({
+        args: z.optional(z.string()),
+        command: z.string(),
+        projectId: z.string(),
+        sessionId: z.optional(z.string()),
       }),
     },
   );
