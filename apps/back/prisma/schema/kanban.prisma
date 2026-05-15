@@ -6,17 +6,18 @@ enum KanbanColumn {
 }
 
 model KanbanCard {
-  id          String       @id @default(uuid())
-  projectId   String
-  sessionId   String?
-  title       String
-  description String
-  column      KanbanColumn @default(TODO)
-  position    Int
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  newBranch   String
-  baseBranch  String
+  id              String       @id @default(uuid())
+  projectId       String
+  sessionId       String?
+  title           String
+  description     String
+  column          KanbanColumn @default(TODO)
+  position        Int
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  newBranch       String
+  baseBranch      String
+  useTravailleMcp Boolean      @default(true)
 
   @@index([projectId, column, position])
 }

@@ -525,7 +525,8 @@ export const KanbanCardScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   newBranch: 'newBranch',
-  baseBranch: 'baseBranch'
+  baseBranch: 'baseBranch',
+  useTravailleMcp: 'useTravailleMcp'
 } as const
 
 export type KanbanCardScalarFieldEnum = (typeof KanbanCardScalarFieldEnum)[keyof typeof KanbanCardScalarFieldEnum]
@@ -578,6 +579,13 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 

@@ -78,7 +78,8 @@ export const KanbanCardScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   newBranch: 'newBranch',
-  baseBranch: 'baseBranch'
+  baseBranch: 'baseBranch',
+  useTravailleMcp: 'useTravailleMcp'
 } as const
 
 export type KanbanCardScalarFieldEnum = (typeof KanbanCardScalarFieldEnum)[keyof typeof KanbanCardScalarFieldEnum]
