@@ -40,6 +40,13 @@ async function relayOpencodeEvents() {
         delta,
       });
     }
+
+    if (payload.type === 'session.idle') {
+      websockets.sendMessage({
+        type: 'opencode.session.idle',
+        sessionId: payload.properties.sessionID,
+      });
+    }
   }
 }
 

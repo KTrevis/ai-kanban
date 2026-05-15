@@ -1,5 +1,6 @@
 import { SessionMessages } from '#/components/opencode/messages/SessionMessages';
 import { ProjectList } from '#/components/opencode/ProjectList';
+import { useAppEvent } from '#/hooks/use-app-event';
 import { useSendSessionMessage } from '#/hooks/mutations/opencode/session.mutations';
 import {
   type KanbanCard,
@@ -8,7 +9,7 @@ import {
 } from '#/hooks/queries/kanban/kanban.queries';
 import { KanbanPage, type CardMovedEvent } from '#/page/kanban/KanbanPage';
 import type { KeyboardEvent } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function ProjectPage({
   cardId,
@@ -22,10 +23,22 @@ export function ProjectPage({
   sessionId?: string;
 }) {
   const [sessionMessage, setSessionMessage] = useState('');
+  const [waitingForSessionResponse, setWaitingForSessionResponse] =
+    useState(false);
   const { data: cards } = useGetKanbanCards(projectId);
   const { mutate: moveCards } = useMoveKanbanCards(projectId);
   const { isPending: isSendingSessionMessage, mutate: sendSessionMessage } =
     useSendSessionMessage();
+
+  useEffect(() => {
+    setWaitingForSessionResponse(false);
+  }, [sessionId]);
+
+  useAppEvent('opencode.session.idle', ({ sessionId: idleSessionId }) => {
+    if (idleSessionId === sessionId) {
+      setWaitingForSessionResponse(false);
+    }
+  });
 
   function startAgentSession(card: KanbanCard) {
     sendSessionMessage({
@@ -74,6 +87,8 @@ export function ProjectPage({
       return;
     }
 
+    setWaitingForSessionResponse(true);
+
     sendSessionMessage(
       {
         message,
@@ -82,12 +97,13 @@ export function ProjectPage({
       },
       {
         onSuccess: () => setSessionMessage(''),
+        onError: () => setWaitingForSessionResponse(false),
       },
     );
   }
 
   function onSessionMessageKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key !== 'Enter' || (!event.metaKey && !event.ctrlKey)) {
+    if (event.key !== 'Enter' || (!event.metaKey && event.shiftKey)) {
       return;
     }
 
@@ -100,12 +116,13 @@ export function ProjectPage({
       <ProjectList selectedProject={projectId} />
       {sessionId ? (
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 overflow-y-auto">
-            <SessionMessages id={sessionId} />
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <SessionMessages
+              id={sessionId}
+              waitingForResponse={waitingForSessionResponse}
+            />
           </div>
-          <div
-            className="flex gap-3 border-white/10 border-t bg-gray-950/80 p-4"
-          >
+          <div className="flex gap-3 border-white/10 border-t bg-gray-950/80 p-4">
             <textarea
               className="min-h-24 flex-1 resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-gray-500 focus:border-cyan-400"
               disabled={isSendingSessionMessage}

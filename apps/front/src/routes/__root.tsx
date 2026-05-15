@@ -1,47 +1,17 @@
-import { useEffect } from 'react';
 import { Outlet, createRootRoute } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { TanStackDevtools } from '@tanstack/react-devtools';
-import { queryClient } from '#/lib/query-client';
-import { useEden, websocket } from '#/lib/eden/client';
+import { useHandleWsMessages } from '#/hooks/use-handle-ws-messages';
 
 import '../styles.css';
 import { Toaster } from '#/components/ui/sonner';
-
-type WebsocketData = Parameters<
-  Parameters<typeof websocket.subscribe>[0]
->[0]['data'];
 
 export const Route = createRootRoute({
   component: RootComponent,
 });
 
 function RootComponent() {
-  const eden = useEden();
-
-  // TODO: separate hook to handle incoming ws messages
-  useEffect(() => {
-    const handleMessage = ({ data }: { data: WebsocketData }) => {
-      if (data.type === 'cards.updated') {
-        queryClient.invalidateQueries(
-          eden.kanban.cards({ projectId: data.projectId }).get.queryOptions(),
-        );
-      }
-
-      if (
-        data.type === 'opencode.message.updated' ||
-        data.type === 'opencode.message.part.updated'
-      ) {
-        queryClient.invalidateQueries(
-          eden.opencode.session({ id: data.sessionId }).get.queryOptions(),
-        );
-      }
-    };
-    websocket.on('message', handleMessage);
-    return () => {
-      websocket.off('message', handleMessage);
-    };
-  }, []);
+  useHandleWsMessages();
 
   return (
     <div className="bg-gray-800 h-dvh overflow-hidden text-white">

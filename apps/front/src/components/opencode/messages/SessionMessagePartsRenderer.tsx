@@ -47,7 +47,12 @@ export function SessionMessagePartsRenderer({
 }: {
   parts: MessagePart[];
 }) {
-  return dedupeConsecutiveParts(parts).map(({ count, part }) => (
-    <SessionMessagePart count={count} key={part.id} part={part} />
+  return dedupeConsecutiveParts(parts).map(({ count, part }, i) => (
+    <SessionMessagePart
+      count={count}
+      key={part.id}
+      part={part}
+      pulse={i === parts.length - 1}
+    />
   ));
 }

@@ -1,12 +1,15 @@
 import type { MessagePart } from '#/hooks/queries/opencode/session.queries';
+import { cn } from '#/lib/utils';
 import MarkdownPreview from '@uiw/react-markdown-preview';
 
 export function SessionMessagePart({
   count = 1,
   part,
+  pulse,
 }: {
   count?: number;
   part: MessagePart;
+  pulse: boolean;
 }) {
   if (part.type === 'text' && part.synthetic !== true) {
     return (
@@ -18,19 +21,33 @@ export function SessionMessagePart({
   }
   if (part.type === 'reasoning') {
     return (
-      <div className="text-gray-400">Thinking... {formatCount(count)}</div>
+      <div
+        className={cn('text-gray-400', {
+          'animate-pulse': pulse,
+        })}
+      >
+        Thinking... {formatCount(count)}
+      </div>
     );
   }
   if (part.type === 'tool') {
     if (part.state.status === 'error') {
       return (
-        <div className="text-red-500">
+        <div
+          className={cn('text-red-500', {
+            'animate-pulse': pulse,
+          })}
+        >
           Tool call failed{formatCount(count)}: {part.tool} - {part.state.error}
         </div>
       );
     }
     return (
-      <div className="text-gray-400">
+      <div
+        className={cn('text-gray-400', {
+          'animate-pulse': pulse,
+        })}
+      >
         Tool call: {part.tool} {formatCount(count)}
       </div>
     );

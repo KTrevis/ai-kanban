@@ -18,6 +18,10 @@ export const WS_SERVER_PAYLOAD_SCHEMA = z.discriminatedUnion('type', [
     content: z.string().optional(),
     delta: z.string().optional(),
   }),
+  z.object({
+    type: z.literal('opencode.session.idle'),
+    sessionId: z.string(),
+  }),
 ]);
 
 export type WsServerPayload = z.infer<typeof WS_SERVER_PAYLOAD_SCHEMA>;
