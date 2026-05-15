@@ -38,7 +38,7 @@ export function ReviewContent({
     return (
       <ReviewStateMessage
         title="No review diff"
-        detail="This branch has no committed or tracked uncommitted changes against its base branch."
+        detail="This branch has no changes against its base branch. Tracked uncommitted changes are included only when the branch is checked out."
       />
     );
   }

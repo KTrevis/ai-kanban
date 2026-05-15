@@ -31,6 +31,10 @@ export async function getUncommittedReviewDiff({
   branchRef: string;
   repoPath: string;
 }) {
+  if (!(await isCurrentBranch({ branchRef, repoPath }))) {
+    return getCommittedReviewDiff({ baseRef, branchRef, repoPath });
+  }
+
   const { stdout: mergeBase } = await runGit(
     ['merge-base', baseRef, normalizeBranchRef(branchRef)],
     { cwd: repoPath },
@@ -41,6 +45,24 @@ export async function getUncommittedReviewDiff({
   );
 
   return stdout;
+}
+
+async function isCurrentBranch({
+  branchRef,
+  repoPath,
+}: {
+  branchRef: string;
+  repoPath: string;
+}) {
+  const { stdout } = await runGit(['branch', '--show-current'], {
+    cwd: repoPath,
+  });
+
+  return stdout.trim() === getShortBranchName(branchRef);
+}
+
+function getShortBranchName(ref: string) {
+  return ref.startsWith('refs/heads/') ? ref.slice('refs/heads/'.length) : ref;
 }
 
 function normalizeBranchRef(ref: string) {
