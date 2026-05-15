@@ -9,7 +9,7 @@ export function ReviewStateMessage({
     <div className="flex h-full items-center justify-center text-center">
       <div>
         <h2 className="text-lg font-semibold text-white">{title}</h2>
-        {detail ? <p className="mt-2 text-sm text-gray-400">{detail}</p> : null}
+        {detail && <p className="mt-2 text-sm text-gray-400">{detail}</p>}
       </div>
     </div>
   );

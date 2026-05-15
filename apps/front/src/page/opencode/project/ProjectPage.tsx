@@ -69,23 +69,31 @@ export function ProjectPage({
     }
   }
 
+  function renderProjectContent() {
+    if (reviewCardId) {
+      return <ReviewPage cardId={reviewCardId} projectId={projectId} />;
+    }
+
+    if (sessionId) {
+      return <ProjectSessionPanel projectId={projectId} sessionId={sessionId} />;
+    }
+
+    return (
+      <KanbanPage
+        cards={cards ?? []}
+        cardId={cardId}
+        projectId={projectId}
+        onCardIdChange={onCardIdChange}
+        onCardCreated={onCardCreated}
+        onCardMoved={onCardMoved}
+      />
+    );
+  }
+
   return (
     <div className="flex h-full min-h-0">
       <ProjectList selectedProject={projectId} />
-      {reviewCardId ? (
-        <ReviewPage cardId={reviewCardId} projectId={projectId} />
-      ) : sessionId ? (
-        <ProjectSessionPanel projectId={projectId} sessionId={sessionId} />
-      ) : (
-        <KanbanPage
-          cards={cards ?? []}
-          cardId={cardId}
-          projectId={projectId}
-          onCardIdChange={onCardIdChange}
-          onCardCreated={onCardCreated}
-          onCardMoved={onCardMoved}
-        />
-      )}
+      {renderProjectContent()}
     </div>
   );
 }
