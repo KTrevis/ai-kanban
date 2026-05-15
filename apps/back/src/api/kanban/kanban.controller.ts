@@ -88,6 +88,7 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
       isEmpty: diff.trim().length === 0,
       newBranch,
       projectId: card.projectId,
+      sessionId: card.sessionId,
     };
   })
   .patch(

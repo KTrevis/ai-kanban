@@ -1,6 +1,16 @@
+import type { SplitSide } from '@git-diff-view/react';
+
 export type DiffFilePatch = {
   filename: string;
   patch: string;
+};
+
+export type ReviewComment = {
+  line: number;
+  comment: string;
+  file: string;
+  side: SplitSide;
+  date: Date;
 };
 
 export function splitGitDiff(diff: string): DiffFilePatch[] {

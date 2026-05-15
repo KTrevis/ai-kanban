@@ -1,3 +1,4 @@
+import { Button } from '#/components/ui/button';
 import { cn } from '#/lib/utils';
 import { DiffModeEnum } from '@git-diff-view/react';
 import { Link } from '@tanstack/react-router';
@@ -9,12 +10,14 @@ export function ReviewHeader({
   mode,
   newBranch,
   onModeChange,
+  onSendReview,
   projectId,
 }: {
   baseBranch?: string;
   mode: DiffModeEnum;
   newBranch?: string;
   onModeChange: (mode: DiffModeEnum) => void;
+  onSendReview: () => void;
   projectId: string;
 }) {
   return (
@@ -37,19 +40,24 @@ export function ReviewHeader({
             </p>
           ) : null}
         </div>
-        <div className="flex rounded-lg border border-white/10 bg-gray-800 p-1 text-sm">
-          <ModeButton
-            active={mode === DiffModeEnum.SplitGitHub}
-            onClick={() => onModeChange(DiffModeEnum.SplitGitHub)}
-          >
-            Split
-          </ModeButton>
-          <ModeButton
-            active={mode === DiffModeEnum.Unified}
-            onClick={() => onModeChange(DiffModeEnum.Unified)}
-          >
-            Unified
-          </ModeButton>
+        <div className="flex gap-2">
+          <Button onClick={onSendReview} type="button">
+            Send Review
+          </Button>
+          <div className="flex rounded-lg border border-white/10 bg-gray-800 p-1 text-sm">
+            <ModeButton
+              active={mode === DiffModeEnum.SplitGitHub}
+              onClick={() => onModeChange(DiffModeEnum.SplitGitHub)}
+            >
+              Split
+            </ModeButton>
+            <ModeButton
+              active={mode === DiffModeEnum.Unified}
+              onClick={() => onModeChange(DiffModeEnum.Unified)}
+            >
+              Unified
+            </ModeButton>
+          </div>
         </div>
       </div>
     </header>

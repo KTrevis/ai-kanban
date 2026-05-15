@@ -1,18 +1,12 @@
 import { DiffModeEnum, DiffView, SplitSide } from '@git-diff-view/react';
-import type { DiffFilePatch } from './review.utils';
-import { useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import type { DiffFilePatch, ReviewComment } from './review.utils';
 import { ReviewCommentCreator } from './ReviewCommentCreator';
 import MarkdownPreview from '@uiw/react-markdown-preview';
 import './ReviewDiffFile.css';
+import { format } from 'date-fns';
 
-type Comment = {
-  line: number;
-  comment: string;
-  file: string;
-  side: SplitSide;
-};
-
-function buildExtendedData(comments: Comment[], side: SplitSide) {
+function buildExtendedData(comments: ReviewComment[], side: SplitSide) {
   return comments.reduce(
     (acc, curr) => {
       if (curr.side !== side) {
@@ -24,20 +18,21 @@ function buildExtendedData(comments: Comment[], side: SplitSide) {
       acc[curr.line].data.push(curr);
       return acc;
     },
-    {} as Record<string, { data: Comment[] }>,
+    {} as Record<string, { data: ReviewComment[] }>,
   );
 }
 
 export function ReviewDiffFile({
+  comments,
   file,
   mode,
+  onCommentsChange,
 }: {
+  comments: ReviewComment[];
   file: DiffFilePatch;
   mode: DiffModeEnum;
+  onCommentsChange: Dispatch<SetStateAction<ReviewComment[]>>;
 }) {
-  const [comments, setComments] = useState<Comment[]>([]);
-  console.log(comments);
-
   return (
     <article className="overflow-hidden rounded-xl border border-white/10">
       <div className="border-b border-white/10 px-4 py-3 font-mono text-sm">
@@ -48,13 +43,14 @@ export function ReviewDiffFile({
         renderWidgetLine={({ onClose, side, lineNumber }) => (
           <ReviewCommentCreator
             onSubmit={(comment) =>
-              setComments([
-                ...comments,
+              onCommentsChange((current) => [
+                ...current,
                 {
                   comment,
                   line: lineNumber,
                   file: file.filename,
                   side,
+                  date: new Date(),
                 },
               ])
             }
@@ -65,18 +61,27 @@ export function ReviewDiffFile({
           newFile: buildExtendedData(comments, SplitSide.new),
           oldFile: buildExtendedData(comments, SplitSide.old),
         }}
-        renderExtendLine={({ data, lineNumber, diffFile }) => (
-          <div className="flex">
+        renderExtendLine={({ data }) => (
+          <div className="flex border-y border-gray-700 py-2">
             <div className="w-[1%] min-w-25" />
-            <MarkdownPreview
-              className="review-comment-markdown"
-              source={data.map((curr) => curr.comment).join()}
-              style={{
-                background: 'transparent',
-                fontSize: 14,
-                color: 'white',
-              }}
-            />
+            <div>
+              {data.map((curr) => (
+                <div>
+                  <div className="text-white!">
+                    {format(curr.date, 'dd-MM-yyyy HH:mm:ss')}
+                  </div>
+                  <MarkdownPreview
+                    className="review-comment-markdown"
+                    source={curr.comment}
+                    style={{
+                      background: 'transparent',
+                      fontSize: 14,
+                      color: 'white',
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         )}
         data={{
