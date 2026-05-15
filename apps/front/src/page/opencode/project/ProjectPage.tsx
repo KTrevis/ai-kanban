@@ -5,9 +5,8 @@ import {
   useGetKanbanCards,
   useMoveKanbanCards,
 } from '#/hooks/queries/kanban/kanban.queries';
-import { KanbanPage, type CardMovedEvent } from '#/page/kanban/KanbanPage';
-import { ProjectSessionPanel } from './ProjectSessionPanel';
-import { ReviewPage } from './ReviewPage';
+import type { CardMovedEvent } from '#/page/kanban/KanbanPage';
+import { ProjectContent } from './ProjectContent';
 
 export function ProjectPage({
   cardId,
@@ -69,31 +68,19 @@ export function ProjectPage({
     }
   }
 
-  function renderProjectContent() {
-    if (reviewCardId) {
-      return <ReviewPage cardId={reviewCardId} projectId={projectId} />;
-    }
-
-    if (sessionId) {
-      return <ProjectSessionPanel projectId={projectId} sessionId={sessionId} />;
-    }
-
-    return (
-      <KanbanPage
-        cards={cards ?? []}
-        cardId={cardId}
-        projectId={projectId}
-        onCardIdChange={onCardIdChange}
-        onCardCreated={onCardCreated}
-        onCardMoved={onCardMoved}
-      />
-    );
-  }
-
   return (
     <div className="flex h-full min-h-0">
       <ProjectList selectedProject={projectId} />
-      {renderProjectContent()}
+      <ProjectContent
+        cards={cards ?? []}
+        cardId={cardId}
+        projectId={projectId}
+        reviewCardId={reviewCardId}
+        sessionId={sessionId}
+        onCardCreated={onCardCreated}
+        onCardIdChange={onCardIdChange}
+        onCardMoved={onCardMoved}
+      />
     </div>
   );
 }

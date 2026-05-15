@@ -6,22 +6,26 @@ import { ReviewHeader } from './review/ReviewHeader';
 import { splitGitDiff, type ReviewComment } from './review/review.utils';
 import { useSendSessionMessage } from '#/hooks/mutations/opencode/session.mutations';
 import { useNavigate } from '@tanstack/react-router';
+import { toast } from 'sonner';
 
 function formatComments(comments: ReviewComment[]) {
   const PREPROMPT = `
-    Utilise le MCP travaille pour corriger les retours que t'a fait l'utilisateur.
+    Utilise le MCP travaille pour modifier les fichier afin de répondre aux retours que t'a fait l'utilisateur.
     S'il s'agit d'une question, réponds directement dans le tchat.
     `;
 
-  return comments
-    .map(
-      ({ file, line, side, comment }) => `
+  return (
+    PREPROMPT +
+    comments
+      .map(
+        ({ file, line, side, comment }) => `
       File : ${file}:${line}
       Side : ${side === SplitSide.new ? 'New' : 'Old'}
       Comment : ${comment}
       `,
-    )
-    .join('\n\n');
+      )
+      .join('\n\n')
+  );
 }
 
 export function ReviewPage({
@@ -55,6 +59,7 @@ export function ReviewPage({
             },
             {
               onSuccess() {
+                toast.success('Review comments sent');
                 navigate({
                   to: '/project/$id',
                   params: {
