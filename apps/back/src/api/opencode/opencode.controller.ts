@@ -39,6 +39,15 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
     const { data = [] } = await opencodeClient.project.list();
     return data.filter((curr) => curr.id !== 'global');
   })
+  .get('project/:id/commands', async ({ params: { id } }) => {
+    const { data: projects = [] } = await opencodeClient.project.list();
+    const project = projects.find((curr) => curr.id === id);
+    const { data: commands = [] } = await opencodeClient.command.list({
+      query: { directory: project?.worktree },
+    });
+
+    return { commands };
+  })
   .get('project/:id', async ({ params: { id } }) => {
     return {
       sessions: await getProjectSessions(id),
