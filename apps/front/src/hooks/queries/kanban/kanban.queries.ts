@@ -6,6 +6,14 @@ export function useGetKanbanCards(projectId: string) {
   return useQuery(eden.kanban.cards({ projectId }).get.queryOptions());
 }
 
+export function useGetKanbanCardReview(cardId?: string) {
+  const eden = useEden();
+  return useQuery({
+    ...eden.kanban.card({ cardId: cardId ?? '' }).review.get.queryOptions(),
+    enabled: Boolean(cardId),
+  });
+}
+
 export type KanbanCards = NonNullable<
   ReturnType<typeof useGetKanbanCards>['data']
 >;

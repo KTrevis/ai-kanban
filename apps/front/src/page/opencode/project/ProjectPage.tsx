@@ -7,16 +7,19 @@ import {
 } from '#/hooks/queries/kanban/kanban.queries';
 import { KanbanPage, type CardMovedEvent } from '#/page/kanban/KanbanPage';
 import { ProjectSessionPanel } from './ProjectSessionPanel';
+import { ReviewPage } from './ReviewPage';
 
 export function ProjectPage({
   cardId,
   onCardIdChange,
   projectId,
+  reviewCardId,
   sessionId,
 }: {
   cardId?: string;
   onCardIdChange: (cardId?: string) => void;
   projectId: string;
+  reviewCardId?: string;
   sessionId?: string;
 }) {
   const { data: cards } = useGetKanbanCards(projectId);
@@ -69,7 +72,9 @@ export function ProjectPage({
   return (
     <div className="flex h-full min-h-0">
       <ProjectList selectedProject={projectId} />
-      {sessionId ? (
+      {reviewCardId ? (
+        <ReviewPage cardId={reviewCardId} projectId={projectId} />
+      ) : sessionId ? (
         <ProjectSessionPanel projectId={projectId} sessionId={sessionId} />
       ) : (
         <KanbanPage

@@ -1,5 +1,5 @@
 import type { KanbanCard as KanbanCardType } from '#/hooks/queries/kanban/kanban.queries';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import MarkdownPreview from '@uiw/react-markdown-preview';
 
 export function KanbanCard({
@@ -11,8 +11,6 @@ export function KanbanCard({
   isOverlay?: boolean;
   onClick?: () => void;
 }) {
-  const navigate = useNavigate();
-
   return (
     <article
       onClick={onClick}
@@ -28,17 +26,30 @@ export function KanbanCard({
           style={{ background: 'transparent', fontSize: 14 }}
         />
       </div>
-      {card.sessionId && (
-        <Link
-          to={`/project/$id`}
-          params={{ id: card.projectId }}
-          search={{ sessionId: card.sessionId }}
-          className="mt-3 inline-flex font-medium text-cyan-300 hover:text-cyan-200"
-          onClick={(event) => event.stopPropagation()}
-        >
-          Open session
-        </Link>
-      )}
+      <div className="mt-3 flex flex-wrap gap-3">
+        {card.sessionId && (
+          <Link
+            to={`/project/$id`}
+            params={{ id: card.projectId }}
+            search={{ sessionId: card.sessionId }}
+            className="inline-flex font-medium text-cyan-300 hover:text-cyan-200"
+            onClick={(event) => event.stopPropagation()}
+          >
+            Open session
+          </Link>
+        )}
+        {card.newBranch && (
+          <Link
+            to={`/project/$id`}
+            params={{ id: card.projectId }}
+            search={{ reviewCardId: card.id }}
+            className="inline-flex font-medium text-violet-300 hover:text-violet-200"
+            onClick={(event) => event.stopPropagation()}
+          >
+            Review changes
+          </Link>
+        )}
+      </div>
     </article>
   );
 }
