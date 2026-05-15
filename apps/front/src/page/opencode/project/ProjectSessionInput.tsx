@@ -1,4 +1,3 @@
-import { AutoCompleteCard } from '#/components/opencode/AutocompleteCard';
 import {
   parseCommand,
   useExecuteSessionCommand,
@@ -10,6 +9,7 @@ import {
 } from '#/hooks/queries/opencode/project.queries';
 import type { KeyboardEvent } from 'react';
 import { useState } from 'react';
+import { AutoComplete } from './AutoComplete';
 
 function getCurrentFileToken(text: string) {
   const split = text.split(' ');
@@ -50,6 +50,7 @@ export function ProjectSessionInput({
       return;
     }
     const command = parseCommand(sessionMessage);
+    onWaitingForResponseChange(true);
 
     if (command) {
       executeCommand(
@@ -66,7 +67,6 @@ export function ProjectSessionInput({
         },
       );
       setSessionMessage('');
-      onWaitingForResponseChange(true);
       return;
     }
 
@@ -84,6 +84,10 @@ export function ProjectSessionInput({
   }
 
   function onSessionMessageKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.defaultPrevented) {
+      return;
+    }
+
     if (event.key !== 'Enter' || (!event.metaKey && event.shiftKey)) {
       return;
     }
@@ -116,15 +120,25 @@ export function ProjectSessionInput({
     setCommandAutoComplete([]);
   }
 
+  function onAutoCompleteSelect(suggestion: string) {
+    if (fileSearch !== null) {
+      setSessionMessage((current) =>
+        current.replace(/@[^\s]*$/, `@${suggestion} `),
+      );
+      setFileSearch(null);
+      return;
+    }
+
+    setSessionMessage(`/${suggestion} `);
+    setCommandAutoComplete([]);
+  }
+
   return (
     <div className="relative flex gap-3 border-white/10 border-t bg-gray-950/80 p-4">
-      {autoComplete.length > 0 && (
-        <div className="absolute right-4 bottom-full left-4 z-50 mb-2 max-h-72 overflow-y-auto rounded-lg border border-white/10 bg-gray-950/95 p-2 shadow-2xl">
-          {autoComplete.map((curr) => (
-            <AutoCompleteCard key={curr} name={curr} />
-          ))}
-        </div>
-      )}
+      <AutoComplete
+        onSelect={onAutoCompleteSelect}
+        suggestions={autoComplete}
+      />
       <textarea
         className="min-h-24 flex-1 resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-gray-500 focus:border-cyan-400"
         disabled={isSendingSessionMessage}

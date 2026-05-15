@@ -40,7 +40,9 @@ export function ProjectPage({
         Avant de modifier le code, mets à jour la carte Kanban avec travaille_patch_kanban_card en définissant newBranch avec le nom de branche choisi.
         Utilise ensuite exactement ce même nom de branche pour tous les outils MCP travaille qui demandent branchRef.
         Avant de commencer ta tâche, rajoue le SESSION_ID à la carte.
-        Quand tu as fini, place la carte dans la colonne REVIEW.`,
+        Quand tu as fini, place la carte dans la colonne REVIEW.
+        Si jamais la carte te demande explicitement de ne pas écrire de code, ne crée pas la branche, réponds juste dans la conversation au message.
+        Tu dois tout de même lire le code si tu en as besoin pour répondre à la question.`,
     });
   }
 

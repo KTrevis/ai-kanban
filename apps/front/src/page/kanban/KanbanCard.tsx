@@ -1,5 +1,5 @@
 import type { KanbanCard as KanbanCardType } from '#/hooks/queries/kanban/kanban.queries';
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import MarkdownPreview from '@uiw/react-markdown-preview';
 
 export function KanbanCard({
@@ -12,18 +12,6 @@ export function KanbanCard({
   onClick?: () => void;
 }) {
   const navigate = useNavigate();
-
-  function openSession() {
-    if (!card.sessionId) {
-      return;
-    }
-
-    navigate({
-      to: '/project/$id',
-      params: { id: card.projectId },
-      search: { sessionId: card.sessionId },
-    });
-  }
 
   return (
     <article
@@ -41,16 +29,15 @@ export function KanbanCard({
         />
       </div>
       {card.sessionId && (
-        <button
+        <Link
+          to={`/project/$id`}
+          params={{ id: card.projectId }}
+          search={{ sessionId: card.sessionId }}
           className="mt-3 inline-flex font-medium text-cyan-300 hover:text-cyan-200"
-          onClick={(event) => {
-            event.stopPropagation();
-            openSession();
-          }}
-          type="button"
+          onClick={(event) => event.stopPropagation()}
         >
           Open session
-        </button>
+        </Link>
       )}
     </article>
   );
