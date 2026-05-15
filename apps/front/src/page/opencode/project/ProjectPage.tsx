@@ -56,7 +56,8 @@ export function ProjectPage({
         Choisis un nom de branche court et descriptif au format ai/<slug>, par exemple ai/fix-login ou ai/add-kanban-filter.
         Avant de modifier le code, mets à jour la carte Kanban avec travaille_patch_kanban_card en définissant newBranch avec le nom de branche choisi.
         Utilise ensuite exactement ce même nom de branche pour tous les outils MCP travaille qui demandent branchRef.
-        Quand tu as fini, place la carte dans la colonne REVIEW, et rajoute lui le SESSION_ID`,
+        Avant de commencer ta tâche, rajoue le SESSION_ID à la carte.
+        Quand tu as fini, place la carte dans la colonne REVIEW.`,
     });
   }
 

@@ -37,7 +37,7 @@ export function KanbanCard({
         <MarkdownPreview
           className="kanban-card-markdown"
           source={card.description}
-          style={{ background: 'transparent' }}
+          style={{ background: 'transparent', fontSize: 14 }}
         />
       </div>
       {card.sessionId && (
