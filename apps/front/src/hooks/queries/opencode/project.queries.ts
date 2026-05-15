@@ -18,3 +18,12 @@ export const useGetProjectById = (id: string) => {
   const eden = useEden();
   return useQuery(eden.opencode.project({ id }).get.queryOptions());
 };
+
+export type Command = NonNullable<
+  ReturnType<typeof useGetProjectCommands>['data']
+>['commands'][number];
+
+export const useGetProjectCommands = (id: string) => {
+  const eden = useEden();
+  return useQuery(eden.opencode.project({ id }).commands.get.queryOptions());
+};
