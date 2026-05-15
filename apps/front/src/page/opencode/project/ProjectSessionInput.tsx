@@ -1,8 +1,13 @@
 import { AutoCompleteCard } from '#/components/opencode/AutocompleteCard';
-import { useSendSessionMessage } from '#/hooks/mutations/opencode/session.mutations';
+import {
+  parseCommand,
+  useExecuteSessionCommand,
+  useSendSessionMessage,
+} from '#/hooks/mutations/opencode/session.mutations';
 import { useGetProjectCommands } from '#/hooks/queries/opencode/project.queries';
 import type { KeyboardEvent } from 'react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export function ProjectSessionInput({
   onWaitingForResponseChange,
@@ -17,6 +22,7 @@ export function ProjectSessionInput({
   const [sessionMessage, setSessionMessage] = useState('');
   const { data: { commands } = { commands: [] } } =
     useGetProjectCommands(projectId);
+  const { mutate: executeCommand } = useExecuteSessionCommand(projectId);
   const { isPending: isSendingSessionMessage, mutate: sendSessionMessage } =
     useSendSessionMessage();
 
@@ -26,8 +32,26 @@ export function ProjectSessionInput({
     if (!message || isSendingSessionMessage) {
       return;
     }
+    const command = parseCommand(sessionMessage);
 
-    onWaitingForResponseChange(true);
+    if (command) {
+      executeCommand(
+        {
+          command: command.name,
+          args: command.args,
+          projectId,
+          sessionId,
+        },
+        {
+          onSettled() {
+            onWaitingForResponseChange(false);
+          },
+        },
+      );
+      setSessionMessage('');
+      onWaitingForResponseChange(true);
+      return;
+    }
 
     sendSessionMessage(
       {

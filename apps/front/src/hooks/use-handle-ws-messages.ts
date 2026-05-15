@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEden, websocket } from '#/lib/eden/client';
 import { dispatchAppEvent } from './use-app-event';
+import { useInvalidateSessionMessages } from './queries/opencode/session.queries';
 
 type WebsocketData = Parameters<
   Parameters<typeof websocket.subscribe>[0]
@@ -9,6 +10,7 @@ type WebsocketData = Parameters<
 
 export function useHandleWsMessages() {
   const eden = useEden();
+  const invalidateSessionMessages = useInvalidateSessionMessages();
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -24,9 +26,7 @@ export function useHandleWsMessages() {
         data.type === 'opencode.message.part.updated' ||
         data.type === 'opencode.session.idle'
       ) {
-        queryClient.invalidateQueries(
-          eden.opencode.session({ id: data.sessionId }).get.queryOptions(),
-        );
+        invalidateSessionMessages(data.sessionId);
       }
 
       if (data.type === 'opencode.session.idle') {
@@ -41,5 +41,5 @@ export function useHandleWsMessages() {
     return () => {
       websocket.off('message', handleMessage);
     };
-  }, [eden, queryClient]);
+  }, [eden, invalidateSessionMessages, queryClient]);
 }

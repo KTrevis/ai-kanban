@@ -5,11 +5,9 @@ import {
   type OpencodeClient,
 } from '@opencode-ai/sdk';
 import { ENVIRONMENT } from '../../schema/env.schema';
+import { executeSessionCommand } from './opencode.execute-command';
 import { getProjectSessions } from './opencode.sessions';
-import {
-  executeSessionCommand,
-  upsertSessionMessage,
-} from './opencode.upsert-session';
+import { upsertSessionMessage } from './opencode.upsert-session';
 import z from 'zod/v3';
 
 async function canReachOpencode(url: string) {
@@ -93,6 +91,7 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
         sessionId,
       });
 
+      // TODO: seems like a good pattern, except it probably should be in a middleware
       if ('error' in result) {
         set.status = result.status;
         return { error: result.error };

@@ -1,16 +1,15 @@
 import { opencodeClient } from './opencode.controller';
-import { notifyAgentTaskStarted } from '../../lib/notifications';
 
-export async function upsertSessionMessage({
-  message,
+export async function executeSessionCommand({
+  args,
+  command,
   projectId,
   sessionId,
-  taskTitle,
 }: {
-  message: string;
+  args?: string;
+  command: string;
   projectId: string;
   sessionId?: string;
-  taskTitle?: string;
 }) {
   const { data: projects } = await opencodeClient.project.list();
   const project = projects?.find((project) => project.id === projectId);
@@ -19,25 +18,18 @@ export async function upsertSessionMessage({
     return { error: 'Project not found' as const, status: 404 as const };
   }
 
-  const sessionExists = sessionId?.length;
-  const targetSessionId = sessionExists
+  const targetSessionId = sessionId?.length
     ? sessionId
     : await createSession(project.worktree);
 
-  opencodeClient.session.promptAsync({
+  await opencodeClient.session.command({
     body: {
-      parts: [
-        {
-          text:
-            message + (!sessionExists ? `\nSESSION_ID=${targetSessionId}` : ''),
-          type: 'text',
-        },
-      ],
+      arguments: args ?? '',
+      command,
     },
     path: { id: targetSessionId },
     query: { directory: project.worktree },
   });
-  notifyAgentTaskStarted(taskTitle);
 
   return { sessionId: targetSessionId };
 }

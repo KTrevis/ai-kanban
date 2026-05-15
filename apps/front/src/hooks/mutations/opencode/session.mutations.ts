@@ -1,9 +1,12 @@
 import { useEden } from '#/lib/eden/client';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInvalidateSessionMessages } from '#/hooks/queries/opencode/session.queries';
+import { useMutation } from '@tanstack/react-query';
+import { useGetProjectCommands } from '#/hooks/queries/opencode/project.queries';
+import { toast } from 'sonner';
 
 export function useSendSessionMessage() {
   const eden = useEden();
-  const queryClient = useQueryClient();
+  const invalidateSessionMessages = useInvalidateSessionMessages();
 
   return useMutation(
     eden.opencode.session.message.post.mutationOptions({
@@ -12,28 +15,40 @@ export function useSendSessionMessage() {
           return;
         }
 
-        queryClient.invalidateQueries(
-          eden.opencode.session({ id: sessionId }).get.queryOptions(),
-        );
+        invalidateSessionMessages(sessionId);
       },
     }),
   );
 }
 
-export function useExecuteSessionCommand() {
+export function parseCommand(command: string) {
+  if (!command.startsWith('/')) {
+    return null;
+  }
+  const split = command.slice(1).split(' ');
+  const name = split[0];
+  const args = split.slice(1).join(' ');
+  return { name, args };
+}
+
+export function useExecuteSessionCommand(projectId: string) {
+  const { data: { commands } = { commands: [] } } =
+    useGetProjectCommands(projectId);
   const eden = useEden();
-  const queryClient = useQueryClient();
+  const invalidateSessionMessages = useInvalidateSessionMessages();
 
   return useMutation(
     eden.opencode.session.command.post.mutationOptions({
-      onSuccess({ sessionId }) {
+      onMutate({ command, sessionId }) {
         if (!sessionId) {
           return;
         }
+        if (!commands.map((curr) => curr.name).includes(command)) {
+          toast.error('This command does not exist');
+          return;
+        }
 
-        queryClient.invalidateQueries(
-          eden.opencode.session({ id: sessionId }).get.queryOptions(),
-        );
+        invalidateSessionMessages(sessionId);
       },
     }),
   );
