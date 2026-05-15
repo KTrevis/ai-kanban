@@ -3,6 +3,8 @@ import { prisma } from '../../lib/prisma';
 import z from 'zod/v3';
 import { KanbanColumn } from '../../generated/prisma/enums';
 import { notifyAgentTaskFinished } from '../../lib/notifications';
+import { getDiff } from '../../git/virtual-branch-writer';
+import { opencodeClient } from '../opencode/opencode.controller';
 import { websockets } from '../ws/ws.controller';
 
 const KANBAN_COLUMNS_SCHEMA = z.union([
@@ -48,6 +50,45 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
     }
 
     return card;
+  })
+  .get('card/:cardId/review', async ({ params: { cardId }, set }) => {
+    const card = await prisma.kanbanCard.findUnique({
+      where: { id: cardId },
+    });
+
+    if (!card) {
+      set.status = 404;
+      return { error: 'Kanban card not found' };
+    }
+
+    const newBranch = card.newBranch.trim();
+    if (!newBranch) {
+      set.status = 400;
+      return { error: 'Kanban card has no linked branch to review' };
+    }
+
+    const { data: projects = [] } = await opencodeClient.project.list();
+    const project = projects.find((project) => project.id === card.projectId);
+
+    if (!project) {
+      set.status = 404;
+      return { error: 'OpenCode project not found' };
+    }
+
+    const diff = await getDiff({
+      baseRef: card.baseBranch,
+      branchRef: newBranch,
+      repoPath: project.worktree,
+    });
+
+    return {
+      baseBranch: card.baseBranch,
+      cardId: card.id,
+      diff,
+      isEmpty: diff.trim().length === 0,
+      newBranch,
+      projectId: card.projectId,
+    };
   })
   .patch(
     'cards',
