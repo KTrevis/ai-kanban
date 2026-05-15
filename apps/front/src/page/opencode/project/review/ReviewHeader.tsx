@@ -36,11 +36,6 @@ export function ReviewHeader({
           <h1 className="mt-2 truncate text-xl font-semibold text-white">
             Review changes
           </h1>
-          {baseBranch && newBranch ? (
-            <p className="mt-1 text-sm text-gray-400">
-              {baseBranch}...{newBranch}
-            </p>
-          ) : null}
         </div>
         <div className="flex flex-wrap justify-end gap-2">
           <Button onClick={onSendReview} type="button">
