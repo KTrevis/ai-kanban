@@ -1,6 +1,4 @@
 import { Outlet, createRootRoute } from '@tanstack/react-router';
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
-import { TanStackDevtools } from '@tanstack/react-devtools';
 import { useHandleWsMessages } from '#/hooks/use-handle-ws-messages';
 
 import '../styles.css';
@@ -19,17 +17,6 @@ function RootComponent() {
         <Outlet />
         <Toaster richColors />
       </main>
-      <TanStackDevtools
-        config={{
-          position: 'bottom-right',
-        }}
-        plugins={[
-          {
-            name: 'TanStack Router',
-            render: <TanStackRouterDevtoolsPanel />,
-          },
-        ]}
-      />
     </div>
   );
 }
