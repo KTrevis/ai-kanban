@@ -46,21 +46,7 @@ export function ReviewHeader({
             {newBranch} <Copy className="size-4" />
           </div>
         </div>
-        <div className="flex flex-wrap justify-end gap-2">
-          {projectId && sessionId && (
-            <Button asChild variant="outline">
-              <Link
-                to="/project/$id"
-                params={{ id: projectId }}
-                search={{ sessionId }}
-              >
-                Open chat
-              </Link>
-            </Button>
-          )}
-          <Button onClick={onSendReview} type="button">
-            Send Review
-          </Button>
+        <div className="flex flex-col items-end gap-2">
           <div className="flex rounded-lg border border-white/10 bg-gray-800 p-1 text-sm">
             <ModeButton
               active={mode === DiffModeEnum.SplitGitHub}
@@ -74,6 +60,22 @@ export function ReviewHeader({
             >
               Unified
             </ModeButton>
+          </div>
+          <div className="flex flex-wrap justify-end gap-2">
+            {projectId && sessionId && (
+              <Button asChild variant="outline">
+                <Link
+                  to="/project/$id"
+                  params={{ id: projectId }}
+                  search={{ sessionId }}
+                >
+                  Open chat
+                </Link>
+              </Button>
+            )}
+            <Button onClick={onSendReview} type="button">
+              Send Review
+            </Button>
           </div>
         </div>
       </div>
