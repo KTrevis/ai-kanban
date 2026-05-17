@@ -10,22 +10,10 @@ const HIDDEN_PROJECTS_STORAGE_KEY = 'travaille.hiddenProjects';
 const hiddenProjectIdsQueryKey = ['opencode', 'hidden-project-ids'] as const;
 
 function readHiddenProjectIds() {
-  if (typeof window === 'undefined') {
-    return [] as string[];
-  }
+  const value = window.localStorage.getItem(HIDDEN_PROJECTS_STORAGE_KEY);
+  const parsed = JSON.parse(value ?? '[]');
 
-  try {
-    const value = window.localStorage.getItem(HIDDEN_PROJECTS_STORAGE_KEY);
-    const parsed = value ? JSON.parse(value) : [];
-
-    return Array.isArray(parsed)
-      ? parsed.filter(
-          (projectId): projectId is string => typeof projectId === 'string',
-        )
-      : [];
-  } catch {
-    return [] as string[];
-  }
+  return parsed;
 }
 
 function writeHiddenProjectIds(projectIds: Array<string>) {
