@@ -57,7 +57,6 @@ export function ReviewPage({ cardId }: { cardId: string }) {
       <ReviewHeader
         mode={mode}
         newBranch={data?.newBranch}
-        projectId={projectId}
         onBack={goBack}
         onModeChange={setMode}
         onSendReview={() => {

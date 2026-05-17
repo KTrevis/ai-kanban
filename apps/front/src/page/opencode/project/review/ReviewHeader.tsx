@@ -11,28 +11,24 @@ export function ReviewHeader({
   onBack,
   onModeChange,
   onSendReview,
-  projectId,
 }: {
   mode: DiffModeEnum;
   newBranch?: string;
   onBack: () => void;
   onModeChange: (mode: DiffModeEnum) => void;
   onSendReview: () => void;
-  projectId?: string;
 }) {
   return (
     <header className="border-b border-white/10 px-6 py-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
-          {projectId && (
-            <button
-              type="button"
-              onClick={onBack}
-              className="cursor-pointer text-sm font-medium text-cyan-300 hover:text-cyan-200"
-            >
-              Back
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={onBack}
+            className="cursor-pointer text-sm font-medium text-cyan-300 hover:text-cyan-200"
+          >
+            Back
+          </button>
           <h1 className="mt-2 truncate text-xl font-semibold text-white">
             Review changes
           </h1>
