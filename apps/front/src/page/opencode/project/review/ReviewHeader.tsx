@@ -48,7 +48,7 @@ export function ReviewHeader({
         </div>
         <div className="flex flex-wrap justify-end gap-2">
           {projectId && sessionId && (
-            <Button asChild variant="outline" type="button">
+            <Button asChild variant="outline">
               <Link
                 to="/project/$id"
                 params={{ id: projectId }}
