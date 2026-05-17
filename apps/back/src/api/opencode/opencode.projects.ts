@@ -11,7 +11,7 @@ export type StoredProject = {
 export async function listProjects() {
   return prisma.$queryRaw<Array<StoredProject>>`
     SELECT id, name, worktree, createdAt, updatedAt
-    FROM Project
+    FROM "Project"
     WHERE id <> 'global'
     ORDER BY name COLLATE NOCASE ASC
   `;
@@ -20,7 +20,7 @@ export async function listProjects() {
 export async function getProjectById(id: string) {
   const projects = await prisma.$queryRaw<Array<StoredProject>>`
     SELECT id, name, worktree, createdAt, updatedAt
-    FROM Project
+    FROM "Project"
     WHERE id = ${id}
     LIMIT 1
   `;
