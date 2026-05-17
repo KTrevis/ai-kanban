@@ -27,6 +27,7 @@ export function CreateKanbanCardModalContent({
   const [title, setTitle] = useState(card?.title ?? '');
   const [description, setDescription] = useState(card?.description ?? '');
   const [baseBranch, setBaseBranch] = useState(card?.baseBranch ?? 'HEAD');
+  const [newBranch, setNewBranch] = useState(card?.newBranch ?? '');
   const [useTravailleMcp, setUseTravailleMcp] = useState(
     card?.useTravailleMcp ?? true,
   );
@@ -55,6 +56,7 @@ export function CreateKanbanCardModalContent({
     setTitle(card?.title ?? '');
     setDescription(nextDescription);
     setBaseBranch(card?.baseBranch ?? 'HEAD');
+    setNewBranch(card?.newBranch ?? '');
     setUseTravailleMcp(card?.useTravailleMcp ?? true);
   }, [card]);
 
@@ -64,6 +66,7 @@ export function CreateKanbanCardModalContent({
     const trimmedTitle = title.trim();
     const trimmedDescription = description.trim();
     const trimmedBaseBranch = baseBranch.trim();
+    const trimmedNewBranch = newBranch.trim();
 
     if (!trimmedTitle || !trimmedBaseBranch) {
       return;
@@ -77,12 +80,14 @@ export function CreateKanbanCardModalContent({
       projectId,
       title: trimmedTitle,
       useTravailleMcp,
+      ...(isEditing ? { newBranch: trimmedNewBranch } : {}),
     };
 
     const onSuccess = () => {
       setTitle('');
       setDescription('');
       setBaseBranch('HEAD');
+      setNewBranch('');
       setUseTravailleMcp(true);
       onOpenChange(false);
     };
@@ -164,13 +169,25 @@ export function CreateKanbanCardModalContent({
           />
         </label>
 
-        <LinkedSession
-          disabled={isPending}
-          isRemoving={isUpdating}
-          onRemove={handleClearSession}
-          sessionId={card?.sessionId ?? undefined}
-        />
-
+        {isEditing && (
+          <>
+            <LinkedSession
+              disabled={isPending}
+              isRemoving={isUpdating}
+              onRemove={handleClearSession}
+              sessionId={card?.sessionId ?? undefined}
+            />
+            <label className="block space-y-2 text-sm font-medium text-gray-100">
+              <span>Linked branch</span>
+              <input
+                className="w-full rounded-lg border border-white/20 bg-gray-800 px-3 py-2 text-sm text-white outline-none placeholder:text-gray-500 focus:border-cyan-400"
+                onChange={(event) => setNewBranch(event.target.value)}
+                placeholder="ai/my-branch"
+                value={newBranch}
+              />
+            </label>
+          </>
+        )}
         <label className="flex items-start gap-3 rounded-lg border border-white/10 bg-gray-800/60 p-3 text-sm text-gray-100">
           <input
             checked={useTravailleMcp}
