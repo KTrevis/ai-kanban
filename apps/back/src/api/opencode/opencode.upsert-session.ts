@@ -29,7 +29,10 @@ export async function upsertSessionMessage({
       parts: [
         {
           text:
-            message + (!sessionExists ? `\nSESSION_ID=${targetSessionId}` : ''),
+            message +
+            (!sessionExists
+              ? `\nSi la base branch de la carte Kanban s'appelle HEAD, renomme-la avec le nom de la branche actuellement checkout avant de commencer.\nSESSION_ID=${targetSessionId}`
+              : ''),
           type: 'text',
         },
       ],
