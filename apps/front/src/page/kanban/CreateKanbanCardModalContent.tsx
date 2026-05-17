@@ -6,7 +6,7 @@ import {
 } from '#/hooks/queries/kanban/kanban.queries';
 import { Button } from '#/components/ui/button';
 import { DialogDescription, DialogTitle } from '#/components/ui/dialog';
-import { useEffect, useState, type SubmitEventHandler } from 'react';
+import { useEffect, useRef, useState, type SubmitEventHandler } from 'react';
 import { LinkedSession } from './LinkedSession';
 import { MarkdownDescriptionEditor } from './MarkdownDescriptionEditor';
 import type { Column } from './kanban.types';
@@ -31,6 +31,7 @@ export function CreateKanbanCardModalContent({
   const [useTravailleMcp, setUseTravailleMcp] = useState(
     card?.useTravailleMcp ?? true,
   );
+  const formRef = useRef<HTMLFormElement>(null);
   const { isPending: isCreating, mutate: createCard } =
     useCreateKanbanCard(projectId);
   const { isPending: isUpdating, mutate: updateCard } = useUpdateKanbanCard(
@@ -105,6 +106,14 @@ export function CreateKanbanCardModalContent({
     });
   };
 
+  const handleDescriptionSubmit = () => {
+    if (isPending) {
+      return;
+    }
+
+    formRef.current?.requestSubmit();
+  };
+
   const handleClearSession = () => {
     if (!card?.sessionId) {
       return;
@@ -138,7 +147,7 @@ export function CreateKanbanCardModalContent({
         </DialogDescription>
       </div>
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
+      <form className="space-y-4" onSubmit={handleSubmit} ref={formRef}>
         <label className="block space-y-2 text-sm font-medium text-gray-100">
           <span>Title</span>
           <input
@@ -156,6 +165,7 @@ export function CreateKanbanCardModalContent({
             initialValue={description}
             key={card?.id ?? 'new-card'}
             onChange={setDescription}
+            onSubmit={handleDescriptionSubmit}
           />
         </label>
 
