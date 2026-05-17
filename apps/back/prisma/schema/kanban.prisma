@@ -6,7 +6,7 @@ enum KanbanColumn {
 }
 
 model Project {
-  id        String   @id
+  id        String   @id @default(uuid())
   name      String
   worktree  String   @unique
   createdAt DateTime @default(now())

@@ -46,16 +46,14 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
   })
   .post(
     'projects',
-    async ({ body: { id, name, worktree } }) => {
+    async ({ body: { name, worktree } }) => {
       return createProject({
-        id: id?.trim() || undefined,
         name: name.trim(),
         worktree: worktree.trim(),
       });
     },
     {
       body: z.object({
-        id: z.optional(z.string()),
         name: z.string().min(1),
         worktree: z.string().min(1),
       }),
