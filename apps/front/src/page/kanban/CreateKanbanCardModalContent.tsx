@@ -99,6 +99,14 @@ export function CreateKanbanCardModalContent({
     });
   };
 
+  const handleClearSession = () => {
+    if (!card?.sessionId) {
+      return;
+    }
+
+    updateCard({ sessionId: null });
+  };
+
   const handleDelete = () => {
     if (!card) {
       return;
@@ -154,6 +162,25 @@ export function CreateKanbanCardModalContent({
             value={baseBranch}
           />
         </label>
+
+        {card?.sessionId ? (
+          <div className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-gray-800/60 p-3 text-sm text-gray-100">
+            <div className="min-w-0 space-y-1">
+              <span className="block font-medium">Linked session</span>
+              <span className="block truncate text-xs text-gray-400">
+                {card.sessionId}
+              </span>
+            </div>
+            <Button
+              disabled={isPending}
+              onClick={handleClearSession}
+              type="button"
+              variant="ghost"
+            >
+              {isUpdating ? 'Removing...' : 'Remove session'}
+            </Button>
+          </div>
+        ) : null}
 
         <label className="flex items-start gap-3 rounded-lg border border-white/10 bg-gray-800/60 p-3 text-sm text-gray-100">
           <input
