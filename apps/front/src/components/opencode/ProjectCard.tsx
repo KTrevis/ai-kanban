@@ -23,7 +23,7 @@ export function ProjectCard({
         navigate({ to: '/project/$id', params: { id: project.id } })
       }
       className={cn(
-        'group flex w-fit cursor-pointer items-center gap-1 rounded-sm border border-gray-700 px-2 py-1',
+        'flex w-fit cursor-pointer items-center gap-1 rounded-sm border border-gray-700 px-2 py-1',
         {
           'bg-blue-500': selectedProject === project.id,
         },
@@ -33,7 +33,7 @@ export function ProjectCard({
       {onHide ? (
         <button
           aria-label={`Hide ${project.name ?? 'project'}`}
-          className="rounded px-1 text-xs text-gray-400 opacity-0 hover:bg-gray-700 hover:text-white group-hover:opacity-100"
+          className="rounded px-1 text-xs text-gray-400 hover:bg-gray-700 hover:text-white"
           onClick={(event) => {
             event.stopPropagation();
             onHide();

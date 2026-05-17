@@ -18,7 +18,9 @@ function readHiddenProjects() {
     const parsed = value ? JSON.parse(value) : [];
 
     return Array.isArray(parsed)
-      ? parsed.filter((projectId): projectId is string => typeof projectId === 'string')
+      ? parsed.filter(
+          (projectId): projectId is string => typeof projectId === 'string',
+        )
       : [];
   } catch {
     return [] as string[];
@@ -61,8 +63,7 @@ export function ProjectList({ selectedProject }: { selectedProject?: string }) {
     <div className="flex h-full min-h-0 w-fit shrink-0 flex-col gap-2 overflow-y-auto border-r border-gray-700 p-2">
       <button
         aria-label="Show hidden projects"
-        className="flex h-8 w-8 items-center justify-center rounded-sm border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
-        disabled={hiddenProjects.length === 0}
+        className="flex h-8 w-8 items-center justify-center rounded-sm border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
         onClick={() => setShowHiddenProjects(true)}
         type="button"
       >
