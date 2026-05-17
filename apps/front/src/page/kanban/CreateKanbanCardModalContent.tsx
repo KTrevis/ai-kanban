@@ -6,7 +6,7 @@ import {
 } from '#/hooks/queries/kanban/kanban.queries';
 import { Button } from '#/components/ui/button';
 import { DialogDescription, DialogTitle } from '#/components/ui/dialog';
-import { useEffect, useRef, useState, type SubmitEventHandler } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { LinkedSession } from './LinkedSession';
 import { MarkdownDescriptionEditor } from './MarkdownDescriptionEditor';
 import type { Column } from './kanban.types';
@@ -61,9 +61,7 @@ export function CreateKanbanCardModalContent({
     setUseTravailleMcp(card?.useTravailleMcp ?? true);
   }, [card]);
 
-  const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault();
-
+  const handleSubmit = () => {
     const trimmedTitle = title.trim();
     const trimmedDescription = description.trim();
     const trimmedBaseBranch = baseBranch.trim();
@@ -147,7 +145,14 @@ export function CreateKanbanCardModalContent({
         </DialogDescription>
       </div>
 
-      <form className="space-y-4" onSubmit={handleSubmit} ref={formRef}>
+      <form
+        className="space-y-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          handleSubmit();
+        }}
+        ref={formRef}
+      >
         <label className="block space-y-2 text-sm font-medium text-gray-100">
           <span>Title</span>
           <input
