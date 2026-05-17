@@ -40,13 +40,15 @@ export function ProjectPage({
       projectId,
       sessionId: card.sessionId ?? undefined,
       taskTitle: card.title,
-      message: `Réalise la tâche suivante :
-        Titre de la tâche : ${card.title}
-        Description de la tâches : ${card.description}
-        Branche sur laquelle te baser : ${card.baseBranch}
-        ID de la carte Kanban : ${card.id}${travailleMcpInstructions}
-        Avant de commencer ta tâche, rajoute le SESSION_ID à la carte.
-        Quand tu as fini, place la carte dans la colonne REVIEW.`,
+      message: [
+        `Réalise la tâche suivante :`,
+        `Titre de la tâche : ${card.title}`,
+        `Description de la tâches : ${card.description}`,
+        `Branche sur laquelle te baser : ${card.baseBranch}`,
+        `ID de la carte Kanban : ${card.id}${travailleMcpInstructions}`,
+        `Avant de commencer ta tâche, rajoute le SESSION_ID à la carte.`,
+        `Quand tu as fini, place la carte dans la colonne REVIEW.`,
+      ].join('\n\n'),
     });
   }
 

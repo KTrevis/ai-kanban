@@ -6,20 +6,21 @@ import { ReviewHeader } from './review/ReviewHeader';
 import { splitGitDiff, type ReviewComment } from './review/review.utils';
 import { useSendSessionMessage } from '#/hooks/mutations/opencode/session.mutations';
 import { toast } from 'sonner';
+import { useNavigate } from '@tanstack/react-router';
 
 function formatComments(comments: ReviewComment[]) {
   const PREPROMPT = `Utilise le MCP travaille pour modifier les fichier afin de répondre aux commentaires que t'a fait l'utilisateur.
-    S'il s'agit d'une question, réponds directement dans le tchat.
-    `;
+    S'il s'agit d'une question, réponds directement dans le tchat.\n\n`;
 
   return (
     PREPROMPT +
     comments
-      .map(
-        ({ file, line, side, comment }) =>
-          `File : ${file}:${line}
-Side : ${side === SplitSide.new ? 'New' : 'Old'}
-Comment : ${comment}`,
+      .map(({ file, line, side, comment }) =>
+        [
+          `File : ${file}:${line}`,
+          `Side : ${side === SplitSide.new ? 'New' : 'Old'}`,
+          `Comment : ${comment}`,
+        ].join('\n\n'),
       )
       .join('\n\n')
   );
@@ -31,6 +32,7 @@ export function ReviewPage({ cardId }: { cardId: string }) {
   const [mode, setMode] = useState<DiffModeEnum>(DiffModeEnum.Unified);
   const [comments, setComments] = useState<ReviewComment[]>([]);
   const { mutate: sendMessage } = useSendSessionMessage();
+  const navigate = useNavigate();
   const files = useMemo(
     () => splitGitDiff(data?.uncommittedDiff ?? ''),
     [data?.uncommittedDiff],
@@ -42,7 +44,6 @@ export function ReviewPage({ cardId }: { cardId: string }) {
         mode={mode}
         newBranch={data?.newBranch}
         projectId={projectId}
-        sessionId={data?.sessionId}
         onModeChange={setMode}
         onSendReview={() => {
           if (!projectId) {
@@ -58,6 +59,16 @@ export function ReviewPage({ cardId }: { cardId: string }) {
             {
               onSuccess() {
                 toast.success('Review comments sent');
+                const sessionId = data.sessionId;
+                if (sessionId) {
+                  navigate({
+                    to: '/project/$id',
+                    params: { id: projectId },
+                    search: {
+                      sessionId,
+                    },
+                  });
+                }
               },
             },
           );

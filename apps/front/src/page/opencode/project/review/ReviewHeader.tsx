@@ -12,14 +12,12 @@ export function ReviewHeader({
   onModeChange,
   onSendReview,
   projectId,
-  sessionId,
 }: {
   mode: DiffModeEnum;
   newBranch?: string;
   onModeChange: (mode: DiffModeEnum) => void;
   onSendReview: () => void;
   projectId?: string;
-  sessionId?: string;
 }) {
   return (
     <header className="border-b border-white/10 px-6 py-4">
@@ -61,22 +59,9 @@ export function ReviewHeader({
               Unified
             </ModeButton>
           </div>
-          <div className="flex flex-wrap justify-end gap-2">
-            {projectId && sessionId && (
-              <Button asChild variant="outline">
-                <Link
-                  to="/project/$id"
-                  params={{ id: projectId }}
-                  search={{ sessionId }}
-                >
-                  Open chat
-                </Link>
-              </Button>
-            )}
-            <Button onClick={onSendReview} type="button">
-              Send Review
-            </Button>
-          </div>
+          <Button onClick={onSendReview} type="button">
+            Send Review
+          </Button>
         </div>
       </div>
     </header>
