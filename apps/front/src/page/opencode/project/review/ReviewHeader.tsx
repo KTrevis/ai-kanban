@@ -2,6 +2,7 @@ import { Button } from '#/components/ui/button';
 import { cn } from '#/lib/utils';
 import { DiffModeEnum } from '@git-diff-view/react';
 import { Link } from '@tanstack/react-router';
+import { ClipboardPasteIcon, Copy } from 'lucide-react';
 
 const modeButtonClass = 'cursor-pointer rounded-md px-3 py-1.5';
 
@@ -36,6 +37,14 @@ export function ReviewHeader({
           <h1 className="mt-2 truncate text-xl font-semibold text-white">
             Review changes
           </h1>
+          <div
+            className="text-sm text-gray-400 flex items-center gap-2 cursor-pointer"
+            onClick={() =>
+              newBranch && navigator.clipboard.writeText(newBranch)
+            }
+          >
+            {newBranch} <Copy className="size-4" />
+          </div>
         </div>
         <div className="flex flex-wrap justify-end gap-2">
           <Button onClick={onSendReview} type="button">

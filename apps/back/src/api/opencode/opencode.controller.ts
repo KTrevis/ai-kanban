@@ -60,7 +60,14 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
       }
 
       const process = Bun.spawn(
-        ['git', '-C', project.worktree, 'ls-files', '-co', '--exclude-standard'],
+        [
+          'git',
+          '-C',
+          project.worktree,
+          'ls-files',
+          '-co',
+          '--exclude-standard',
+        ],
         { stdout: 'pipe' },
       );
       const output = await new Response(process.stdout).text();

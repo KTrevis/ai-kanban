@@ -18,11 +18,10 @@ function formatComments(comments: ReviewComment[]) {
     PREPROMPT +
     comments
       .map(
-        ({ file, line, side, comment }) => `
-      File : ${file}:${line}
-      Side : ${side === SplitSide.new ? 'New' : 'Old'}
-      Comment : ${comment}
-      `,
+        ({ file, line, side, comment }) =>
+          `File : ${file}:${line}
+Side : ${side === SplitSide.new ? 'New' : 'Old'}
+Comment : ${comment}`,
       )
       .join('\n\n')
   );
