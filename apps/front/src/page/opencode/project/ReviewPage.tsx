@@ -1,12 +1,12 @@
 import { useGetKanbanCardReview } from '#/hooks/queries/kanban/kanban.queries';
+import { useSendSessionMessage } from '#/hooks/mutations/opencode/session.mutations';
 import { DiffModeEnum, SplitSide } from '@git-diff-view/react';
+import { useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import { ReviewContent } from './review/ReviewContent';
 import { ReviewHeader } from './review/ReviewHeader';
 import { splitGitDiff, type ReviewComment } from './review/review.utils';
-import { useSendSessionMessage } from '#/hooks/mutations/opencode/session.mutations';
-import { toast } from 'sonner';
-import { useNavigate } from '@tanstack/react-router';
 
 function formatComments(comments: ReviewComment[]) {
   const PREPROMPT = `Utilise le MCP travaille pour modifier les fichier afin de répondre aux commentaires que t'a fait l'utilisateur.
@@ -38,12 +38,27 @@ export function ReviewPage({ cardId }: { cardId: string }) {
     [data?.uncommittedDiff],
   );
 
+  function goBack() {
+    if (window.history.length > 1) {
+      window.history.back();
+      return;
+    }
+
+    if (projectId) {
+      navigate({
+        to: '/project/$id',
+        params: { id: projectId },
+      });
+    }
+  }
+
   return (
     <section className="flex h-full min-w-0 flex-1 flex-col text-gray-100">
       <ReviewHeader
         mode={mode}
         newBranch={data?.newBranch}
         projectId={projectId}
+        onBack={goBack}
         onModeChange={setMode}
         onSendReview={() => {
           if (!projectId) {

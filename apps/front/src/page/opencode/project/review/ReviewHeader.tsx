@@ -1,7 +1,6 @@
 import { Button } from '#/components/ui/button';
 import { cn } from '#/lib/utils';
 import { DiffModeEnum } from '@git-diff-view/react';
-import { Link } from '@tanstack/react-router';
 import { Copy } from 'lucide-react';
 
 const modeButtonClass = 'cursor-pointer rounded-md px-3 py-1.5';
@@ -9,12 +8,14 @@ const modeButtonClass = 'cursor-pointer rounded-md px-3 py-1.5';
 export function ReviewHeader({
   mode,
   newBranch,
+  onBack,
   onModeChange,
   onSendReview,
   projectId,
 }: {
   mode: DiffModeEnum;
   newBranch?: string;
+  onBack: () => void;
   onModeChange: (mode: DiffModeEnum) => void;
   onSendReview: () => void;
   projectId?: string;
@@ -24,13 +25,13 @@ export function ReviewHeader({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
           {projectId && (
-            <Link
-              to="/project/$id"
-              params={{ id: projectId }}
-              className="text-sm font-medium text-cyan-300 hover:text-cyan-200"
+            <button
+              type="button"
+              onClick={onBack}
+              className="cursor-pointer text-sm font-medium text-cyan-300 hover:text-cyan-200"
             >
-              Back to board
-            </Link>
+              Back
+            </button>
           )}
           <h1 className="mt-2 truncate text-xl font-semibold text-white">
             Review changes
