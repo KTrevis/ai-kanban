@@ -6,7 +6,7 @@ import {
 } from '#/hooks/queries/kanban/kanban.queries';
 import { Button } from '#/components/ui/button';
 import { DialogDescription, DialogTitle } from '#/components/ui/dialog';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LinkedSession } from './LinkedSession';
 import { MarkdownDescriptionEditor } from './MarkdownDescriptionEditor';
 import type { Column } from './kanban.types';
@@ -31,7 +31,6 @@ export function CreateKanbanCardModalContent({
   const [useTravailleMcp, setUseTravailleMcp] = useState(
     card?.useTravailleMcp ?? true,
   );
-  const formRef = useRef<HTMLFormElement>(null);
   const { isPending: isCreating, mutate: createCard } =
     useCreateKanbanCard(projectId);
   const { isPending: isUpdating, mutate: updateCard } = useUpdateKanbanCard(
@@ -62,6 +61,10 @@ export function CreateKanbanCardModalContent({
   }, [card]);
 
   const handleSubmit = () => {
+    if (isPending) {
+      return;
+    }
+
     const trimmedTitle = title.trim();
     const trimmedDescription = description.trim();
     const trimmedBaseBranch = baseBranch.trim();
@@ -104,14 +107,6 @@ export function CreateKanbanCardModalContent({
     });
   };
 
-  const handleDescriptionSubmit = () => {
-    if (isPending) {
-      return;
-    }
-
-    formRef.current?.requestSubmit();
-  };
-
   const handleClearSession = () => {
     if (!card?.sessionId) {
       return;
@@ -151,7 +146,6 @@ export function CreateKanbanCardModalContent({
           event.preventDefault();
           handleSubmit();
         }}
-        ref={formRef}
       >
         <label className="block space-y-2 text-sm font-medium text-gray-100">
           <span>Title</span>
@@ -170,7 +164,7 @@ export function CreateKanbanCardModalContent({
             initialValue={description}
             key={card?.id ?? 'new-card'}
             onChange={setDescription}
-            onSubmit={handleDescriptionSubmit}
+            onSubmit={handleSubmit}
           />
         </label>
 
