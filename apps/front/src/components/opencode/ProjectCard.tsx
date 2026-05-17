@@ -13,7 +13,7 @@ export function ProjectCard({
   project,
   selectedProject,
 }: {
-  onHide?: () => void;
+  onHide: () => void;
   project: Project;
   selectedProject?: string;
 }) {
@@ -40,15 +40,16 @@ export function ProjectCard({
     </div>
   );
 
-  if (!onHide) {
-    return card;
-  }
-
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>{card}</ContextMenuTrigger>
-      <ContextMenuContent>
-        <ContextMenuItem onSelect={onHide}>Hide project</ContextMenuItem>
+      <ContextMenuContent className="border-gray-700 bg-gray-800 text-white">
+        <ContextMenuItem
+          className="cursor-pointer focus:bg-gray-700 focus:text-white"
+          onSelect={onHide}
+        >
+          Hide project
+        </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
   );

@@ -46,7 +46,7 @@ export function ProjectList({ selectedProject }: { selectedProject?: string }) {
     <div className="flex h-full min-h-0 w-fit shrink-0 flex-col gap-2 overflow-y-auto border-r border-gray-700 p-2">
       <button
         aria-label="Show hidden projects"
-        className="flex h-8 w-8 items-center justify-center rounded-sm border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
+        className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm border border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
         onClick={() => setShowHiddenProjects(true)}
         type="button"
       >
