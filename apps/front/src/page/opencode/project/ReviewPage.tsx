@@ -5,7 +5,6 @@ import { ReviewContent } from './review/ReviewContent';
 import { ReviewHeader } from './review/ReviewHeader';
 import { splitGitDiff, type ReviewComment } from './review/review.utils';
 import { useSendSessionMessage } from '#/hooks/mutations/opencode/session.mutations';
-import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 function formatComments(comments: ReviewComment[]) {
@@ -36,15 +35,14 @@ export function ReviewPage({ cardId }: { cardId: string }) {
     () => splitGitDiff(data?.uncommittedDiff ?? ''),
     [data?.uncommittedDiff],
   );
-  const navigate = useNavigate();
 
   return (
     <section className="flex h-full min-w-0 flex-1 flex-col text-gray-100">
       <ReviewHeader
-        baseBranch={data?.baseBranch}
         mode={mode}
         newBranch={data?.newBranch}
         projectId={projectId}
+        sessionId={data?.sessionId}
         onModeChange={setMode}
         onSendReview={() => {
           if (!projectId) {

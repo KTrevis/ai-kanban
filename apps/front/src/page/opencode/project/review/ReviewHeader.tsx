@@ -2,24 +2,24 @@ import { Button } from '#/components/ui/button';
 import { cn } from '#/lib/utils';
 import { DiffModeEnum } from '@git-diff-view/react';
 import { Link } from '@tanstack/react-router';
-import { ClipboardPasteIcon, Copy } from 'lucide-react';
+import { Copy } from 'lucide-react';
 
 const modeButtonClass = 'cursor-pointer rounded-md px-3 py-1.5';
 
 export function ReviewHeader({
-  baseBranch,
   mode,
   newBranch,
   onModeChange,
   onSendReview,
   projectId,
+  sessionId,
 }: {
-  baseBranch?: string;
   mode: DiffModeEnum;
   newBranch?: string;
   onModeChange: (mode: DiffModeEnum) => void;
   onSendReview: () => void;
   projectId?: string;
+  sessionId?: string;
 }) {
   return (
     <header className="border-b border-white/10 px-6 py-4">
@@ -47,6 +47,17 @@ export function ReviewHeader({
           </div>
         </div>
         <div className="flex flex-wrap justify-end gap-2">
+          {projectId && sessionId && (
+            <Button asChild variant="outline" type="button">
+              <Link
+                to="/project/$id"
+                params={{ id: projectId }}
+                search={{ sessionId }}
+              >
+                Open chat
+              </Link>
+            </Button>
+          )}
           <Button onClick={onSendReview} type="button">
             Send Review
           </Button>
