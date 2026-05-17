@@ -171,12 +171,6 @@ export function CreateKanbanCardModalContent({
 
         {isEditing && (
           <>
-            <LinkedSession
-              disabled={isPending}
-              isRemoving={isUpdating}
-              onRemove={handleClearSession}
-              sessionId={card?.sessionId ?? undefined}
-            />
             <label className="block space-y-2 text-sm font-medium text-gray-100">
               <span>Linked branch</span>
               <input
@@ -186,6 +180,12 @@ export function CreateKanbanCardModalContent({
                 value={newBranch}
               />
             </label>
+            <LinkedSession
+              disabled={isPending}
+              isRemoving={isUpdating}
+              onRemove={handleClearSession}
+              sessionId={card?.sessionId ?? undefined}
+            />
           </>
         )}
         <label className="flex items-start gap-3 rounded-lg border border-white/10 bg-gray-800/60 p-3 text-sm text-gray-100">
