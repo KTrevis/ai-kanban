@@ -7,7 +7,7 @@ import {
   getCommittedReviewDiff,
   getUncommittedReviewDiff,
 } from '../../git/review-diff';
-import { opencodeClient } from '../opencode/opencode.controller';
+import { getProjectById } from '../opencode/opencode.projects';
 import { websockets } from '../ws/ws.controller';
 
 const KANBAN_COLUMNS_SCHEMA = z.union([
@@ -72,12 +72,11 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
       return { error: 'Kanban card has no linked branch to review' };
     }
 
-    const { data: projects = [] } = await opencodeClient.project.list();
-    const project = projects.find((project) => project.id === card.projectId);
+    const project = await getProjectById(card.projectId);
 
     if (!project) {
       set.status = 404;
-      return { error: 'OpenCode project not found' };
+      return { error: 'Project not found' };
     }
 
     const diff = await getCommittedReviewDiff({

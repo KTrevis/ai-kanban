@@ -6,6 +6,7 @@ import {
 } from '@opencode-ai/sdk';
 import { ENVIRONMENT } from '../../schema/env.schema';
 import { executeSessionCommand } from './opencode.execute-command';
+import { getProjectById, listProjects } from './opencode.projects';
 import { getProjectSessions } from './opencode.sessions';
 import { upsertSessionMessage } from './opencode.upsert-session';
 import z from 'zod/v3';
@@ -37,12 +38,10 @@ export const opencodeClient = await createClient();
 
 export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
   .get('projects', async () => {
-    const { data = [] } = await opencodeClient.project.list();
-    return data.filter((curr) => curr.id !== 'global');
+    return listProjects();
   })
   .get('project/:id/commands', async ({ params: { id } }) => {
-    const { data: projects = [] } = await opencodeClient.project.list();
-    const project = projects.find((curr) => curr.id === id);
+    const project = await getProjectById(id);
     const { data: commands = [] } = await opencodeClient.command.list({
       query: { directory: project?.worktree },
     });
@@ -52,8 +51,7 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
   .get(
     'project/:id/files',
     async ({ params: { id }, query: { q } }) => {
-      const { data: projects = [] } = await opencodeClient.project.list();
-      const project = projects.find((curr) => curr.id === id);
+      const project = await getProjectById(id);
 
       if (!project) {
         return { files: [] };

@@ -1,8 +1,8 @@
+import { getProjectById } from './opencode.projects';
 import { opencodeClient } from './opencode.controller';
 
 export async function getProjectSessions(projectId: string) {
-  const { data: projects } = await opencodeClient.project.list();
-  const project = projects?.find((project) => project.id === projectId);
+  const project = await getProjectById(projectId);
 
   if (!project) {
     return null;

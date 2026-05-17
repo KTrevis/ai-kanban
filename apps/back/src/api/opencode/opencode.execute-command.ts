@@ -1,3 +1,4 @@
+import { getProjectById } from './opencode.projects';
 import { opencodeClient } from './opencode.controller';
 
 export async function executeSessionCommand({
@@ -11,8 +12,7 @@ export async function executeSessionCommand({
   projectId: string;
   sessionId?: string;
 }) {
-  const { data: projects } = await opencodeClient.project.list();
-  const project = projects?.find((project) => project.id === projectId);
+  const project = await getProjectById(projectId);
 
   if (!project) {
     return { error: 'Project not found' as const, status: 404 as const };
