@@ -9,8 +9,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 function formatComments(comments: ReviewComment[]) {
-  const PREPROMPT = `
-    Utilise le MCP travaille pour modifier les fichier afin de répondre aux commentaires que t'a fait l'utilisateur.
+  const PREPROMPT = `Utilise le MCP travaille pour modifier les fichier afin de répondre aux commentaires que t'a fait l'utilisateur.
     S'il s'agit d'une question, réponds directement dans le tchat.
     `;
 

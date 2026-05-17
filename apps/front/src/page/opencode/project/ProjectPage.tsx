@@ -26,8 +26,7 @@ export function ProjectPage({
   function startAgentSession(card: KanbanCard) {
     const travailleMcpInstructions =
       card.useTravailleMcp !== false
-        ? `
-        Utilise le MCP travaille pour réaliser cette tâche.
+        ? `Utilise le MCP travaille pour réaliser cette tâche.
         Interdiction stricte : ne crée pas et n'utilise pas de git worktree.
         Pour lire, modifier, committer ou comparer du code sur la branche cible, utilise les outils MCP travaille : travaille_read_file, travaille_write_file, travaille_commit_changes et travaille_get_diff.
         Choisis un nom de branche court et descriptif au format ai/<slug>, par exemple ai/fix-login ou ai/add-kanban-filter.
