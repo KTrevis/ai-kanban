@@ -34,6 +34,21 @@ export const useGetProjects = () => {
   return useQuery(eden.opencode.projects.get.queryOptions());
 };
 
+export const useCreateProject = () => {
+  const eden = useEden();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    eden.opencode.projects.post.mutationOptions({
+      onSuccess() {
+        queryClient.invalidateQueries(
+          eden.opencode.projects.get.queryOptions(),
+        );
+      },
+    }),
+  );
+};
+
 export const useGetHiddenProjectIds = () => {
   return useQuery({
     queryKey: hiddenProjectIdsQueryKey,
