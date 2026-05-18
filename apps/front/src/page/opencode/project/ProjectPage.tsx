@@ -5,7 +5,9 @@ import {
   useGetKanbanCards,
   useMoveKanbanCards,
 } from '#/hooks/queries/kanban/kanban.queries';
+import { useGetProjects } from '#/hooks/queries/opencode/project.queries';
 import type { CardMovedEvent } from '#/page/kanban/KanbanPage';
+import { useEffect } from 'react';
 import { ProjectContent } from './ProjectContent';
 
 export function ProjectPage({
@@ -20,8 +22,18 @@ export function ProjectPage({
   sessionId?: string;
 }) {
   const { data: cards } = useGetKanbanCards(projectId);
+  const { data: projects = [] } = useGetProjects();
   const { mutate: moveCards } = useMoveKanbanCards(projectId);
   const { mutate: sendSessionMessage } = useSendSessionMessage();
+  const project = projects.find((project) => project.id === projectId);
+  const projectFirstChar = Array.from(project?.name ?? '')[0];
+
+  useEffect(() => {
+    const page = sessionId ? 'Chat' : 'Kanban';
+    document.title = projectFirstChar
+      ? `${projectFirstChar} - ${page}`
+      : `Travaille - ${page}`;
+  }, [projectFirstChar, sessionId]);
 
   function startAgentSession(card: KanbanCard) {
     const travailleMcpInstructions =

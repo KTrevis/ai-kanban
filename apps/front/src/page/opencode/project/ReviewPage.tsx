@@ -1,8 +1,9 @@
 import { useGetKanbanCardReview } from '#/hooks/queries/kanban/kanban.queries';
 import { useSendSessionMessage } from '#/hooks/mutations/opencode/session.mutations';
+import { useGetProjects } from '#/hooks/queries/opencode/project.queries';
 import { DiffModeEnum, SplitSide } from '@git-diff-view/react';
 import { useNavigate } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { ReviewContent } from './review/ReviewContent';
 import { ReviewHeader } from './review/ReviewHeader';
@@ -28,7 +29,10 @@ function formatComments(comments: ReviewComment[]) {
 
 export function ReviewPage({ cardId }: { cardId: string }) {
   const { data, error, isLoading } = useGetKanbanCardReview(cardId);
+  const { data: projects = [] } = useGetProjects();
   const projectId = data?.projectId;
+  const project = projects.find((project) => project.id === projectId);
+  const projectFirstChar = Array.from(project?.name ?? '')[0];
   const [mode, setMode] = useState<DiffModeEnum>(DiffModeEnum.Unified);
   const [comments, setComments] = useState<ReviewComment[]>([]);
   const { mutate: sendMessage } = useSendSessionMessage();
@@ -37,6 +41,12 @@ export function ReviewPage({ cardId }: { cardId: string }) {
     () => splitGitDiff(data?.uncommittedDiff ?? ''),
     [data?.uncommittedDiff],
   );
+
+  useEffect(() => {
+    document.title = projectFirstChar
+      ? `${projectFirstChar} - Review`
+      : 'Travaille - Review';
+  }, [projectFirstChar]);
 
   function goBack() {
     if (window.history.length > 1) {
