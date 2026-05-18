@@ -1,4 +1,4 @@
-import { getProjectById } from './opencode.projects';
+import { getProjectById } from '../projects/projects.service';
 import { opencodeClient } from './opencode.controller';
 
 export async function getProjectSessions(projectId: string) {
