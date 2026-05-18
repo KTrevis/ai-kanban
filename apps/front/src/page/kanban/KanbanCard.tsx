@@ -38,16 +38,6 @@ export function KanbanCard({
             Open session
           </Link>
         )}
-        {card.newBranch && (
-          <Link
-            to="/review/$cardId"
-            params={{ cardId: card.id }}
-            className="inline-flex font-medium text-violet-300 hover:text-violet-200"
-            onClick={(event) => event.stopPropagation()}
-          >
-            Review changes
-          </Link>
-        )}
       </div>
     </article>
   );
