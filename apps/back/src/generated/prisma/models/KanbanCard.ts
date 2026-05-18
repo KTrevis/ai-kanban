@@ -272,6 +272,7 @@ export type KanbanCardWhereInput = {
   newBranch?: Prisma.StringFilter<"KanbanCard"> | string
   baseBranch?: Prisma.StringFilter<"KanbanCard"> | string
   useTravailleMcp?: Prisma.BoolFilter<"KanbanCard"> | boolean
+  project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
 }
 
 export type KanbanCardOrderByWithRelationInput = {
@@ -287,6 +288,7 @@ export type KanbanCardOrderByWithRelationInput = {
   newBranch?: Prisma.SortOrder
   baseBranch?: Prisma.SortOrder
   useTravailleMcp?: Prisma.SortOrder
+  project?: Prisma.ProjectOrderByWithRelationInput
 }
 
 export type KanbanCardWhereUniqueInput = Prisma.AtLeast<{
@@ -305,6 +307,7 @@ export type KanbanCardWhereUniqueInput = Prisma.AtLeast<{
   newBranch?: Prisma.StringFilter<"KanbanCard"> | string
   baseBranch?: Prisma.StringFilter<"KanbanCard"> | string
   useTravailleMcp?: Prisma.BoolFilter<"KanbanCard"> | boolean
+  project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
 }, "id">
 
 export type KanbanCardOrderByWithAggregationInput = {
@@ -347,7 +350,6 @@ export type KanbanCardScalarWhereWithAggregatesInput = {
 
 export type KanbanCardCreateInput = {
   id?: string
-  projectId: string
   sessionId?: string | null
   title: string
   description: string
@@ -358,6 +360,7 @@ export type KanbanCardCreateInput = {
   newBranch: string
   baseBranch: string
   useTravailleMcp?: boolean
+  project: Prisma.ProjectCreateNestedOneWithoutKanbanCardsInput
 }
 
 export type KanbanCardUncheckedCreateInput = {
@@ -377,7 +380,6 @@ export type KanbanCardUncheckedCreateInput = {
 
 export type KanbanCardUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  projectId?: Prisma.StringFieldUpdateOperationsInput | string
   sessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
@@ -388,6 +390,7 @@ export type KanbanCardUpdateInput = {
   newBranch?: Prisma.StringFieldUpdateOperationsInput | string
   baseBranch?: Prisma.StringFieldUpdateOperationsInput | string
   useTravailleMcp?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  project?: Prisma.ProjectUpdateOneRequiredWithoutKanbanCardsNestedInput
 }
 
 export type KanbanCardUncheckedUpdateInput = {
@@ -422,7 +425,6 @@ export type KanbanCardCreateManyInput = {
 
 export type KanbanCardUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  projectId?: Prisma.StringFieldUpdateOperationsInput | string
   sessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
@@ -448,6 +450,16 @@ export type KanbanCardUncheckedUpdateManyInput = {
   newBranch?: Prisma.StringFieldUpdateOperationsInput | string
   baseBranch?: Prisma.StringFieldUpdateOperationsInput | string
   useTravailleMcp?: Prisma.BoolFieldUpdateOperationsInput | boolean
+}
+
+export type KanbanCardListRelationFilter = {
+  every?: Prisma.KanbanCardWhereInput
+  some?: Prisma.KanbanCardWhereInput
+  none?: Prisma.KanbanCardWhereInput
+}
+
+export type KanbanCardOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type KanbanCardCountOrderByAggregateInput = {
@@ -503,6 +515,48 @@ export type KanbanCardSumOrderByAggregateInput = {
   position?: Prisma.SortOrder
 }
 
+export type KanbanCardCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.KanbanCardCreateWithoutProjectInput, Prisma.KanbanCardUncheckedCreateWithoutProjectInput> | Prisma.KanbanCardCreateWithoutProjectInput[] | Prisma.KanbanCardUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.KanbanCardCreateOrConnectWithoutProjectInput | Prisma.KanbanCardCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.KanbanCardCreateManyProjectInputEnvelope
+  connect?: Prisma.KanbanCardWhereUniqueInput | Prisma.KanbanCardWhereUniqueInput[]
+}
+
+export type KanbanCardUncheckedCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.KanbanCardCreateWithoutProjectInput, Prisma.KanbanCardUncheckedCreateWithoutProjectInput> | Prisma.KanbanCardCreateWithoutProjectInput[] | Prisma.KanbanCardUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.KanbanCardCreateOrConnectWithoutProjectInput | Prisma.KanbanCardCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.KanbanCardCreateManyProjectInputEnvelope
+  connect?: Prisma.KanbanCardWhereUniqueInput | Prisma.KanbanCardWhereUniqueInput[]
+}
+
+export type KanbanCardUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.KanbanCardCreateWithoutProjectInput, Prisma.KanbanCardUncheckedCreateWithoutProjectInput> | Prisma.KanbanCardCreateWithoutProjectInput[] | Prisma.KanbanCardUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.KanbanCardCreateOrConnectWithoutProjectInput | Prisma.KanbanCardCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.KanbanCardUpsertWithWhereUniqueWithoutProjectInput | Prisma.KanbanCardUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.KanbanCardCreateManyProjectInputEnvelope
+  set?: Prisma.KanbanCardWhereUniqueInput | Prisma.KanbanCardWhereUniqueInput[]
+  disconnect?: Prisma.KanbanCardWhereUniqueInput | Prisma.KanbanCardWhereUniqueInput[]
+  delete?: Prisma.KanbanCardWhereUniqueInput | Prisma.KanbanCardWhereUniqueInput[]
+  connect?: Prisma.KanbanCardWhereUniqueInput | Prisma.KanbanCardWhereUniqueInput[]
+  update?: Prisma.KanbanCardUpdateWithWhereUniqueWithoutProjectInput | Prisma.KanbanCardUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.KanbanCardUpdateManyWithWhereWithoutProjectInput | Prisma.KanbanCardUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.KanbanCardScalarWhereInput | Prisma.KanbanCardScalarWhereInput[]
+}
+
+export type KanbanCardUncheckedUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.KanbanCardCreateWithoutProjectInput, Prisma.KanbanCardUncheckedCreateWithoutProjectInput> | Prisma.KanbanCardCreateWithoutProjectInput[] | Prisma.KanbanCardUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.KanbanCardCreateOrConnectWithoutProjectInput | Prisma.KanbanCardCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.KanbanCardUpsertWithWhereUniqueWithoutProjectInput | Prisma.KanbanCardUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.KanbanCardCreateManyProjectInputEnvelope
+  set?: Prisma.KanbanCardWhereUniqueInput | Prisma.KanbanCardWhereUniqueInput[]
+  disconnect?: Prisma.KanbanCardWhereUniqueInput | Prisma.KanbanCardWhereUniqueInput[]
+  delete?: Prisma.KanbanCardWhereUniqueInput | Prisma.KanbanCardWhereUniqueInput[]
+  connect?: Prisma.KanbanCardWhereUniqueInput | Prisma.KanbanCardWhereUniqueInput[]
+  update?: Prisma.KanbanCardUpdateWithWhereUniqueWithoutProjectInput | Prisma.KanbanCardUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.KanbanCardUpdateManyWithWhereWithoutProjectInput | Prisma.KanbanCardUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.KanbanCardScalarWhereInput | Prisma.KanbanCardScalarWhereInput[]
+}
+
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
@@ -523,6 +577,133 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
+export type KanbanCardCreateWithoutProjectInput = {
+  id?: string
+  sessionId?: string | null
+  title: string
+  description: string
+  column?: $Enums.KanbanColumn
+  position: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  newBranch: string
+  baseBranch: string
+  useTravailleMcp?: boolean
+}
+
+export type KanbanCardUncheckedCreateWithoutProjectInput = {
+  id?: string
+  sessionId?: string | null
+  title: string
+  description: string
+  column?: $Enums.KanbanColumn
+  position: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  newBranch: string
+  baseBranch: string
+  useTravailleMcp?: boolean
+}
+
+export type KanbanCardCreateOrConnectWithoutProjectInput = {
+  where: Prisma.KanbanCardWhereUniqueInput
+  create: Prisma.XOR<Prisma.KanbanCardCreateWithoutProjectInput, Prisma.KanbanCardUncheckedCreateWithoutProjectInput>
+}
+
+export type KanbanCardCreateManyProjectInputEnvelope = {
+  data: Prisma.KanbanCardCreateManyProjectInput | Prisma.KanbanCardCreateManyProjectInput[]
+}
+
+export type KanbanCardUpsertWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.KanbanCardWhereUniqueInput
+  update: Prisma.XOR<Prisma.KanbanCardUpdateWithoutProjectInput, Prisma.KanbanCardUncheckedUpdateWithoutProjectInput>
+  create: Prisma.XOR<Prisma.KanbanCardCreateWithoutProjectInput, Prisma.KanbanCardUncheckedCreateWithoutProjectInput>
+}
+
+export type KanbanCardUpdateWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.KanbanCardWhereUniqueInput
+  data: Prisma.XOR<Prisma.KanbanCardUpdateWithoutProjectInput, Prisma.KanbanCardUncheckedUpdateWithoutProjectInput>
+}
+
+export type KanbanCardUpdateManyWithWhereWithoutProjectInput = {
+  where: Prisma.KanbanCardScalarWhereInput
+  data: Prisma.XOR<Prisma.KanbanCardUpdateManyMutationInput, Prisma.KanbanCardUncheckedUpdateManyWithoutProjectInput>
+}
+
+export type KanbanCardScalarWhereInput = {
+  AND?: Prisma.KanbanCardScalarWhereInput | Prisma.KanbanCardScalarWhereInput[]
+  OR?: Prisma.KanbanCardScalarWhereInput[]
+  NOT?: Prisma.KanbanCardScalarWhereInput | Prisma.KanbanCardScalarWhereInput[]
+  id?: Prisma.StringFilter<"KanbanCard"> | string
+  projectId?: Prisma.StringFilter<"KanbanCard"> | string
+  sessionId?: Prisma.StringNullableFilter<"KanbanCard"> | string | null
+  title?: Prisma.StringFilter<"KanbanCard"> | string
+  description?: Prisma.StringFilter<"KanbanCard"> | string
+  column?: Prisma.EnumKanbanColumnFilter<"KanbanCard"> | $Enums.KanbanColumn
+  position?: Prisma.IntFilter<"KanbanCard"> | number
+  createdAt?: Prisma.DateTimeFilter<"KanbanCard"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"KanbanCard"> | Date | string
+  newBranch?: Prisma.StringFilter<"KanbanCard"> | string
+  baseBranch?: Prisma.StringFilter<"KanbanCard"> | string
+  useTravailleMcp?: Prisma.BoolFilter<"KanbanCard"> | boolean
+}
+
+export type KanbanCardCreateManyProjectInput = {
+  id?: string
+  sessionId?: string | null
+  title: string
+  description: string
+  column?: $Enums.KanbanColumn
+  position: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  newBranch: string
+  baseBranch: string
+  useTravailleMcp?: boolean
+}
+
+export type KanbanCardUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  column?: Prisma.EnumKanbanColumnFieldUpdateOperationsInput | $Enums.KanbanColumn
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  newBranch?: Prisma.StringFieldUpdateOperationsInput | string
+  baseBranch?: Prisma.StringFieldUpdateOperationsInput | string
+  useTravailleMcp?: Prisma.BoolFieldUpdateOperationsInput | boolean
+}
+
+export type KanbanCardUncheckedUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  column?: Prisma.EnumKanbanColumnFieldUpdateOperationsInput | $Enums.KanbanColumn
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  newBranch?: Prisma.StringFieldUpdateOperationsInput | string
+  baseBranch?: Prisma.StringFieldUpdateOperationsInput | string
+  useTravailleMcp?: Prisma.BoolFieldUpdateOperationsInput | boolean
+}
+
+export type KanbanCardUncheckedUpdateManyWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  column?: Prisma.EnumKanbanColumnFieldUpdateOperationsInput | $Enums.KanbanColumn
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  newBranch?: Prisma.StringFieldUpdateOperationsInput | string
+  baseBranch?: Prisma.StringFieldUpdateOperationsInput | string
+  useTravailleMcp?: Prisma.BoolFieldUpdateOperationsInput | boolean
+}
+
 
 
 export type KanbanCardSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -538,6 +719,7 @@ export type KanbanCardSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   newBranch?: boolean
   baseBranch?: boolean
   useTravailleMcp?: boolean
+  project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["kanbanCard"]>
 
 export type KanbanCardSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -553,6 +735,7 @@ export type KanbanCardSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   newBranch?: boolean
   baseBranch?: boolean
   useTravailleMcp?: boolean
+  project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["kanbanCard"]>
 
 export type KanbanCardSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -568,6 +751,7 @@ export type KanbanCardSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   newBranch?: boolean
   baseBranch?: boolean
   useTravailleMcp?: boolean
+  project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["kanbanCard"]>
 
 export type KanbanCardSelectScalar = {
@@ -586,10 +770,21 @@ export type KanbanCardSelectScalar = {
 }
 
 export type KanbanCardOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "sessionId" | "title" | "description" | "column" | "position" | "createdAt" | "updatedAt" | "newBranch" | "baseBranch" | "useTravailleMcp", ExtArgs["result"]["kanbanCard"]>
+export type KanbanCardInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+}
+export type KanbanCardIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+}
+export type KanbanCardIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
+}
 
 export type $KanbanCardPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "KanbanCard"
-  objects: {}
+  objects: {
+    project: Prisma.$ProjectPayload<ExtArgs>
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     projectId: string
@@ -997,6 +1192,7 @@ readonly fields: KanbanCardFieldRefs;
  */
 export interface Prisma__KanbanCardClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  project<T extends Prisma.ProjectDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectDefaultArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1055,6 +1251,10 @@ export type KanbanCardFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   omit?: Prisma.KanbanCardOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KanbanCardInclude<ExtArgs> | null
+  /**
    * Filter, which KanbanCard to fetch.
    */
   where: Prisma.KanbanCardWhereUniqueInput
@@ -1073,6 +1273,10 @@ export type KanbanCardFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extens
    */
   omit?: Prisma.KanbanCardOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KanbanCardInclude<ExtArgs> | null
+  /**
    * Filter, which KanbanCard to fetch.
    */
   where: Prisma.KanbanCardWhereUniqueInput
@@ -1090,6 +1294,10 @@ export type KanbanCardFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the KanbanCard
    */
   omit?: Prisma.KanbanCardOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KanbanCardInclude<ExtArgs> | null
   /**
    * Filter, which KanbanCard to fetch.
    */
@@ -1139,6 +1347,10 @@ export type KanbanCardFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    */
   omit?: Prisma.KanbanCardOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KanbanCardInclude<ExtArgs> | null
+  /**
    * Filter, which KanbanCard to fetch.
    */
   where?: Prisma.KanbanCardWhereInput
@@ -1186,6 +1398,10 @@ export type KanbanCardFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Omit specific fields from the KanbanCard
    */
   omit?: Prisma.KanbanCardOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KanbanCardInclude<ExtArgs> | null
   /**
    * Filter, which KanbanCards to fetch.
    */
@@ -1235,6 +1451,10 @@ export type KanbanCardCreateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   omit?: Prisma.KanbanCardOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KanbanCardInclude<ExtArgs> | null
+  /**
    * The data needed to create a KanbanCard.
    */
   data: Prisma.XOR<Prisma.KanbanCardCreateInput, Prisma.KanbanCardUncheckedCreateInput>
@@ -1266,6 +1486,10 @@ export type KanbanCardCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Exte
    * The data used to create many KanbanCards.
    */
   data: Prisma.KanbanCardCreateManyInput | Prisma.KanbanCardCreateManyInput[]
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KanbanCardIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1280,6 +1504,10 @@ export type KanbanCardUpdateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the KanbanCard
    */
   omit?: Prisma.KanbanCardOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KanbanCardInclude<ExtArgs> | null
   /**
    * The data needed to update a KanbanCard.
    */
@@ -1332,6 +1560,10 @@ export type KanbanCardUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Exte
    * Limit how many KanbanCards to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KanbanCardIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1346,6 +1578,10 @@ export type KanbanCardUpsertArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the KanbanCard
    */
   omit?: Prisma.KanbanCardOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KanbanCardInclude<ExtArgs> | null
   /**
    * The filter to search for the KanbanCard to update in case it exists.
    */
@@ -1372,6 +1608,10 @@ export type KanbanCardDeleteArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the KanbanCard
    */
   omit?: Prisma.KanbanCardOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KanbanCardInclude<ExtArgs> | null
   /**
    * Filter which KanbanCard to delete.
    */
@@ -1404,4 +1644,8 @@ export type KanbanCardDefaultArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Omit specific fields from the KanbanCard
    */
   omit?: Prisma.KanbanCardOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KanbanCardInclude<ExtArgs> | null
 }
