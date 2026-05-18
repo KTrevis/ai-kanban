@@ -6,25 +6,6 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
-const HIDDEN_PROJECTS_STORAGE_KEY = 'travaille.hiddenProjects';
-const hiddenProjectIdsQueryKey = ['opencode', 'hidden-project-ids'] as const;
-
-function readHiddenProjectIds() {
-  const value = window.localStorage.getItem(HIDDEN_PROJECTS_STORAGE_KEY);
-  const parsed = JSON.parse(value ?? '[]');
-
-  return parsed;
-}
-
-function writeHiddenProjectIds(projectIds: Array<string>) {
-  window.localStorage.setItem(
-    HIDDEN_PROJECTS_STORAGE_KEY,
-    JSON.stringify(projectIds),
-  );
-
-  return projectIds;
-}
-
 export type Project = NonNullable<
   ReturnType<typeof useGetProjects>['data']
 >[number] & { name?: string };
@@ -47,24 +28,6 @@ export const useCreateProject = () => {
       },
     }),
   );
-};
-
-export const useGetHiddenProjectIds = () => {
-  return useQuery({
-    queryKey: hiddenProjectIdsQueryKey,
-    queryFn: readHiddenProjectIds,
-  });
-};
-
-export const useUpdateHiddenProjectIds = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: writeHiddenProjectIds,
-    onSuccess() {
-      queryClient.invalidateQueries({ queryKey: hiddenProjectIdsQueryKey });
-    },
-  });
 };
 
 export type Session = NonNullable<

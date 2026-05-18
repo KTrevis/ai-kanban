@@ -1,19 +1,11 @@
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from '#/components/ui/context-menu';
 import type { Project } from '#/hooks/queries/opencode/project.queries';
 import { cn } from '#/lib/utils';
 import { useNavigate } from '@tanstack/react-router';
 
 export function ProjectCard({
-  onHide,
   project,
   selectedProject,
 }: {
-  onHide: () => void;
   project: Project;
   selectedProject?: string;
 }) {
@@ -24,7 +16,7 @@ export function ProjectCard({
     return null;
   }
 
-  const card = (
+  return (
     <div
       onClick={() =>
         navigate({ to: '/project/$id', params: { id: project.id } })
@@ -38,19 +30,5 @@ export function ProjectCard({
     >
       {firstChar}
     </div>
-  );
-
-  return (
-    <ContextMenu>
-      <ContextMenuTrigger asChild>{card}</ContextMenuTrigger>
-      <ContextMenuContent className="border-gray-700 bg-gray-800 text-white">
-        <ContextMenuItem
-          className="cursor-pointer focus:bg-gray-700 focus:text-white"
-          onSelect={onHide}
-        >
-          Hide project
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
   );
 }
