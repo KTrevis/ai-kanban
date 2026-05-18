@@ -7,7 +7,7 @@ import {
   getCommittedReviewDiff,
   getUncommittedReviewDiff,
 } from '../../git/review-diff';
-import { getProjectById } from '../opencode/opencode.projects';
+import { getProjectById } from '../projects/projects.service';
 import { websockets } from '../ws/ws.controller';
 
 const KANBAN_COLUMNS_SCHEMA = z.union([

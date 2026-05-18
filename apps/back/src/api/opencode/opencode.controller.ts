@@ -6,11 +6,7 @@ import {
 } from '@opencode-ai/sdk';
 import { ENVIRONMENT } from '../../schema/env.schema';
 import { executeSessionCommand } from './opencode.execute-command';
-import {
-  createProject,
-  getProjectById,
-  listProjects,
-} from './opencode.projects';
+import { getProjectById } from '../projects/projects.service';
 import { getProjectSessions } from './opencode.sessions';
 import { upsertSessionMessage } from './opencode.upsert-session';
 import z from 'zod/v3';
@@ -41,24 +37,6 @@ async function createClient(): Promise<OpencodeClient> {
 export const opencodeClient = await createClient();
 
 export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
-  .get('projects', async () => {
-    return listProjects();
-  })
-  .post(
-    'projects',
-    async ({ body: { name, worktree } }) => {
-      return createProject({
-        name: name.trim(),
-        worktree: worktree.trim(),
-      });
-    },
-    {
-      body: z.object({
-        name: z.string().min(1),
-        worktree: z.string().min(1),
-      }),
-    },
-  )
   .get('project/:id/commands', async ({ params: { id } }) => {
     const project = await getProjectById(id);
     const { data: commands = [] } = await opencodeClient.command.list({

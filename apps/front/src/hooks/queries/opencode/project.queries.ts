@@ -12,7 +12,7 @@ export type Project = NonNullable<
 
 export const useGetProjects = () => {
   const eden = useEden();
-  return useQuery(eden.opencode.projects.get.queryOptions());
+  return useQuery(eden.projects.get.queryOptions());
 };
 
 export const useCreateProject = () => {
@@ -20,11 +20,9 @@ export const useCreateProject = () => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    eden.opencode.projects.post.mutationOptions({
+    eden.projects.post.mutationOptions({
       onSuccess() {
-        queryClient.invalidateQueries(
-          eden.opencode.projects.get.queryOptions(),
-        );
+        queryClient.invalidateQueries(eden.projects.get.queryOptions());
       },
     }),
   );
