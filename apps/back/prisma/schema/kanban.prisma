@@ -6,16 +6,18 @@ enum KanbanColumn {
 }
 
 model Project {
-  id        String   @id @default(uuid())
-  name      String
-  worktree  String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String       @id @default(uuid())
+  name        String
+  worktree    String       @unique
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  kanbanCards KanbanCard[]
 }
 
 model KanbanCard {
   id              String       @id @default(uuid())
   projectId       String
+  project         Project      @relation(fields: [projectId], references: [id])
   sessionId       String?
   title           String
   description     String
