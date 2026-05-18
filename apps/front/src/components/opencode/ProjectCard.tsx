@@ -9,7 +9,7 @@ export function ProjectCard({
   project: Project;
   selectedProject?: string;
 }) {
-  const firstChar = Array.from(project.name ?? '')[0];
+  const firstChar = getFirstGrapheme(project.name ?? '');
   const navigate = useNavigate();
 
   if (!firstChar) {
@@ -31,4 +31,9 @@ export function ProjectCard({
       {firstChar}
     </div>
   );
+}
+
+function getFirstGrapheme(value: string) {
+  const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+  return segmenter.segment(value)[Symbol.iterator]().next().value?.segment;
 }
