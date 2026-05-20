@@ -55,9 +55,9 @@ export function ProjectPage({
     createProjectSession(
       { projectId },
       {
-        onSuccess({ sessionId }) {
-          if (sessionId) {
-            onSessionIdChange(sessionId);
+        onSuccess(result) {
+          if ('sessionId' in result && result.sessionId) {
+            onSessionIdChange(result.sessionId);
           }
         },
       },
