@@ -6,10 +6,23 @@ import { runGit } from './git-runner';
 import {
   commitVirtualChanges,
   getDiff,
+  getCheckedOutBranch,
   readFileFromRef,
 } from './virtual-branch-writer';
 
 describe('virtual branch writer', () => {
+  test('gets the checked out branch for a repository path', async () => {
+    const repoPath = await mkdtemp(join(tmpdir(), 'travaille-git-repo-'));
+
+    try {
+      await initTestRepo(repoPath);
+
+      await expect(getCheckedOutBranch(repoPath)).resolves.toBe('main');
+    } finally {
+      await rm(repoPath, { force: true, recursive: true });
+    }
+  });
+
   test('commits changes to a branch without checking it out or touching the worktree', async () => {
     const repoPath = await mkdtemp(join(tmpdir(), 'travaille-git-repo-'));
 

@@ -101,22 +101,10 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
   })
   .post(
     'session/message',
-    async ({ body: { message, projectId, sessionId, taskTitle } }) => {
-      const result = await upsertSessionMessage({
-        message,
-        projectId,
-        sessionId,
-        taskTitle,
-      });
-
-      return { sessionId: result.sessionId };
-    },
+    async ({ body: { cardId } }) => await upsertSessionMessage(cardId),
     {
       body: z.object({
-        message: z.string(),
-        projectId: z.string(),
-        sessionId: z.optional(z.string()),
-        taskTitle: z.optional(z.string()),
+        cardId: z.string(),
       }),
     },
   )

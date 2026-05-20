@@ -1,4 +1,9 @@
 import { runGit } from './git-runner';
+import {
+  getCheckedOutBranch,
+  getShortBranchName,
+  normalizeBranchRef,
+} from './virtual-branch-writer';
 
 export async function getCommittedReviewDiff({
   baseRef,
@@ -54,17 +59,5 @@ async function isCurrentBranch({
   branchRef: string;
   repoPath: string;
 }) {
-  const { stdout } = await runGit(['branch', '--show-current'], {
-    cwd: repoPath,
-  });
-
-  return stdout.trim() === getShortBranchName(branchRef);
-}
-
-function getShortBranchName(ref: string) {
-  return ref.startsWith('refs/heads/') ? ref.slice('refs/heads/'.length) : ref;
-}
-
-function normalizeBranchRef(ref: string) {
-  return ref.startsWith('refs/') ? ref : `refs/heads/${ref}`;
+  return (await getCheckedOutBranch(repoPath)) === getShortBranchName(branchRef);
 }

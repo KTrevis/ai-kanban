@@ -1,21 +1,15 @@
 import Elysia from 'elysia';
 import { prisma } from '../../lib/prisma';
-import z from 'zod/v3';
 import { KanbanColumn } from '../../generated/prisma/enums';
-import { notifyAgentTaskFinished } from '../../lib/notifications';
 import {
   getCommittedReviewDiff,
   getUncommittedReviewDiff,
 } from '../../git/review-diff';
 import { getProjectById } from '../projects/projects.service';
-import { websockets } from '../ws/ws.controller';
-
-const KANBAN_COLUMNS_SCHEMA = z.union([
-  z.literal(KanbanColumn.AI),
-  z.literal(KanbanColumn.DONE),
-  z.literal(KanbanColumn.REVIEW),
-  z.literal(KanbanColumn.TODO),
-]);
+import z from 'zod';
+import { patchCard } from './patch-card';
+import { UPDATE_KANBAN_CARD_SCHEMA } from './update-card.schema';
+import { KANBAN_COLUMNS_SCHEMA } from './kanban-columns.schema';
 
 const KANBAN_CARD_SCHEMA = z.object({
   id: z.string().optional(),
@@ -26,17 +20,6 @@ const KANBAN_CARD_SCHEMA = z.object({
   column: KANBAN_COLUMNS_SCHEMA,
   position: z.number().int().optional(),
   baseBranch: z.string().optional(),
-  useTravailleMcp: z.boolean().optional(),
-});
-
-const UPDATE_KANBAN_CARD_SCHEMA = z.object({
-  title: z.string().optional(),
-  description: z.string().optional(),
-  column: KANBAN_COLUMNS_SCHEMA.optional(),
-  position: z.number().int().optional(),
-  sessionId: z.string().nullable().optional(),
-  baseBranch: z.string().optional(),
-  newBranch: z.string().optional(),
   useTravailleMcp: z.boolean().optional(),
 });
 
@@ -163,28 +146,7 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
   )
   .patch(
     'card/:cardId',
-    async ({ body, params: { cardId } }) => {
-      const previousCard = await prisma.kanbanCard.findUnique({
-        where: { id: cardId },
-      });
-      const card = await prisma.kanbanCard.update({
-        where: { id: cardId },
-        data: body,
-      });
-
-      if (
-        previousCard?.column !== KanbanColumn.REVIEW &&
-        card.column === KanbanColumn.REVIEW
-      ) {
-        notifyAgentTaskFinished(card.title);
-        websockets.sendMessage({
-          type: 'cards.updated',
-          projectId: card.projectId,
-        });
-      }
-
-      return card;
-    },
+    ({ body, params: { cardId } }) => patchCard(cardId, body),
     {
       body: UPDATE_KANBAN_CARD_SCHEMA,
     },
