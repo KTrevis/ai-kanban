@@ -1,5 +1,8 @@
 import { ProjectList } from '#/components/opencode/ProjectList';
-import { useSendSessionMessage } from '#/hooks/mutations/opencode/session.mutations';
+import {
+  useCreateProjectSession,
+  useSendSessionMessage,
+} from '#/hooks/mutations/opencode/session.mutations';
 import {
   type KanbanCard,
   useGetKanbanCards,
@@ -13,11 +16,13 @@ import { ProjectContent } from './ProjectContent';
 export function ProjectPage({
   cardId,
   onCardIdChange,
+  onSessionIdChange,
   projectId,
   sessionId,
 }: {
   cardId?: string;
   onCardIdChange: (cardId?: string) => void;
+  onSessionIdChange: (sessionId: string) => void;
   projectId: string;
   sessionId?: string;
 }) {
@@ -25,6 +30,10 @@ export function ProjectPage({
   const { data: projects = [] } = useGetProjects();
   const { mutate: moveCards } = useMoveKanbanCards(projectId);
   const { mutate: sendSessionMessage } = useSendSessionMessage();
+  const {
+    isPending: isCreatingProjectSession,
+    mutate: createProjectSession,
+  } = useCreateProjectSession();
   const project = projects.find((project) => project.id === projectId);
   const projectFirstChar = Array.from(project?.name ?? '')[0];
 
@@ -40,6 +49,19 @@ export function ProjectPage({
       type: 'create-session-from-card',
       cardId: card.id,
     });
+  }
+
+  function startProjectSession() {
+    createProjectSession(
+      { projectId },
+      {
+        onSuccess({ sessionId }) {
+          if (sessionId) {
+            onSessionIdChange(sessionId);
+          }
+        },
+      },
+    );
   }
 
   function onCardMoved({ card, cards }: CardMovedEvent) {
@@ -68,11 +90,13 @@ export function ProjectPage({
       <ProjectContent
         cards={cards ?? []}
         cardId={cardId}
+        isProjectSessionStarting={isCreatingProjectSession}
         projectId={projectId}
         sessionId={sessionId}
         onCardCreated={onCardCreated}
         onCardIdChange={onCardIdChange}
         onCardMoved={onCardMoved}
+        onProjectSessionStart={startProjectSession}
       />
     </div>
   );

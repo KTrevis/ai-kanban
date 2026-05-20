@@ -101,6 +101,33 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
     return { messages };
   })
   .post(
+    'session',
+    async ({ body: { projectId }, set }) => {
+      const project = await getProjectById(projectId);
+
+      if (!project) {
+        set.status = 404;
+        return { error: 'Project not found' };
+      }
+
+      const { data: session } = await opencodeClient.session.create({
+        query: { directory: project.worktree },
+      });
+
+      if (!session) {
+        set.status = 500;
+        return { error: 'Failed to create session' };
+      }
+
+      return { sessionId: session.id };
+    },
+    {
+      body: z.object({
+        projectId: z.string(),
+      }),
+    },
+  )
+  .post(
     'session/message',
     async ({ body }) => await upsertSessionMessage(body),
     {

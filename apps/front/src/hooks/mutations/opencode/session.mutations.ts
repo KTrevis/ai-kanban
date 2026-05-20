@@ -1,8 +1,23 @@
 import { useEden } from '#/lib/eden/client';
 import { useInvalidateSessionMessages } from '#/hooks/queries/opencode/session.queries';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useGetProjectCommands } from '#/hooks/queries/opencode/project.queries';
 import { toast } from 'sonner';
+
+export function useCreateProjectSession() {
+  const eden = useEden();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    eden.opencode.session.post.mutationOptions({
+      onSuccess(_, { projectId }) {
+        queryClient.invalidateQueries(
+          eden.opencode.project({ id: projectId }).get.queryOptions(),
+        );
+      },
+    }),
+  );
+}
 
 export function useSendSessionMessage() {
   const eden = useEden();

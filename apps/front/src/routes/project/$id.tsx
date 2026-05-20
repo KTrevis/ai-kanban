@@ -22,12 +22,24 @@ function RouteComponent() {
     });
   }
 
+  function setSessionId(nextSessionId: string) {
+    navigate({
+      search: (search) => ({
+        ...search,
+        cardId: undefined,
+        sessionId: nextSessionId,
+      }),
+      replace: true,
+    });
+  }
+
   return (
     <ProjectPage
       cardId={cardId}
       projectId={id}
       sessionId={sessionId}
       onCardIdChange={setCardId}
+      onSessionIdChange={setSessionId}
     />
   );
 }

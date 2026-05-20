@@ -5,17 +5,21 @@ import { ProjectSessionPanel } from './ProjectSessionPanel';
 export function ProjectContent({
   cardId,
   cards,
+  isProjectSessionStarting,
   onCardCreated,
   onCardIdChange,
   onCardMoved,
+  onProjectSessionStart,
   projectId,
   sessionId,
 }: {
   cardId?: string;
   cards: KanbanCard[];
+  isProjectSessionStarting: boolean;
   onCardCreated: (card: KanbanCard) => void;
   onCardIdChange: (cardId?: string) => void;
   onCardMoved: (event: CardMovedEvent) => void;
+  onProjectSessionStart: () => void;
   projectId: string;
   sessionId?: string;
 }) {
@@ -35,10 +39,12 @@ export function ProjectContent({
     <KanbanPage
       cards={cards}
       cardId={cardId}
+      isProjectSessionStarting={isProjectSessionStarting}
       projectId={projectId}
       onCardIdChange={onCardIdChange}
       onCardCreated={onCardCreated}
       onCardMoved={onCardMoved}
+      onProjectSessionStart={onProjectSessionStart}
     />
   );
 }

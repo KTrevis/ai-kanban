@@ -15,6 +15,7 @@ import type {
 import type { KanbanCard as KanbanCardType } from '#/hooks/queries/kanban/kanban.queries';
 import { useEffect, useState } from 'react';
 import { Modal } from '#/components/Modal';
+import { Button } from '#/components/ui/button';
 import { KanbanCard } from './KanbanCard';
 import { KanbanColumn } from './KanbanColumn';
 import { CreateKanbanCardModalContent } from './CreateKanbanCardModalContent';
@@ -33,9 +34,11 @@ export type CardMovedEvent = {
 
 type KanbanPageProps = {
   cardId?: string;
+  isProjectSessionStarting?: boolean;
   onCardIdChange: (cardId?: string) => void;
   onCardCreated?: (card: KanbanCardType) => void;
   onCardMoved?: (event: CardMovedEvent) => void;
+  onProjectSessionStart?: () => void;
   cards: KanbanCardType[];
   projectId: string;
 };
@@ -50,9 +53,11 @@ const kanbanCollisionDetection: CollisionDetection = (args) => {
 
 export function KanbanPage({
   cardId,
+  isProjectSessionStarting = false,
   onCardIdChange,
   onCardCreated,
   onCardMoved,
+  onProjectSessionStart,
   cards,
   projectId,
 }: KanbanPageProps) {
@@ -137,7 +142,18 @@ export function KanbanPage({
       onDragStart={handleDragStart}
       sensors={sensors}
     >
-      <div className="h-full overflow-auto p-6 text-white flex-1">
+      <div className="h-full flex-1 overflow-auto p-6 text-white">
+        <div className="mb-4 flex min-w-220 justify-end">
+          <Button
+            disabled={isProjectSessionStarting}
+            onClick={onProjectSessionStart}
+            type="button"
+          >
+            {isProjectSessionStarting
+              ? 'Creation de la conversation...'
+              : 'Nouvelle conversation'}
+          </Button>
+        </div>
         <div className="grid min-w-220 grid-cols-4 gap-4">
           {KANBAN_COLUMNS.map((column) => {
             const columnCards = getColumnCards(column);
