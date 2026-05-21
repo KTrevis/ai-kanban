@@ -3,8 +3,43 @@ import { notifyAgentTaskStarted } from '../../lib/notifications';
 import { patchCard } from '../kanban/patch-card';
 import { prisma } from '../../lib/prisma';
 import { getCheckedOutBranch } from '../../git/virtual-branch-writer';
+import type {
+  SendMessageToCardData,
+  SendMessageToSessionData,
+  SessionMessageData,
+} from './session-message.schema';
 
-export async function upsertSessionMessage(cardId: string) {
+function buildPrompt(card: {
+  title: string;
+  description: string;
+  branch: string;
+  id: string;
+  useTravailleMcp: boolean;
+}) {
+  const travailleMcpInstructions =
+    card.useTravailleMcp !== false
+      ? `Utilise le MCP travaille pour réaliser cette tâche.
+        Interdiction stricte : ne crée pas et n'utilise pas de git worktree.
+        Pour lire, modifier, committer ou comparer du code sur la branche cible, utilise les outils MCP travaille : travaille_read_file, travaille_write_file, travaille_commit_changes et travaille_get_diff.
+        Choisis un nom de branche court et descriptif au format ai/<slug>, par exemple ai/fix-login ou ai/add-kanban-filter.
+        Avant de modifier le code, mets à jour la carte Kanban avec travaille_patch_kanban_card en définissant newBranch avec le nom de branche choisi.
+        Utilise ensuite exactement ce même nom de branche pour tous les outils MCP travaille qui demandent branchRef.
+        Si jamais la carte te demande explicitement de ne pas écrire de code, ne crée pas la branche, réponds juste dans la conversation au message.
+        Tu dois tout de même lire le code si tu en as besoin pour répondre à la question.`
+      : '';
+  const message = [
+    `Réalise la tâche suivante :`,
+    `Titre de la tâche : ${card.title}`,
+    `Description de la tâches : ${card.description}`,
+    `Branche sur laquelle te baser : ${card.branch}`,
+    `ID de la carte Kanban : ${card.id}`,
+    travailleMcpInstructions,
+    `Quand tu as fini, place la carte dans la colonne REVIEW.`,
+  ].join('\n\n');
+  return message;
+}
+
+async function createSessionFromCard({ cardId }: SendMessageToCardData) {
   const card = await prisma.kanbanCard.findUniqueOrThrow({
     where: {
       id: cardId,
@@ -24,41 +59,53 @@ export async function upsertSessionMessage(cardId: string) {
       },
     },
   });
-  const sessionId = card.sessionId;
-  const sessionExists = sessionId?.length;
-  const targetSessionId = sessionExists
-    ? sessionId
-    : await createSession(card.project.worktree);
+
+  if (card.sessionId?.length) {
+    // TODO: exception that sets the http code
+    throw new Error(`session already exists for card ${card.id}`);
+  }
+
+  const sessionId = await createSession(card.project.worktree);
   const branch =
     card.baseBranch === 'HEAD'
       ? ((await getCheckedOutBranch(card.project.worktree)) ?? 'HEAD')
       : card.baseBranch;
   await patchCard(cardId, {
-    sessionId: targetSessionId,
+    sessionId: sessionId,
     baseBranch: branch,
   });
+  const prompt = buildPrompt({ ...card, branch });
 
-  const travailleMcpInstructions =
-    card.useTravailleMcp !== false
-      ? `Utilise le MCP travaille pour réaliser cette tâche.
-      Interdiction stricte : ne crée pas et n'utilise pas de git worktree.
-      Pour lire, modifier, committer ou comparer du code sur la branche cible, utilise les outils MCP travaille : travaille_read_file, travaille_write_file, travaille_commit_changes et travaille_get_diff.
-      Choisis un nom de branche court et descriptif au format ai/<slug>, par exemple ai/fix-login ou ai/add-kanban-filter.
-      Avant de modifier le code, mets à jour la carte Kanban avec travaille_patch_kanban_card en définissant newBranch avec le nom de branche choisi.
-      Utilise ensuite exactement ce même nom de branche pour tous les outils MCP travaille qui demandent branchRef.
-      Si jamais la carte te demande explicitement de ne pas écrire de code, ne crée pas la branche, réponds juste dans la conversation au message.
-      Tu dois tout de même lire le code si tu en as besoin pour répondre à la question.`
-      : '';
-  const message = [
-    `Réalise la tâche suivante :`,
-    `Titre de la tâche : ${card.title}`,
-    `Description de la tâches : ${card.description}`,
-    `Branche sur laquelle te baser : ${branch}`,
-    `ID de la carte Kanban : ${card.id}`,
-    travailleMcpInstructions,
-    `Quand tu as fini, place la carte dans la colonne REVIEW.`,
-  ].join('\n\n');
+  await opencodeClient.session.promptAsync({
+    body: {
+      parts: [
+        {
+          text: prompt,
+          type: 'text',
+        },
+      ],
+    },
+    path: { id: sessionId },
+    query: { directory: card.project.worktree },
+  });
+  notifyAgentTaskStarted(card.title);
 
+  return { sessionId };
+}
+
+async function sendMessageToSession({
+  message,
+  projectId,
+  sessionId,
+}: SendMessageToSessionData) {
+  const { worktree } = await prisma.project.findUniqueOrThrow({
+    where: {
+      id: projectId,
+    },
+    select: {
+      worktree: true,
+    },
+  });
   await opencodeClient.session.promptAsync({
     body: {
       parts: [
@@ -68,12 +115,21 @@ export async function upsertSessionMessage(cardId: string) {
         },
       ],
     },
-    path: { id: targetSessionId },
-    query: { directory: card.project.worktree },
+    path: { id: sessionId },
+    query: { directory: worktree },
   });
-  notifyAgentTaskStarted(card.title);
+  return { sessionId };
+}
 
-  return { sessionId: targetSessionId };
+export async function upsertSessionMessage(
+  body: SessionMessageData,
+): Promise<{ sessionId: string }> {
+  switch (body.type) {
+    case 'create-session-from-card':
+      return createSessionFromCard(body);
+    case 'send-message-to-session':
+      return sendMessageToSession(body);
+  }
 }
 
 async function createSession(directory: string) {

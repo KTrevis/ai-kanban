@@ -72,9 +72,10 @@ export function ProjectSessionInput({
 
     sendSessionMessage(
       {
-        message,
-        projectId,
+        type: 'send-message-to-session',
         sessionId,
+        projectId,
+        message,
       },
       {
         onSuccess: () => setSessionMessage(''),

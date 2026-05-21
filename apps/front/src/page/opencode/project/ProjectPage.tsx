@@ -37,6 +37,7 @@ export function ProjectPage({
 
   function startAgentSession(card: KanbanCard) {
     sendSessionMessage({
+      type: 'create-session-from-card',
       cardId: card.id,
     });
   }

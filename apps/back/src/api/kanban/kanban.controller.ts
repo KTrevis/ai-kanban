@@ -1,6 +1,5 @@
 import Elysia from 'elysia';
 import { prisma } from '../../lib/prisma';
-import { KanbanColumn } from '../../generated/prisma/enums';
 import {
   getCommittedReviewDiff,
   getUncommittedReviewDiff,

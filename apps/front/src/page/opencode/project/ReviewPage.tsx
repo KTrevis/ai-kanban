@@ -31,6 +31,7 @@ export function ReviewPage({ cardId }: { cardId: string }) {
   const { data, error, isLoading } = useGetKanbanCardReview(cardId);
   const { data: projects = [] } = useGetProjects();
   const projectId = data?.projectId;
+  const sessionId = data?.sessionId;
   const project = projects.find((project) => project.id === projectId);
   const projectFirstChar = Array.from(project?.name ?? '')[0];
   const [mode, setMode] = useState<DiffModeEnum>(DiffModeEnum.Unified);
@@ -71,28 +72,32 @@ export function ReviewPage({ cardId }: { cardId: string }) {
         onModeChange={setMode}
         onSendReview={() => {
           if (!projectId) {
+            toast.error('No project id linked to the card');
+            return;
+          }
+
+          if (!sessionId) {
+            toast.error('No session id linked to the card');
             return;
           }
 
           sendMessage(
             {
-              projectId,
+              type: 'send-message-to-session',
               message: formatComments(comments),
-              sessionId: data?.sessionId ?? undefined,
+              projectId,
+              sessionId,
             },
             {
               onSuccess() {
                 toast.success('Review comments sent');
-                const sessionId = data.sessionId;
-                if (sessionId) {
-                  navigate({
-                    to: '/project/$id',
-                    params: { id: projectId },
-                    search: {
-                      sessionId,
-                    },
-                  });
-                }
+                navigate({
+                  to: '/project/$id',
+                  params: { id: projectId },
+                  search: {
+                    sessionId,
+                  },
+                });
               },
             },
           );

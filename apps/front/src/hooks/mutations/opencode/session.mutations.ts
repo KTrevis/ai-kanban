@@ -11,10 +11,6 @@ export function useSendSessionMessage() {
   return useMutation(
     eden.opencode.session.message.post.mutationOptions({
       onSuccess({ sessionId }) {
-        if (!sessionId) {
-          return;
-        }
-
         invalidateSessionMessages(sessionId);
       },
     }),

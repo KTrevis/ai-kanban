@@ -10,6 +10,7 @@ import { getProjectById } from '../projects/projects.service';
 import { getProjectSessions } from './opencode.sessions';
 import { upsertSessionMessage } from './opencode.upsert-session';
 import z from 'zod/v3';
+import { SESSION_MESSAGE_SCHEMA } from './session-message.schema';
 
 async function canReachOpencode(url: string) {
   try {
@@ -101,11 +102,9 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
   })
   .post(
     'session/message',
-    async ({ body: { cardId } }) => await upsertSessionMessage(cardId),
+    async ({ body }) => await upsertSessionMessage(body),
     {
-      body: z.object({
-        cardId: z.string(),
-      }),
+      body: SESSION_MESSAGE_SCHEMA,
     },
   )
   .post(
