@@ -6,6 +6,7 @@ import { Copy, GitBranch, GitMerge } from 'lucide-react';
 const modeButtonClass = 'cursor-pointer rounded-md px-3 py-1.5';
 
 export function ReviewHeader({
+  canRebase,
   isCheckingOutBranch,
   isMergingBranch,
   mode,
@@ -17,6 +18,7 @@ export function ReviewHeader({
   onSendReview,
   baseBranch,
 }: {
+  canRebase?: boolean;
   isCheckingOutBranch?: boolean;
   isMergingBranch?: boolean;
   mode: DiffModeEnum;
@@ -78,7 +80,7 @@ export function ReviewHeader({
               {isCheckingOutBranch ? 'Checking out...' : 'Checkout branch'}
             </Button>
             <Button
-              disabled={!newBranch || isMergingBranch}
+              disabled={!newBranch || !canRebase || isMergingBranch}
               onClick={onMergeBranch}
               type="button"
               variant="outline"

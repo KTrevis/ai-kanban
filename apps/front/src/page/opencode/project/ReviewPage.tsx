@@ -74,6 +74,7 @@ export function ReviewPage({ cardId }: { cardId: string }) {
   return (
     <section className="flex h-full min-w-0 flex-1 flex-col text-gray-100">
       <ReviewHeader
+        canRebase={data?.canRebase}
         isCheckingOutBranch={isCheckingOutBranch}
         isMergingBranch={isMergingBranch}
         mode={mode}
@@ -102,6 +103,11 @@ export function ReviewPage({ cardId }: { cardId: string }) {
         onMergeBranch={() => {
           if (!data?.newBranch) {
             toast.error('No branch linked to the card');
+            return;
+          }
+
+          if (!data.canRebase) {
+            toast.error('Rebase has conflicts');
             return;
           }
 

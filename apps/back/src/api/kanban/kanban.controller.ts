@@ -10,11 +10,7 @@ import z from 'zod';
 import { patchCard } from './patch-card';
 import { UPDATE_KANBAN_CARD_SCHEMA } from './update-card.schema';
 import { KANBAN_COLUMNS_SCHEMA } from './kanban-columns.schema';
-import {
-  getCheckedOutBranch,
-  getShortBranchName,
-  normalizeBranchRef,
-} from '../../git/virtual-branch-writer';
+import { normalizeBranchRef } from '../../git/virtual-branch-writer';
 
 const KANBAN_CARD_SCHEMA = z.object({
   id: z.string().optional(),
@@ -80,6 +76,11 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
 
     return {
       baseBranch: card.baseBranch,
+      canRebase: await canRebaseBranch({
+        baseBranch: card.baseBranch,
+        branchRef: newBranch,
+        repoPath: project.worktree,
+      }),
       cardId: card.id,
       diff,
       isEmpty: diff.trim().length === 0,
@@ -252,6 +253,31 @@ function getProjectCards(projectId: string) {
   });
 }
 
+async function canRebaseBranch({
+  baseBranch,
+  branchRef,
+  repoPath,
+}: {
+  baseBranch: string;
+  branchRef: string;
+  repoPath: string;
+}) {
+  try {
+    await runGit(
+      [
+        'merge-tree',
+        '--write-tree',
+        getUpdatableBranchRef(baseBranch),
+        normalizeBranchRef(branchRef),
+      ],
+      { cwd: repoPath },
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function rebaseBranchIntoBase({
   baseBranch,
   branchRef,
@@ -263,59 +289,24 @@ async function rebaseBranchIntoBase({
 }) {
   const targetRef = getUpdatableBranchRef(baseBranch);
   const sourceRef = normalizeBranchRef(branchRef);
-  const previousBranch = await getCheckedOutBranch(repoPath);
 
-  try {
-    await runGit(['rebase', targetRef, sourceRef], {
-      cwd: repoPath,
-      timeoutMs: 120_000,
-    });
-  } catch (error) {
-    await abortRebase(repoPath);
-    await restoreBranch({ branchRef: sourceRef, previousBranch, repoPath });
-    throw error;
-  }
+  await runGit(['rebase', targetRef, sourceRef], {
+    cwd: repoPath,
+    timeoutMs: 120_000,
+  });
 
-  try {
-    const { stdout } = await runGit(['rev-parse', '--verify', sourceRef], {
-      cwd: repoPath,
-    });
-    const commitOid = stdout.trim();
-    await runGit(['update-ref', targetRef, commitOid], { cwd: repoPath });
+  const { stdout } = await runGit(['rev-parse', '--verify', sourceRef], {
+    cwd: repoPath,
+  });
+  const commitOid = stdout.trim();
+  await runGit(['update-ref', targetRef, commitOid], { cwd: repoPath });
 
-    return {
-      baseBranch,
-      branch: branchRef,
-      commitOid,
-      rebased: true,
-    };
-  } finally {
-    await restoreBranch({ branchRef: sourceRef, previousBranch, repoPath });
-  }
-}
-
-async function abortRebase(repoPath: string) {
-  try {
-    await runGit(['rebase', '--abort'], { cwd: repoPath });
-  } catch {
-    // Nothing to abort, or Git already restored the repository state.
-  }
-}
-
-async function restoreBranch({
-  branchRef,
-  previousBranch,
-  repoPath,
-}: {
-  branchRef: string;
-  previousBranch: string | null;
-  repoPath: string;
-}) {
-  if (!previousBranch || previousBranch === getShortBranchName(branchRef)) {
-    return;
-  }
-
-  await runGit(['switch', previousBranch], { cwd: repoPath });
+  return {
+    baseBranch,
+    branch: branchRef,
+    commitOid,
+    rebased: true,
+  };
 }
 
 function getUpdatableBranchRef(ref: string) {
