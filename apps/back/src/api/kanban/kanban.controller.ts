@@ -162,14 +162,15 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
       });
     } catch (error) {
       set.status = 400;
-      return {
-        error:
-          error instanceof GitRunError
-            ? error.result.stderr.trim() || error.message
-            : error instanceof Error
-              ? error.message
-              : 'Failed to rebase branch',
-      };
+
+      let message = 'Failed to rebase branch';
+      if (error instanceof GitRunError) {
+        message = error.result.stderr.trim() || error.message;
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
+
+      return { error: message };
     }
   })
   .patch(
