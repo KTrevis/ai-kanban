@@ -1,6 +1,7 @@
 import {
   useCheckoutKanbanCardBranch,
   useGetKanbanCardReview,
+  useMergeKanbanCardBranch,
 } from '#/hooks/queries/kanban/kanban.queries';
 import { useSendSessionMessage } from '#/hooks/mutations/opencode/session.mutations';
 import { useGetProjects } from '#/hooks/queries/opencode/project.queries';
@@ -41,6 +42,8 @@ export function ReviewPage({ cardId }: { cardId: string }) {
   const [comments, setComments] = useState<ReviewComment[]>([]);
   const { mutate: checkoutBranch, isPending: isCheckingOutBranch } =
     useCheckoutKanbanCardBranch(cardId);
+  const { mutate: mergeBranch, isPending: isMergingBranch } =
+    useMergeKanbanCardBranch(cardId);
   const { mutate: sendMessage } = useSendSessionMessage();
   const navigate = useNavigate();
   const files = useMemo(
@@ -72,6 +75,7 @@ export function ReviewPage({ cardId }: { cardId: string }) {
     <section className="flex h-full min-w-0 flex-1 flex-col text-gray-100">
       <ReviewHeader
         isCheckingOutBranch={isCheckingOutBranch}
+        isMergingBranch={isMergingBranch}
         mode={mode}
         newBranch={data?.newBranch}
         baseBranch={data?.baseBranch}
@@ -92,6 +96,25 @@ export function ReviewPage({ cardId }: { cardId: string }) {
             },
             onSuccess() {
               toast.success(`Checked out ${data.newBranch}`);
+            },
+          });
+        }}
+        onMergeBranch={() => {
+          if (!data?.newBranch) {
+            toast.error('No branch linked to the card');
+            return;
+          }
+
+          mergeBranch(undefined, {
+            onError(error) {
+              toast.error(
+                error instanceof Error ? error.message : 'Failed to merge branch',
+              );
+            },
+            onSuccess(result) {
+              toast.success(
+                result.fastForward ? 'Branch fast-forwarded' : 'Branch merged',
+              );
             },
           });
         }}

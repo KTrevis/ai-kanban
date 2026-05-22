@@ -10,6 +10,7 @@ import z from 'zod';
 import { patchCard } from './patch-card';
 import { UPDATE_KANBAN_CARD_SCHEMA } from './update-card.schema';
 import { KANBAN_COLUMNS_SCHEMA } from './kanban-columns.schema';
+import { getShortBranchName, normalizeBranchRef } from '../../git/virtual-branch-writer';
 
 const KANBAN_CARD_SCHEMA = z.object({
   id: z.string().optional(),
@@ -123,6 +124,49 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
 
     return { branch: newBranch };
   })
+  .post('card/:cardId/merge', async ({ params: { cardId }, set }) => {
+    const card = await prisma.kanbanCard.findUnique({
+      where: { id: cardId },
+      select: {
+        baseBranch: true,
+        newBranch: true,
+        project: {
+          select: {
+            worktree: true,
+          },
+        },
+      },
+    });
+
+    if (!card) {
+      set.status = 404;
+      return { error: 'Kanban card not found' };
+    }
+
+    const newBranch = card.newBranch.trim();
+    if (!newBranch) {
+      set.status = 400;
+      return { error: 'Kanban card has no linked branch to merge' };
+    }
+
+    try {
+      return await mergeBranchIntoBase({
+        baseBranch: card.baseBranch,
+        branchRef: newBranch,
+        repoPath: card.project.worktree,
+      });
+    } catch (error) {
+      set.status = 400;
+      return {
+        error:
+          error instanceof GitRunError
+            ? error.result.stderr.trim() || error.message
+            : error instanceof Error
+              ? error.message
+              : 'Failed to merge branch',
+      };
+    }
+  })
   .patch(
     'cards',
     async ({ body }) => {
@@ -202,4 +246,89 @@ function getProjectCards(projectId: string) {
     },
     orderBy: [{ column: 'asc' }, { position: 'asc' }],
   });
+}
+
+async function mergeBranchIntoBase({
+  baseBranch,
+  branchRef,
+  repoPath,
+}: {
+  baseBranch: string;
+  branchRef: string;
+  repoPath: string;
+}) {
+  const targetRef = getUpdatableBranchRef(baseBranch);
+  const sourceRef = normalizeBranchRef(branchRef);
+  const { stdout: baseOidOutput } = await runGit(
+    ['rev-parse', '--verify', targetRef],
+    { cwd: repoPath },
+  );
+  const { stdout: branchOidOutput } = await runGit(
+    ['rev-parse', '--verify', sourceRef],
+    { cwd: repoPath },
+  );
+  const baseOid = baseOidOutput.trim();
+  const branchOid = branchOidOutput.trim();
+
+  try {
+    await runGit(['merge-base', '--is-ancestor', baseOid, branchOid], {
+      cwd: repoPath,
+    });
+    await runGit(['update-ref', targetRef, branchOid, baseOid], {
+      cwd: repoPath,
+    });
+
+    return {
+      baseBranch,
+      branch: branchRef,
+      commitOid: branchOid,
+      fastForward: true,
+    };
+  } catch (error) {
+    if (!(error instanceof GitRunError) || error.result.args[0] !== 'merge-base') {
+      throw error;
+    }
+  }
+
+  const { stdout: treeOidOutput } = await runGit(
+    ['merge-tree', '--write-tree', baseOid, branchOid],
+    { cwd: repoPath },
+  );
+  const mergeMessage = `Merge branch '${getShortBranchName(branchRef)}' into ${getShortBranchName(baseBranch)}`;
+  const { stdout: commitOidOutput } = await runGit(
+    [
+      'commit-tree',
+      treeOidOutput.trim(),
+      '-p',
+      baseOid,
+      '-p',
+      branchOid,
+      '-m',
+      mergeMessage,
+    ],
+    { cwd: repoPath },
+  );
+  const commitOid = commitOidOutput.trim();
+  await runGit(['update-ref', targetRef, commitOid, baseOid], {
+    cwd: repoPath,
+  });
+
+  return {
+    baseBranch,
+    branch: branchRef,
+    commitOid,
+    fastForward: false,
+  };
+}
+
+function getUpdatableBranchRef(ref: string) {
+  if (ref.startsWith('refs/heads/')) {
+    return ref;
+  }
+
+  if (ref === 'HEAD' || ref.startsWith('refs/')) {
+    throw new Error('Base branch must be a local branch to merge into');
+  }
+
+  return normalizeBranchRef(ref);
 }

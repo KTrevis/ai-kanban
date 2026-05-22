@@ -82,6 +82,21 @@ export function useCheckoutKanbanCardBranch(cardId: string) {
   );
 }
 
+export function useMergeKanbanCardBranch(cardId: string) {
+  const eden = useEden();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    eden.kanban.card({ cardId }).merge.post.mutationOptions({
+      onSuccess() {
+        queryClient.invalidateQueries(
+          eden.kanban.card({ cardId }).review.get.queryOptions(),
+        );
+      },
+    }),
+  );
+}
+
 export function useDeleteKanbanCard(projectId: string, cardId: string) {
   const eden = useEden();
   const queryClient = useQueryClient();
