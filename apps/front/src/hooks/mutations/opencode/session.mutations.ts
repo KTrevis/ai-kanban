@@ -61,6 +61,9 @@ export function useExecuteSessionCommand(projectId: string) {
 
         invalidateSessionMessages(sessionId);
       },
+      onSuccess({ sessionId }) {
+        invalidateSessionMessages(sessionId);
+      },
     }),
   );
 }

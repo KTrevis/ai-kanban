@@ -45,7 +45,16 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
       query: { directory: project?.worktree },
     });
 
-    return { commands };
+    return {
+      commands: [
+        ...commands,
+        {
+          description: 'Revert the last message in the session',
+          name: 'undo',
+          template: '',
+        },
+      ],
+    };
   })
   .get(
     'project/:id/files',

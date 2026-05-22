@@ -18,6 +18,17 @@ export async function executeSessionCommand({
     return { error: 'Project not found' as const, status: 404 as const };
   }
 
+  if (command === 'undo') {
+    if (!sessionId?.length) {
+      return { error: 'Session is required to undo' as const, status: 400 as const };
+    }
+
+    return await revertLastSessionMessage({
+      directory: project.worktree,
+      sessionId,
+    });
+  }
+
   const targetSessionId = sessionId?.length
     ? sessionId
     : await createSession(project.worktree);
@@ -32,6 +43,32 @@ export async function executeSessionCommand({
   });
 
   return { sessionId: targetSessionId };
+}
+
+async function revertLastSessionMessage({
+  directory,
+  sessionId,
+}: {
+  directory: string;
+  sessionId: string;
+}) {
+  const { data: messages = [] } = await opencodeClient.session.messages({
+    path: { id: sessionId },
+    query: { directory },
+  });
+  const lastMessage = messages.at(-1);
+
+  if (!lastMessage) {
+    return { error: 'No message to undo' as const, status: 400 as const };
+  }
+
+  await opencodeClient.session.revert({
+    body: { messageID: lastMessage.info.id },
+    path: { id: sessionId },
+    query: { directory },
+  });
+
+  return { sessionId };
 }
 
 async function createSession(directory: string) {
