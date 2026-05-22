@@ -152,10 +152,6 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
         sessionId,
       });
 
-      if ('error' in result) {
-        throw new HttpError(result.status ?? 500, result.error);
-      }
-
       return { sessionId: result.sessionId };
     },
     {

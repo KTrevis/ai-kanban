@@ -1,3 +1,4 @@
+import { HttpError } from '../../lib/http-error';
 import { getProjectById } from '../projects/projects.service';
 import { opencodeClient } from './opencode.controller';
 
@@ -15,15 +16,12 @@ export async function executeSessionCommand({
   const project = await getProjectById(projectId);
 
   if (!project) {
-    return { error: 'Project not found' as const, status: 404 as const };
+    throw new HttpError(404, 'Project not found');
   }
 
   if (command === 'undo') {
     if (!sessionId?.length) {
-      return {
-        error: 'Session is required to undo' as const,
-        status: 400 as const,
-      };
+      throw new HttpError(400, 'Session is required to undo');
     }
 
     return await revertLastSessionMessage({
@@ -62,7 +60,7 @@ async function revertLastSessionMessage({
   const lastMessage = messages.at(-1);
 
   if (!lastMessage) {
-    return { error: 'No message to undo' as const, status: 400 as const };
+    throw new HttpError(400, 'No message to undo');
   }
 
   await opencodeClient.session.revert({
