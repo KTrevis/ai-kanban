@@ -20,7 +20,10 @@ export async function executeSessionCommand({
 
   if (command === 'undo') {
     if (!sessionId?.length) {
-      return { error: 'Session is required to undo' as const, status: 400 as const };
+      return {
+        error: 'Session is required to undo' as const,
+        status: 400 as const,
+      };
     }
 
     return await revertLastSessionMessage({
