@@ -15,6 +15,7 @@ const modeButtonClass = 'cursor-pointer rounded-md px-3 py-1.5';
 export function ReviewHeader({
   canRebase,
   cannotMergeReason,
+  checkedOutBranch,
   isCheckingOutBranch,
   isMergingBranch,
   mode,
@@ -28,6 +29,7 @@ export function ReviewHeader({
 }: {
   canRebase?: boolean;
   cannotMergeReason?: string;
+  checkedOutBranch?: string;
   isCheckingOutBranch?: boolean;
   isMergingBranch?: boolean;
   mode: DiffModeEnum;
@@ -39,6 +41,9 @@ export function ReviewHeader({
   onSendReview: () => void;
   baseBranch?: string;
 }) {
+  const isBranchCheckedOut = Boolean(
+    newBranch && checkedOutBranch === newBranch,
+  );
   const mergeDisabledReason = !newBranch
     ? 'No branch linked to the card'
     : canRebase === false
@@ -98,13 +103,17 @@ export function ReviewHeader({
           </div>
           <div className="flex flex-wrap justify-end gap-2">
             <Button
-              disabled={!newBranch || isCheckingOutBranch}
+              disabled={!newBranch || isBranchCheckedOut || isCheckingOutBranch}
               onClick={onCheckoutBranch}
               type="button"
               variant="outline"
             >
               <GitBranch className="size-4" />
-              {isCheckingOutBranch ? 'Checking out...' : 'Checkout branch'}
+              {isCheckingOutBranch
+                ? 'Checking out...'
+                : isBranchCheckedOut
+                  ? 'Branch checked out'
+                  : 'Checkout branch'}
             </Button>
             {mergeDisabledReason ? (
               <DisabledReasonTooltip reason={mergeDisabledReason}>

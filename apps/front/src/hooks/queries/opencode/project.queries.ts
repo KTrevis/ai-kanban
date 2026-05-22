@@ -15,6 +15,15 @@ export const useGetProjects = () => {
   return useQuery(eden.projects.get.queryOptions());
 };
 
+export const useGetProjectCheckedOutBranch = (projectId?: string) => {
+  const eden = useEden();
+
+  return useQuery({
+    ...eden.projects({ projectId: projectId ?? '' })['checked-out-branch'].get.queryOptions(),
+    enabled: Boolean(projectId),
+  });
+};
+
 export const useCreateProject = () => {
   const eden = useEden();
   const queryClient = useQueryClient();

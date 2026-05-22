@@ -4,7 +4,10 @@ import {
   useMergeKanbanCardBranch,
 } from '#/hooks/queries/kanban/kanban.queries';
 import { useSendSessionMessage } from '#/hooks/mutations/opencode/session.mutations';
-import { useGetProjects } from '#/hooks/queries/opencode/project.queries';
+import {
+  useGetProjectCheckedOutBranch,
+  useGetProjects,
+} from '#/hooks/queries/opencode/project.queries';
 import { DiffModeEnum, SplitSide } from '@git-diff-view/react';
 import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
@@ -38,6 +41,7 @@ export function ReviewPage({ cardId }: { cardId: string }) {
   const projectId = data?.projectId;
   const sessionId = data?.sessionId;
   const project = projects.find((project) => project.id === projectId);
+  const checkedOutBranchQuery = useGetProjectCheckedOutBranch(projectId);
   const projectFirstChar = Array.from(project?.name ?? '')[0];
   const [mode, setMode] = useState<DiffModeEnum>(DiffModeEnum.Unified);
   const [comments, setComments] = useState<ReviewComment[]>([]);
@@ -80,6 +84,7 @@ export function ReviewPage({ cardId }: { cardId: string }) {
           baseBranch={data?.baseBranch}
           canRebase={data?.canRebase}
           cannotMergeReason={data?.cannotMergeReason}
+          checkedOutBranch={checkedOutBranchQuery.data?.branch ?? undefined}
           isCheckingOutBranch={isCheckingOutBranch}
           isMergingBranch={isMergingBranch}
           mode={mode}
@@ -101,6 +106,7 @@ export function ReviewPage({ cardId }: { cardId: string }) {
               },
               onSuccess() {
                 toast.success(`Checked out ${data.newBranch}`);
+                checkedOutBranchQuery.refetch();
               },
             });
           }}
@@ -125,6 +131,7 @@ export function ReviewPage({ cardId }: { cardId: string }) {
               },
               onSuccess() {
                 toast.success('Branch rebased and merged');
+                checkedOutBranchQuery.refetch();
               },
             });
           }}
