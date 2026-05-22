@@ -1,4 +1,4 @@
-import { Elysia } from 'elysia';
+import { Elysia, error as httpError } from 'elysia';
 import cors from '@elysiajs/cors';
 import { OPENCODE_CONTROLLER } from './api/opencode/opencode.controller';
 import { startOpencodeEventRelay } from './api/opencode/opencode.event-relay';
@@ -11,10 +11,9 @@ export const app = new Elysia()
   .onAfterResponse(({ request, set }) => {
     console.log(request.method, request.url, set.status);
   })
-  .onError(({ error, set }) => {
+  .onError(({ error }) => {
     if (error instanceof HttpError) {
-      set.status = error.status;
-      return { error: error.message };
+      return httpError(error.status, { error: error.message });
     }
 
     console.error(error);
