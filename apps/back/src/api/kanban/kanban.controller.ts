@@ -10,7 +10,10 @@ import z from 'zod';
 import { patchCard } from './patch-card';
 import { UPDATE_KANBAN_CARD_SCHEMA } from './update-card.schema';
 import { KANBAN_COLUMNS_SCHEMA } from './kanban-columns.schema';
-import { getShortBranchName, normalizeBranchRef } from '../../git/virtual-branch-writer';
+import {
+  getShortBranchName,
+  normalizeBranchRef,
+} from '../../git/virtual-branch-writer';
 
 const KANBAN_CARD_SCHEMA = z.object({
   id: z.string().optional(),
@@ -285,7 +288,10 @@ async function mergeBranchIntoBase({
       fastForward: true,
     };
   } catch (error) {
-    if (!(error instanceof GitRunError) || error.result.args[0] !== 'merge-base') {
+    if (
+      !(error instanceof GitRunError) ||
+      error.result.args[0] !== 'merge-base'
+    ) {
       throw error;
     }
   }
@@ -294,7 +300,15 @@ async function mergeBranchIntoBase({
     ['merge-tree', '--write-tree', baseOid, branchOid],
     { cwd: repoPath },
   );
-  const mergeMessage = `Merge branch '${getShortBranchName(branchRef)}' into ${getShortBranchName(baseBranch)}`;
+  const mergeMessage = `Merge branch '${getShortBranchName(
+    branchRef,
+  )}' into ${getShortBranchName(baseBranch)}`;
+  const mergeIdentity = {
+    GIT_AUTHOR_EMAIL: 'agent@travaille.local',
+    GIT_AUTHOR_NAME: 'Travaille Agent',
+    GIT_COMMITTER_EMAIL: 'agent@travaille.local',
+    GIT_COMMITTER_NAME: 'Travaille Agent',
+  };
   const { stdout: commitOidOutput } = await runGit(
     [
       'commit-tree',
@@ -306,7 +320,7 @@ async function mergeBranchIntoBase({
       '-m',
       mergeMessage,
     ],
-    { cwd: repoPath },
+    { cwd: repoPath, env: mergeIdentity },
   );
   const commitOid = commitOidOutput.trim();
   await runGit(['update-ref', targetRef, commitOid, baseOid], {

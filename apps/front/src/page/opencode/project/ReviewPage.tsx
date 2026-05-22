@@ -108,7 +108,9 @@ export function ReviewPage({ cardId }: { cardId: string }) {
           mergeBranch(undefined, {
             onError(error) {
               toast.error(
-                error instanceof Error ? error.message : 'Failed to merge branch',
+                error instanceof Error
+                  ? error.message
+                  : 'Failed to merge branch',
               );
             },
             onSuccess(result) {
