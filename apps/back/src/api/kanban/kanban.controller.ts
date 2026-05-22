@@ -264,40 +264,6 @@ async function rebaseBranchIntoBase({
   const targetRef = getUpdatableBranchRef(baseBranch);
   const sourceRef = normalizeBranchRef(branchRef);
   const previousBranch = await getCheckedOutBranch(repoPath);
-  const { stdout: baseOidOutput } = await runGit(
-    ['rev-parse', '--verify', targetRef],
-    { cwd: repoPath },
-  );
-  const { stdout: branchOidOutput } = await runGit(
-    ['rev-parse', '--verify', sourceRef],
-    { cwd: repoPath },
-  );
-  const baseOid = baseOidOutput.trim();
-  const branchOid = branchOidOutput.trim();
-
-  try {
-    await runGit(['merge-base', '--is-ancestor', baseOid, branchOid], {
-      cwd: repoPath,
-    });
-    await runGit(['update-ref', targetRef, branchOid, baseOid], {
-      cwd: repoPath,
-    });
-
-    return {
-      baseBranch,
-      branch: branchRef,
-      commitOid: branchOid,
-      fastForward: true,
-      rebased: false,
-    };
-  } catch (error) {
-    if (
-      !(error instanceof GitRunError) ||
-      error.result.args[0] !== 'merge-base'
-    ) {
-      throw error;
-    }
-  }
 
   try {
     await runGit(['rebase', targetRef, sourceRef], {
@@ -311,20 +277,16 @@ async function rebaseBranchIntoBase({
   }
 
   try {
-    const { stdout: rebasedOidOutput } = await runGit(
-      ['rev-parse', '--verify', sourceRef],
-      { cwd: repoPath },
-    );
-    const rebasedOid = rebasedOidOutput.trim();
-    await runGit(['update-ref', targetRef, rebasedOid, baseOid], {
+    const { stdout } = await runGit(['rev-parse', '--verify', sourceRef], {
       cwd: repoPath,
     });
+    const commitOid = stdout.trim();
+    await runGit(['update-ref', targetRef, commitOid], { cwd: repoPath });
 
     return {
       baseBranch,
       branch: branchRef,
-      commitOid: rebasedOid,
-      fastForward: false,
+      commitOid,
       rebased: true,
     };
   } finally {

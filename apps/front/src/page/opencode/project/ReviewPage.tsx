@@ -113,12 +113,8 @@ export function ReviewPage({ cardId }: { cardId: string }) {
                   : 'Failed to rebase branch',
               );
             },
-            onSuccess(result) {
-              toast.success(
-                result.rebased
-                  ? 'Branch rebased and merged'
-                  : 'Branch fast-forwarded',
-              );
+            onSuccess() {
+              toast.success('Branch rebased and merged');
             },
           });
         }}
