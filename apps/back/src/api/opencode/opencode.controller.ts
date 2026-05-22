@@ -6,7 +6,10 @@ import {
 } from '@opencode-ai/sdk';
 import { ENVIRONMENT } from '../../schema/env.schema';
 import { HttpError } from '../../lib/http-error';
-import { executeSessionCommand } from './opencode.execute-command';
+import {
+  executeSessionCommand,
+  STOP_SESSION_COMMAND,
+} from './opencode.execute-command';
 import { getProjectById } from '../projects/projects.service';
 import { getProjectSessions } from './opencode.sessions';
 import { upsertSessionMessage } from './opencode.upsert-session';
@@ -53,6 +56,12 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
           name: 'undo',
           template: '',
         },
+        {
+          name: STOP_SESSION_COMMAND,
+          description: 'Stop the current response',
+          template: '',
+        },
+        ...commands.filter((command) => command.name !== STOP_SESSION_COMMAND),
       ],
     };
   })

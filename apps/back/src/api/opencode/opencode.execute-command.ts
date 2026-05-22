@@ -2,6 +2,8 @@ import { HttpError } from '../../lib/http-error';
 import { getProjectById } from '../projects/projects.service';
 import { opencodeClient } from './opencode.controller';
 
+export const STOP_SESSION_COMMAND = 'stop';
+
 export async function executeSessionCommand({
   args,
   command,
@@ -28,6 +30,19 @@ export async function executeSessionCommand({
       directory: project.worktree,
       sessionId,
     });
+  }
+
+  if (command === STOP_SESSION_COMMAND) {
+    if (!sessionId?.length) {
+      return { error: 'Session not found' as const, status: 404 as const };
+    }
+
+    await opencodeClient.session.abort({
+      path: { id: sessionId },
+      query: { directory: project.worktree },
+    });
+
+    return { sessionId };
   }
 
   const targetSessionId = sessionId?.length
