@@ -1,6 +1,6 @@
 import type { Project } from '#/hooks/queries/opencode/project.queries';
 import { cn } from '#/lib/utils';
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 
 export function ProjectCard({
   project,
@@ -10,17 +10,15 @@ export function ProjectCard({
   selectedProject?: string;
 }) {
   const firstChar = getFirstGrapheme(project.name ?? '');
-  const navigate = useNavigate();
 
   if (!firstChar) {
     return null;
   }
 
   return (
-    <div
-      onClick={() =>
-        navigate({ to: '/project/$id', params: { id: project.id } })
-      }
+    <Link
+      to="/project/$id"
+      params={{ id: project.id }}
       className={cn(
         'w-fit cursor-pointer rounded-sm border border-gray-700 px-2 py-1',
         {
@@ -29,7 +27,7 @@ export function ProjectCard({
       )}
     >
       {firstChar}
-    </div>
+    </Link>
   );
 }
 
