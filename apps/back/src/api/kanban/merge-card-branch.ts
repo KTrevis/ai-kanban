@@ -112,10 +112,12 @@ async function rebaseBranchIntoBase({
   });
   const commitOid = stdout.trim();
   await runGit(['update-ref', targetRef, commitOid], { cwd: repoPath });
+  await runGit(['switch', getLocalBranchName(targetRef)], { cwd: repoPath });
 
   return {
     baseBranch,
     branch: branchRef,
+    checkedOutBranch: baseBranch,
     commitOid,
     rebased: true,
   };
@@ -143,4 +145,8 @@ function getUpdatableBranchRef(ref: string) {
   }
 
   return normalizeBranchRef(ref);
+}
+
+function getLocalBranchName(ref: string) {
+  return ref.replace(/^refs\/heads\//, '');
 }
