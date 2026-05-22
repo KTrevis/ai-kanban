@@ -53,7 +53,7 @@ export async function mergeKanbanCardBranch({
   }
 }
 
-export async function canRebaseBranch({
+export async function getRebaseBranchStatus({
   baseBranch,
   branchRef,
   repoPath,
@@ -72,10 +72,22 @@ export async function canRebaseBranch({
       ],
       { cwd: repoPath },
     );
-    return true;
-  } catch {
-    return false;
+    return { canRebase: true };
+  } catch (error) {
+    return {
+      canRebase: false,
+      cannotMergeReason: getRebaseErrorMessage(error),
+    };
   }
+}
+
+export async function canRebaseBranch(params: {
+  baseBranch: string;
+  branchRef: string;
+  repoPath: string;
+}) {
+  const status = await getRebaseBranchStatus(params);
+  return status.canRebase;
 }
 
 async function rebaseBranchIntoBase({
@@ -107,6 +119,18 @@ async function rebaseBranchIntoBase({
     commitOid,
     rebased: true,
   };
+}
+
+function getRebaseErrorMessage(error: unknown) {
+  if (error instanceof GitRunError) {
+    return error.result.stderr.trim() || error.message;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return 'Rebase has conflicts';
 }
 
 function getUpdatableBranchRef(ref: string) {

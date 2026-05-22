@@ -1,12 +1,20 @@
 import { Button } from '#/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '#/components/ui/tooltip';
 import { cn } from '#/lib/utils';
 import { DiffModeEnum } from '@git-diff-view/react';
 import { Copy, GitBranch, GitMerge } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 const modeButtonClass = 'cursor-pointer rounded-md px-3 py-1.5';
 
 export function ReviewHeader({
   canRebase,
+  cannotMergeReason,
   isCheckingOutBranch,
   isMergingBranch,
   mode,
@@ -19,6 +27,7 @@ export function ReviewHeader({
   baseBranch,
 }: {
   canRebase?: boolean;
+  cannotMergeReason?: string;
   isCheckingOutBranch?: boolean;
   isMergingBranch?: boolean;
   mode: DiffModeEnum;
@@ -30,6 +39,24 @@ export function ReviewHeader({
   onSendReview: () => void;
   baseBranch?: string;
 }) {
+  const mergeDisabledReason = !newBranch
+    ? 'No branch linked to the card'
+    : canRebase === false
+      ? (cannotMergeReason ?? 'Rebase has conflicts')
+      : undefined;
+  const mergeButtonDisabled = Boolean(mergeDisabledReason) || isMergingBranch;
+  const mergeButton = (
+    <Button
+      disabled={mergeButtonDisabled}
+      onClick={onMergeBranch}
+      type="button"
+      variant="outline"
+    >
+      <GitMerge className="size-4" />
+      {isMergingBranch ? 'Merging...' : 'Merge'}
+    </Button>
+  );
+
   return (
     <header className="border-b border-white/10 px-6 py-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -45,7 +72,7 @@ export function ReviewHeader({
             Review changes
           </h1>
           <div
-            className="text-sm text-gray-400 flex items-center gap-2 cursor-pointer"
+            className="flex cursor-pointer items-center gap-2 text-sm text-gray-400"
             onClick={() =>
               newBranch && navigator.clipboard.writeText(newBranch)
             }
@@ -79,15 +106,13 @@ export function ReviewHeader({
               <GitBranch className="size-4" />
               {isCheckingOutBranch ? 'Checking out...' : 'Checkout branch'}
             </Button>
-            <Button
-              disabled={!newBranch || !canRebase || isMergingBranch}
-              onClick={onMergeBranch}
-              type="button"
-              variant="outline"
-            >
-              <GitMerge className="size-4" />
-              Merge
-            </Button>
+            {mergeDisabledReason ? (
+              <DisabledReasonTooltip reason={mergeDisabledReason}>
+                {mergeButton}
+              </DisabledReasonTooltip>
+            ) : (
+              mergeButton
+            )}
             <Button onClick={onSendReview} type="button">
               Send Review
             </Button>
@@ -95,6 +120,27 @@ export function ReviewHeader({
         </div>
       </div>
     </header>
+  );
+}
+
+function DisabledReasonTooltip({
+  children,
+  reason,
+}: {
+  children: ReactNode;
+  reason: string;
+}) {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="inline-flex" tabIndex={0}>
+            {children}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top">{reason}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 
