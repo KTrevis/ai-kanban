@@ -61,7 +61,6 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
           description: 'Stop the current response',
           template: '',
         },
-        ...commands.filter((command) => command.name !== STOP_SESSION_COMMAND),
       ],
     };
   })

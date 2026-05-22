@@ -56,26 +56,29 @@ export function AutoComplete({
     return;
   }
 
+  console.log(suggestions);
   return (
     <div
       className="absolute right-4 bottom-full left-4 z-50 mb-2 max-h-72 overflow-y-auto rounded-lg border border-white/10 bg-gray-950/95 p-2 shadow-2xl"
       ref={listRef}
     >
-      {suggestions.map((curr, index) => (
-        <button
-          className={`block w-full rounded px-2 text-left cursor-pointer ${
-            index === selectedIndex
-              ? 'bg-white/10 text-cyan-300'
-              : 'text-white hover:bg-white/5'
-          }`}
-          data-selected={index === selectedIndex || undefined}
-          key={curr}
-          onClick={() => onSelect(curr)}
-          type="button"
-        >
-          <AutoCompleteCard name={curr} />
-        </button>
-      ))}
+      {suggestions.map((curr, index) => {
+        return (
+          <button
+            className={`block w-full rounded px-2 text-left cursor-pointer ${
+              index === selectedIndex
+                ? 'bg-white/10 text-cyan-300'
+                : 'text-white hover:bg-white/5'
+            }`}
+            data-selected={index === selectedIndex || undefined}
+            key={curr}
+            onClick={() => onSelect(curr)}
+            type="button"
+          >
+            <AutoCompleteCard name={curr} />
+          </button>
+        );
+      })}
     </div>
   );
 }

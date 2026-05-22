@@ -34,7 +34,7 @@ export async function executeSessionCommand({
 
   if (command === STOP_SESSION_COMMAND) {
     if (!sessionId?.length) {
-      return { error: 'Session not found' as const, status: 404 as const };
+      throw new HttpError(404, 'Session not found');
     }
 
     await opencodeClient.session.abort({
