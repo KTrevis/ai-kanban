@@ -7,7 +7,7 @@ export async function mergeKanbanCardBranch({
   set,
 }: {
   params: { cardId: string };
-  set: { status?: number };
+  set: { status?: number | string };
 }) {
   const card = await prisma.kanbanCard.findUnique({
     where: { id: cardId },
