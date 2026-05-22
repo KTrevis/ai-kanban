@@ -4,6 +4,7 @@ import {
   getCommittedReviewDiff,
   getUncommittedReviewDiff,
 } from '../../git/review-diff';
+import { GitRunError, runGit } from '../../git/git-runner';
 import { getProjectById } from '../projects/projects.service';
 import z from 'zod';
 import { patchCard } from './patch-card';
@@ -83,6 +84,44 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
       uncommittedDiff,
       uncommittedIsEmpty: uncommittedDiff.trim().length === 0,
     };
+  })
+  .post('card/:cardId/checkout', async ({ params: { cardId }, set }) => {
+    const card = await prisma.kanbanCard.findUnique({
+      where: { id: cardId },
+      select: {
+        newBranch: true,
+        project: {
+          select: {
+            worktree: true,
+          },
+        },
+      },
+    });
+
+    if (!card) {
+      set.status = 404;
+      return { error: 'Kanban card not found' };
+    }
+
+    const newBranch = card.newBranch.trim();
+    if (!newBranch) {
+      set.status = 400;
+      return { error: 'Kanban card has no linked branch to checkout' };
+    }
+
+    try {
+      await runGit(['switch', newBranch], { cwd: card.project.worktree });
+    } catch (error) {
+      set.status = 400;
+      return {
+        error:
+          error instanceof GitRunError
+            ? error.result.stderr.trim() || error.message
+            : 'Failed to checkout branch',
+      };
+    }
+
+    return { branch: newBranch };
   })
   .patch(
     'cards',

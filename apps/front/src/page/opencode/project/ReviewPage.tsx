@@ -1,4 +1,7 @@
-import { useGetKanbanCardReview } from '#/hooks/queries/kanban/kanban.queries';
+import {
+  useCheckoutKanbanCardBranch,
+  useGetKanbanCardReview,
+} from '#/hooks/queries/kanban/kanban.queries';
 import { useSendSessionMessage } from '#/hooks/mutations/opencode/session.mutations';
 import { useGetProjects } from '#/hooks/queries/opencode/project.queries';
 import { DiffModeEnum, SplitSide } from '@git-diff-view/react';
@@ -36,6 +39,8 @@ export function ReviewPage({ cardId }: { cardId: string }) {
   const projectFirstChar = Array.from(project?.name ?? '')[0];
   const [mode, setMode] = useState<DiffModeEnum>(DiffModeEnum.Unified);
   const [comments, setComments] = useState<ReviewComment[]>([]);
+  const { mutate: checkoutBranch, isPending: isCheckingOutBranch } =
+    useCheckoutKanbanCardBranch(cardId);
   const { mutate: sendMessage } = useSendSessionMessage();
   const navigate = useNavigate();
   const files = useMemo(
@@ -66,9 +71,29 @@ export function ReviewPage({ cardId }: { cardId: string }) {
   return (
     <section className="flex h-full min-w-0 flex-1 flex-col text-gray-100">
       <ReviewHeader
+        isCheckingOutBranch={isCheckingOutBranch}
         mode={mode}
         newBranch={data?.newBranch}
         onBack={goBack}
+        onCheckoutBranch={() => {
+          if (!data?.newBranch) {
+            toast.error('No branch linked to the card');
+            return;
+          }
+
+          checkoutBranch(undefined, {
+            onError(error) {
+              toast.error(
+                error instanceof Error
+                  ? error.message
+                  : 'Failed to checkout branch',
+              );
+            },
+            onSuccess() {
+              toast.success(`Checked out ${data.newBranch}`);
+            },
+          });
+        }}
         onModeChange={setMode}
         onSendReview={() => {
           if (!projectId) {

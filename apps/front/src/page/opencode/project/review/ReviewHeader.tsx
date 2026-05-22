@@ -1,20 +1,24 @@
 import { Button } from '#/components/ui/button';
 import { cn } from '#/lib/utils';
 import { DiffModeEnum } from '@git-diff-view/react';
-import { Copy } from 'lucide-react';
+import { Copy, GitBranch } from 'lucide-react';
 
 const modeButtonClass = 'cursor-pointer rounded-md px-3 py-1.5';
 
 export function ReviewHeader({
+  isCheckingOutBranch,
   mode,
   newBranch,
   onBack,
+  onCheckoutBranch,
   onModeChange,
   onSendReview,
 }: {
+  isCheckingOutBranch?: boolean;
   mode: DiffModeEnum;
   newBranch?: string;
   onBack: () => void;
+  onCheckoutBranch: () => void;
   onModeChange: (mode: DiffModeEnum) => void;
   onSendReview: () => void;
 }) {
@@ -56,9 +60,20 @@ export function ReviewHeader({
               Unified
             </ModeButton>
           </div>
-          <Button onClick={onSendReview} type="button">
-            Send Review
-          </Button>
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button
+              disabled={!newBranch || isCheckingOutBranch}
+              onClick={onCheckoutBranch}
+              type="button"
+              variant="outline"
+            >
+              <GitBranch className="size-4" />
+              {isCheckingOutBranch ? 'Checking out...' : 'Checkout branch'}
+            </Button>
+            <Button onClick={onSendReview} type="button">
+              Send Review
+            </Button>
+          </div>
         </div>
       </div>
     </header>
