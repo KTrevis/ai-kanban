@@ -74,6 +74,7 @@ export function ReviewPage({ cardId }: { cardId: string }) {
         isCheckingOutBranch={isCheckingOutBranch}
         mode={mode}
         newBranch={data?.newBranch}
+        baseBranch={data?.baseBranch}
         onBack={goBack}
         onCheckoutBranch={() => {
           if (!data?.newBranch) {

@@ -13,6 +13,7 @@ export function ReviewHeader({
   onCheckoutBranch,
   onModeChange,
   onSendReview,
+  baseBranch,
 }: {
   isCheckingOutBranch?: boolean;
   mode: DiffModeEnum;
@@ -21,6 +22,7 @@ export function ReviewHeader({
   onCheckoutBranch: () => void;
   onModeChange: (mode: DiffModeEnum) => void;
   onSendReview: () => void;
+  baseBranch?: string;
 }) {
   return (
     <header className="border-b border-white/10 px-6 py-4">
@@ -42,7 +44,8 @@ export function ReviewHeader({
               newBranch && navigator.clipboard.writeText(newBranch)
             }
           >
-            {newBranch} <Copy className="size-4" />
+            {baseBranch && `${baseBranch} <=`} {newBranch}{' '}
+            <Copy className="size-4" />
           </div>
         </div>
         <div className="flex flex-col items-end gap-2">
