@@ -3,12 +3,13 @@ import type { KanbanCard } from '#/hooks/queries/kanban/kanban.queries';
 import { Link } from '@tanstack/react-router';
 
 export function ProjectSessionReviewBar({ card }: { card?: KanbanCard }) {
+  console.log(card?.newBranch);
   if (!card?.newBranch) {
     return null;
   }
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 backdrop-blur-xs">
+    <div className="border-b border-gray-700 p-2 flex justify-between">
       <div></div>
       <Button
         asChild
