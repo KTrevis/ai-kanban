@@ -10,7 +10,7 @@ import z from 'zod';
 import { patchCard } from './patch-card';
 import { UPDATE_KANBAN_CARD_SCHEMA } from './update-card.schema';
 import { KANBAN_COLUMNS_SCHEMA } from './kanban-columns.schema';
-import { canRebaseBranch, mergeKanbanCardBranch } from './merge-card-branch';
+import { getRebaseBranchStatus, mergeKanbanCardBranch } from './merge-card-branch';
 
 const KANBAN_CARD_SCHEMA = z.object({
   id: z.string().optional(),
@@ -73,14 +73,16 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
       branchRef: newBranch,
       repoPath: project.worktree,
     });
+    const rebaseStatus = await getRebaseBranchStatus({
+      baseBranch: card.baseBranch,
+      branchRef: newBranch,
+      repoPath: project.worktree,
+    });
 
     return {
       baseBranch: card.baseBranch,
-      canRebase: await canRebaseBranch({
-        baseBranch: card.baseBranch,
-        branchRef: newBranch,
-        repoPath: project.worktree,
-      }),
+      canRebase: rebaseStatus.canRebase,
+      cannotMergeReason: rebaseStatus.cannotMergeReason,
       cardId: card.id,
       diff,
       isEmpty: diff.trim().length === 0,
