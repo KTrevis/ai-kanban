@@ -110,12 +110,14 @@ export function ReviewPage({ cardId }: { cardId: string }) {
               toast.error(
                 error instanceof Error
                   ? error.message
-                  : 'Failed to merge branch',
+                  : 'Failed to rebase branch',
               );
             },
             onSuccess(result) {
               toast.success(
-                result.fastForward ? 'Branch fast-forwarded' : 'Branch merged',
+                result.rebased
+                  ? 'Branch rebased and merged'
+                  : 'Branch fast-forwarded',
               );
             },
           });

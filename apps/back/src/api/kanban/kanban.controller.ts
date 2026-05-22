@@ -11,6 +11,7 @@ import { patchCard } from './patch-card';
 import { UPDATE_KANBAN_CARD_SCHEMA } from './update-card.schema';
 import { KANBAN_COLUMNS_SCHEMA } from './kanban-columns.schema';
 import {
+  getCheckedOutBranch,
   getShortBranchName,
   normalizeBranchRef,
 } from '../../git/virtual-branch-writer';
@@ -153,7 +154,7 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
     }
 
     try {
-      return await mergeBranchIntoBase({
+      return await rebaseBranchIntoBase({
         baseBranch: card.baseBranch,
         branchRef: newBranch,
         repoPath: card.project.worktree,
@@ -166,7 +167,7 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
             ? error.result.stderr.trim() || error.message
             : error instanceof Error
               ? error.message
-              : 'Failed to merge branch',
+              : 'Failed to rebase branch',
       };
     }
   })
@@ -251,7 +252,7 @@ function getProjectCards(projectId: string) {
   });
 }
 
-async function mergeBranchIntoBase({
+async function rebaseBranchIntoBase({
   baseBranch,
   branchRef,
   repoPath,
@@ -262,6 +263,7 @@ async function mergeBranchIntoBase({
 }) {
   const targetRef = getUpdatableBranchRef(baseBranch);
   const sourceRef = normalizeBranchRef(branchRef);
+  const previousBranch = await getCheckedOutBranch(repoPath);
   const { stdout: baseOidOutput } = await runGit(
     ['rev-parse', '--verify', targetRef],
     { cwd: repoPath },
@@ -286,6 +288,7 @@ async function mergeBranchIntoBase({
       branch: branchRef,
       commitOid: branchOid,
       fastForward: true,
+      rebased: false,
     };
   } catch (error) {
     if (
@@ -296,43 +299,61 @@ async function mergeBranchIntoBase({
     }
   }
 
-  const { stdout: treeOidOutput } = await runGit(
-    ['merge-tree', '--write-tree', baseOid, branchOid],
-    { cwd: repoPath },
-  );
-  const mergeMessage = `Merge branch '${getShortBranchName(
-    branchRef,
-  )}' into ${getShortBranchName(baseBranch)}`;
-  const mergeIdentity = {
-    GIT_AUTHOR_EMAIL: 'agent@travaille.local',
-    GIT_AUTHOR_NAME: 'Travaille Agent',
-    GIT_COMMITTER_EMAIL: 'agent@travaille.local',
-    GIT_COMMITTER_NAME: 'Travaille Agent',
-  };
-  const { stdout: commitOidOutput } = await runGit(
-    [
-      'commit-tree',
-      treeOidOutput.trim(),
-      '-p',
-      baseOid,
-      '-p',
-      branchOid,
-      '-m',
-      mergeMessage,
-    ],
-    { cwd: repoPath, env: mergeIdentity },
-  );
-  const commitOid = commitOidOutput.trim();
-  await runGit(['update-ref', targetRef, commitOid, baseOid], {
-    cwd: repoPath,
-  });
+  try {
+    await runGit(['rebase', targetRef, sourceRef], {
+      cwd: repoPath,
+      timeoutMs: 120_000,
+    });
+  } catch (error) {
+    await abortRebase(repoPath);
+    await restoreBranch({ branchRef: sourceRef, previousBranch, repoPath });
+    throw error;
+  }
 
-  return {
-    baseBranch,
-    branch: branchRef,
-    commitOid,
-    fastForward: false,
-  };
+  try {
+    const { stdout: rebasedOidOutput } = await runGit(
+      ['rev-parse', '--verify', sourceRef],
+      { cwd: repoPath },
+    );
+    const rebasedOid = rebasedOidOutput.trim();
+    await runGit(['update-ref', targetRef, rebasedOid, baseOid], {
+      cwd: repoPath,
+    });
+
+    return {
+      baseBranch,
+      branch: branchRef,
+      commitOid: rebasedOid,
+      fastForward: false,
+      rebased: true,
+    };
+  } finally {
+    await restoreBranch({ branchRef: sourceRef, previousBranch, repoPath });
+  }
+}
+
+async function abortRebase(repoPath: string) {
+  try {
+    await runGit(['rebase', '--abort'], { cwd: repoPath });
+  } catch {
+    // Nothing to abort, or Git already restored the repository state.
+  }
+}
+
+async function restoreBranch({
+  branchRef,
+  previousBranch,
+  repoPath,
+}: {
+  branchRef: string;
+  previousBranch: string | null;
+  repoPath: string;
+}) {
+  if (!previousBranch || previousBranch === getShortBranchName(branchRef)) {
+    return;
+  }
+
+  await runGit(['switch', previousBranch], { cwd: repoPath });
 }
 
 function getUpdatableBranchRef(ref: string) {
