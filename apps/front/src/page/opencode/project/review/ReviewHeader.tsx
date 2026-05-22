@@ -86,7 +86,7 @@ export function ReviewHeader({
               variant="outline"
             >
               <GitMerge className="size-4" />
-              {isMergingBranch ? 'Rebasing...' : 'Rebase and merge'}
+              Merge
             </Button>
             <Button onClick={onSendReview} type="button">
               Send Review
