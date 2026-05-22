@@ -1,18 +1,18 @@
 import Elysia from 'elysia';
 import z from 'zod/v3';
 import { GitRunError, runGit } from '../../git/git-runner';
+import { HttpError } from '../../lib/http-error';
 import { createProject, getProjectById, listProjects } from './projects.service';
 
 export const PROJECTS_CONTROLLER = new Elysia()
   .get('projects', async () => {
     return listProjects();
   })
-  .get('projects/:projectId/checked-out-branch', async ({ params, set }) => {
+  .get('projects/:projectId/checked-out-branch', async ({ params }) => {
     const project = await getProjectById(params.projectId);
 
     if (!project) {
-      set.status = 404;
-      return { error: 'Project not found' };
+      throw new HttpError(404, 'Project not found');
     }
 
     try {
@@ -22,13 +22,12 @@ export const PROJECTS_CONTROLLER = new Elysia()
 
       return { branch: stdout.trim() || null };
     } catch (error) {
-      set.status = 400;
-      return {
-        error:
-          error instanceof GitRunError
-            ? error.result.stderr.trim() || error.message
-            : 'Failed to get checked out branch',
-      };
+      throw new HttpError(
+        400,
+        error instanceof GitRunError
+          ? error.result.stderr.trim() || error.message
+          : 'Failed to get checked out branch',
+      );
     }
   })
   .post(

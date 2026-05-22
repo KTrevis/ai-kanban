@@ -1,13 +1,12 @@
 import { GitRunError, runGit } from '../../git/git-runner';
 import { normalizeBranchRef } from '../../git/virtual-branch-writer';
+import { HttpError } from '../../lib/http-error';
 import { prisma } from '../../lib/prisma';
 
 export async function mergeKanbanCardBranch({
   params: { cardId },
-  set,
 }: {
   params: { cardId: string };
-  set: { status?: number | string };
 }) {
   const card = await prisma.kanbanCard.findUnique({
     where: { id: cardId },
@@ -23,14 +22,12 @@ export async function mergeKanbanCardBranch({
   });
 
   if (!card) {
-    set.status = 404;
-    return { error: 'Kanban card not found' };
+    throw new HttpError(404, 'Kanban card not found');
   }
 
   const newBranch = card.newBranch.trim();
   if (!newBranch) {
-    set.status = 400;
-    return { error: 'Kanban card has no linked branch to merge' };
+    throw new HttpError(400, 'Kanban card has no linked branch to merge');
   }
 
   try {
@@ -40,8 +37,6 @@ export async function mergeKanbanCardBranch({
       repoPath: card.project.worktree,
     });
   } catch (error) {
-    set.status = 400;
-
     let message = 'Failed to rebase branch';
     if (error instanceof GitRunError) {
       message = error.result.stderr.trim() || error.message;
@@ -49,7 +44,7 @@ export async function mergeKanbanCardBranch({
       message = error.message;
     }
 
-    return { error: message };
+    throw new HttpError(400, message);
   }
 }
 

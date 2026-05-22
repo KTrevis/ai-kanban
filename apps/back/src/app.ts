@@ -14,6 +14,7 @@ export const app = new Elysia()
   .onError(({ error, set }) => {
     if (error instanceof HttpError) {
       set.status = error.status;
+      return { error: error.message };
     }
 
     console.error(error);

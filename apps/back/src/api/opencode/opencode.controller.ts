@@ -5,6 +5,7 @@ import {
   type OpencodeClient,
 } from '@opencode-ai/sdk';
 import { ENVIRONMENT } from '../../schema/env.schema';
+import { HttpError } from '../../lib/http-error';
 import { executeSessionCommand } from './opencode.execute-command';
 import { getProjectById } from '../projects/projects.service';
 import { getProjectSessions } from './opencode.sessions';
@@ -102,12 +103,11 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
   })
   .post(
     'session',
-    async ({ body: { projectId }, set }) => {
+    async ({ body: { projectId } }) => {
       const project = await getProjectById(projectId);
 
       if (!project) {
-        set.status = 404;
-        return { error: 'Project not found' };
+        throw new HttpError(404, 'Project not found');
       }
 
       const { data: session } = await opencodeClient.session.create({
@@ -115,8 +115,7 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
       });
 
       if (!session) {
-        set.status = 500;
-        return { error: 'Failed to create session' };
+        throw new HttpError(500, 'Failed to create session');
       }
 
       return { sessionId: session.id };
@@ -136,7 +135,7 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
   )
   .post(
     'session/command',
-    async ({ body: { args, command, projectId, sessionId }, set }) => {
+    async ({ body: { args, command, projectId, sessionId } }) => {
       const result = await executeSessionCommand({
         args,
         command,
@@ -144,10 +143,8 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
         sessionId,
       });
 
-      // TODO: seems like a good pattern, except it probably should be in a middleware
       if ('error' in result) {
-        set.status = result.status;
-        return { error: result.error };
+        throw new HttpError(result.status ?? 500, result.error);
       }
 
       return { sessionId: result.sessionId };
