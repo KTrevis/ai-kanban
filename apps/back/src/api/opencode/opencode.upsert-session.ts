@@ -15,11 +15,13 @@ function buildPrompt(card: {
   id: string;
 }) {
   const WORKTREE_PROMPT = [
-    "Crée et utilise un git worktree dédié pour travailler sur cette tâche, afin de ne pas perturber le workspace principal.",
+    'Crée et utilise un git worktree dédié pour travailler sur cette tâche, afin de ne pas perturber le workspace principal.',
+    "Si tu es relancé et que ce worktree temporaire n'existe plus, recrée-le avant de reprendre le travail.",
     'Choisis un nom de branche court et descriptif au format ai/<slug>, par exemple ai/fix-login ou ai/add-kanban-filter.',
     'Avant de modifier le code, mets à jour la carte Kanban en définissant newBranch avec le nom de branche choisi.',
     'Si jamais la carte te demande explicitement de ne pas écrire de code, ne crée pas la branche, réponds juste dans la conversation au message.',
     'Tu dois tout de même lire le code si tu en as besoin pour répondre à la question.',
+    "Quand tu as terminé, supprime le worktree temporaire que tu as créé uniquement si le résultat utile est persisté et que git status --porcelain y est vide. S'il reste des changements non commités, commit les.",
   ].join('\n\n');
 
   const message = [
