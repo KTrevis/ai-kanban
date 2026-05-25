@@ -12,9 +12,15 @@ import {
 } from './opencode.execute-command';
 import { getProjectById } from '../projects/projects.service';
 import { getProjectSessions } from './opencode.sessions';
-import { upsertSessionMessage } from './opencode.upsert-session';
+import {
+  createSessionFromCard,
+  sendMessageToSession,
+} from './opencode.upsert-session';
 import z from 'zod/v3';
-import { SESSION_MESSAGE_SCHEMA } from './session-message.schema';
+import {
+  SEND_MESSAGE_TO_CARD_SCHEMA,
+  SEND_MESSAGE_TO_SESSION_SCHEMA,
+} from './session-message.schema';
 
 async function canReachOpencode(url: string) {
   try {
@@ -145,9 +151,16 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
   )
   .post(
     'session/message',
-    async ({ body }) => await upsertSessionMessage(body),
+    async ({ body }) => await sendMessageToSession(body),
     {
-      body: SESSION_MESSAGE_SCHEMA,
+      body: SEND_MESSAGE_TO_SESSION_SCHEMA,
+    },
+  )
+  .post(
+    'card/message',
+    async ({ body }) => await createSessionFromCard(body),
+    {
+      body: SEND_MESSAGE_TO_CARD_SCHEMA,
     },
   )
   .post(

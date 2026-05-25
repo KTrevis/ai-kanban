@@ -6,7 +6,6 @@ import { getCheckedOutBranch } from '../../git/git-refs';
 import type {
   SendMessageToCardData,
   SendMessageToSessionData,
-  SessionMessageData,
 } from './session-message.schema';
 
 function buildPrompt(card: {
@@ -36,7 +35,7 @@ function buildPrompt(card: {
   return message;
 }
 
-async function createSessionFromCard({ cardId }: SendMessageToCardData) {
+export async function createSessionFromCard({ cardId }: SendMessageToCardData) {
   const card = await prisma.kanbanCard.findUniqueOrThrow({
     where: {
       id: cardId,
@@ -89,7 +88,7 @@ async function createSessionFromCard({ cardId }: SendMessageToCardData) {
   return { sessionId };
 }
 
-async function sendMessageToSession({
+export async function sendMessageToSession({
   message,
   projectId,
   sessionId,
@@ -115,17 +114,6 @@ async function sendMessageToSession({
     query: { directory: worktree },
   });
   return { sessionId };
-}
-
-export async function upsertSessionMessage(
-  body: SessionMessageData,
-): Promise<{ sessionId: string }> {
-  switch (body.type) {
-    case 'create-session-from-card':
-      return createSessionFromCard(body);
-    case 'send-message-to-session':
-      return sendMessageToSession(body);
-  }
 }
 
 async function createSession(directory: string) {

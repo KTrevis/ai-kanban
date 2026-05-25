@@ -72,7 +72,6 @@ export function ProjectSessionInput({
 
     sendSessionMessage(
       {
-        type: 'send-message-to-session',
         sessionId,
         projectId,
         message,

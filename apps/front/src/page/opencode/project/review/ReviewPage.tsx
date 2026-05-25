@@ -149,7 +149,6 @@ export function ReviewPage({ cardId }: { cardId: string }) {
 
             sendMessage(
               {
-                type: 'send-message-to-session',
                 message: formatComments(comments),
                 projectId,
                 sessionId,

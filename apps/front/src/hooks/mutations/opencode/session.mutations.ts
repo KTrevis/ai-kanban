@@ -32,6 +32,19 @@ export function useSendSessionMessage() {
   );
 }
 
+export function useSendCardMessage() {
+  const eden = useEden();
+  const invalidateSessionMessages = useInvalidateSessionMessages();
+
+  return useMutation(
+    eden.opencode.card.message.post.mutationOptions({
+      onSuccess({ sessionId }) {
+        invalidateSessionMessages(sessionId);
+      },
+    }),
+  );
+}
+
 export function parseCommand(command: string) {
   if (!command.startsWith('/')) {
     return null;

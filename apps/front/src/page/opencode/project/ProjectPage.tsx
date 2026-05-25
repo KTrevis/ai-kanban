@@ -1,7 +1,7 @@
 import { ProjectList } from '#/components/opencode/ProjectList';
 import {
   useCreateProjectSession,
-  useSendSessionMessage,
+  useSendCardMessage,
 } from '#/hooks/mutations/opencode/session.mutations';
 import {
   type KanbanCard,
@@ -29,7 +29,7 @@ export function ProjectPage({
   const { data: cards } = useGetKanbanCards(projectId);
   const { data: projects = [] } = useGetProjects();
   const { mutate: moveCards } = useMoveKanbanCards(projectId);
-  const { mutate: sendSessionMessage } = useSendSessionMessage();
+  const { mutate: sendCardMessage } = useSendCardMessage();
   const {
     isPending: isCreatingProjectSession,
     mutate: createProjectSession,
@@ -45,8 +45,7 @@ export function ProjectPage({
   }, [projectFirstChar, sessionId]);
 
   function startAgentSession(card: KanbanCard) {
-    sendSessionMessage({
-      type: 'create-session-from-card',
+    sendCardMessage({
       cardId: card.id,
     });
   }
