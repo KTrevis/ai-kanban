@@ -68,7 +68,7 @@ export function ReviewDiffFile({
                   <div className="text-white!">
                     {format(curr.date, 'dd-MM-yyyy HH:mm:ss')}
                   </div>
-                  <div className="whitespace-pre-wrap break-words text-sm text-white [overflow-wrap:anywhere]">
+                  <div className="whitespace-pre-wrap text-xs text-white! wrap-anywhere">
                     {curr.comment}
                   </div>
                 </div>

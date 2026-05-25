@@ -26,5 +26,5 @@ export function useReviewComments(cardId: string) {
     },
   );
 
-  return [comments, setComments] as const;
+  return [comments, setComments];
 }
