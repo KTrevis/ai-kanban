@@ -18,7 +18,7 @@ import { splitGitDiff, type ReviewComment } from './review.utils';
 import { ProjectList } from '#/components/opencode/ProjectList';
 
 function formatComments(comments: ReviewComment[]) {
-  const PREPROMPT = `Utilise le MCP travaille pour modifier les fichier afin de répondre aux commentaires que t'a fait l'utilisateur.
+  const PREPROMPT = `Modifie les fichiers dans le workspace courant afin de répondre aux commentaires que t'a fait l'utilisateur.
     S'il s'agit d'une question, réponds directement dans le tchat.\n\n`;
 
   return (

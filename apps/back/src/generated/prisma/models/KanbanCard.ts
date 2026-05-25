@@ -46,7 +46,6 @@ export type KanbanCardMinAggregateOutputType = {
   updatedAt: Date | null
   newBranch: string | null
   baseBranch: string | null
-  useTravailleMcp: boolean | null
 }
 
 export type KanbanCardMaxAggregateOutputType = {
@@ -61,7 +60,6 @@ export type KanbanCardMaxAggregateOutputType = {
   updatedAt: Date | null
   newBranch: string | null
   baseBranch: string | null
-  useTravailleMcp: boolean | null
 }
 
 export type KanbanCardCountAggregateOutputType = {
@@ -76,7 +74,6 @@ export type KanbanCardCountAggregateOutputType = {
   updatedAt: number
   newBranch: number
   baseBranch: number
-  useTravailleMcp: number
   _all: number
 }
 
@@ -101,7 +98,6 @@ export type KanbanCardMinAggregateInputType = {
   updatedAt?: true
   newBranch?: true
   baseBranch?: true
-  useTravailleMcp?: true
 }
 
 export type KanbanCardMaxAggregateInputType = {
@@ -116,7 +112,6 @@ export type KanbanCardMaxAggregateInputType = {
   updatedAt?: true
   newBranch?: true
   baseBranch?: true
-  useTravailleMcp?: true
 }
 
 export type KanbanCardCountAggregateInputType = {
@@ -131,7 +126,6 @@ export type KanbanCardCountAggregateInputType = {
   updatedAt?: true
   newBranch?: true
   baseBranch?: true
-  useTravailleMcp?: true
   _all?: true
 }
 
@@ -233,7 +227,6 @@ export type KanbanCardGroupByOutputType = {
   updatedAt: Date
   newBranch: string
   baseBranch: string
-  useTravailleMcp: boolean
   _count: KanbanCardCountAggregateOutputType | null
   _avg: KanbanCardAvgAggregateOutputType | null
   _sum: KanbanCardSumAggregateOutputType | null
@@ -271,7 +264,6 @@ export type KanbanCardWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"KanbanCard"> | Date | string
   newBranch?: Prisma.StringFilter<"KanbanCard"> | string
   baseBranch?: Prisma.StringFilter<"KanbanCard"> | string
-  useTravailleMcp?: Prisma.BoolFilter<"KanbanCard"> | boolean
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
 }
 
@@ -287,7 +279,6 @@ export type KanbanCardOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   newBranch?: Prisma.SortOrder
   baseBranch?: Prisma.SortOrder
-  useTravailleMcp?: Prisma.SortOrder
   project?: Prisma.ProjectOrderByWithRelationInput
 }
 
@@ -306,7 +297,6 @@ export type KanbanCardWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"KanbanCard"> | Date | string
   newBranch?: Prisma.StringFilter<"KanbanCard"> | string
   baseBranch?: Prisma.StringFilter<"KanbanCard"> | string
-  useTravailleMcp?: Prisma.BoolFilter<"KanbanCard"> | boolean
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
 }, "id">
 
@@ -322,7 +312,6 @@ export type KanbanCardOrderByWithAggregationInput = {
   updatedAt?: Prisma.SortOrder
   newBranch?: Prisma.SortOrder
   baseBranch?: Prisma.SortOrder
-  useTravailleMcp?: Prisma.SortOrder
   _count?: Prisma.KanbanCardCountOrderByAggregateInput
   _avg?: Prisma.KanbanCardAvgOrderByAggregateInput
   _max?: Prisma.KanbanCardMaxOrderByAggregateInput
@@ -345,7 +334,6 @@ export type KanbanCardScalarWhereWithAggregatesInput = {
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"KanbanCard"> | Date | string
   newBranch?: Prisma.StringWithAggregatesFilter<"KanbanCard"> | string
   baseBranch?: Prisma.StringWithAggregatesFilter<"KanbanCard"> | string
-  useTravailleMcp?: Prisma.BoolWithAggregatesFilter<"KanbanCard"> | boolean
 }
 
 export type KanbanCardCreateInput = {
@@ -359,7 +347,6 @@ export type KanbanCardCreateInput = {
   updatedAt?: Date | string
   newBranch: string
   baseBranch: string
-  useTravailleMcp?: boolean
   project: Prisma.ProjectCreateNestedOneWithoutKanbanCardsInput
 }
 
@@ -375,7 +362,6 @@ export type KanbanCardUncheckedCreateInput = {
   updatedAt?: Date | string
   newBranch: string
   baseBranch: string
-  useTravailleMcp?: boolean
 }
 
 export type KanbanCardUpdateInput = {
@@ -389,7 +375,6 @@ export type KanbanCardUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   newBranch?: Prisma.StringFieldUpdateOperationsInput | string
   baseBranch?: Prisma.StringFieldUpdateOperationsInput | string
-  useTravailleMcp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   project?: Prisma.ProjectUpdateOneRequiredWithoutKanbanCardsNestedInput
 }
 
@@ -405,7 +390,6 @@ export type KanbanCardUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   newBranch?: Prisma.StringFieldUpdateOperationsInput | string
   baseBranch?: Prisma.StringFieldUpdateOperationsInput | string
-  useTravailleMcp?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KanbanCardCreateManyInput = {
@@ -420,7 +404,6 @@ export type KanbanCardCreateManyInput = {
   updatedAt?: Date | string
   newBranch: string
   baseBranch: string
-  useTravailleMcp?: boolean
 }
 
 export type KanbanCardUpdateManyMutationInput = {
@@ -434,7 +417,6 @@ export type KanbanCardUpdateManyMutationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   newBranch?: Prisma.StringFieldUpdateOperationsInput | string
   baseBranch?: Prisma.StringFieldUpdateOperationsInput | string
-  useTravailleMcp?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KanbanCardUncheckedUpdateManyInput = {
@@ -449,7 +431,6 @@ export type KanbanCardUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   newBranch?: Prisma.StringFieldUpdateOperationsInput | string
   baseBranch?: Prisma.StringFieldUpdateOperationsInput | string
-  useTravailleMcp?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KanbanCardListRelationFilter = {
@@ -474,7 +455,6 @@ export type KanbanCardCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   newBranch?: Prisma.SortOrder
   baseBranch?: Prisma.SortOrder
-  useTravailleMcp?: Prisma.SortOrder
 }
 
 export type KanbanCardAvgOrderByAggregateInput = {
@@ -493,7 +473,6 @@ export type KanbanCardMaxOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   newBranch?: Prisma.SortOrder
   baseBranch?: Prisma.SortOrder
-  useTravailleMcp?: Prisma.SortOrder
 }
 
 export type KanbanCardMinOrderByAggregateInput = {
@@ -508,7 +487,6 @@ export type KanbanCardMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   newBranch?: Prisma.SortOrder
   baseBranch?: Prisma.SortOrder
-  useTravailleMcp?: Prisma.SortOrder
 }
 
 export type KanbanCardSumOrderByAggregateInput = {
@@ -573,10 +551,6 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type KanbanCardCreateWithoutProjectInput = {
   id?: string
   sessionId?: string | null
@@ -588,7 +562,6 @@ export type KanbanCardCreateWithoutProjectInput = {
   updatedAt?: Date | string
   newBranch: string
   baseBranch: string
-  useTravailleMcp?: boolean
 }
 
 export type KanbanCardUncheckedCreateWithoutProjectInput = {
@@ -602,7 +575,6 @@ export type KanbanCardUncheckedCreateWithoutProjectInput = {
   updatedAt?: Date | string
   newBranch: string
   baseBranch: string
-  useTravailleMcp?: boolean
 }
 
 export type KanbanCardCreateOrConnectWithoutProjectInput = {
@@ -645,7 +617,6 @@ export type KanbanCardScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"KanbanCard"> | Date | string
   newBranch?: Prisma.StringFilter<"KanbanCard"> | string
   baseBranch?: Prisma.StringFilter<"KanbanCard"> | string
-  useTravailleMcp?: Prisma.BoolFilter<"KanbanCard"> | boolean
 }
 
 export type KanbanCardCreateManyProjectInput = {
@@ -659,7 +630,6 @@ export type KanbanCardCreateManyProjectInput = {
   updatedAt?: Date | string
   newBranch: string
   baseBranch: string
-  useTravailleMcp?: boolean
 }
 
 export type KanbanCardUpdateWithoutProjectInput = {
@@ -673,7 +643,6 @@ export type KanbanCardUpdateWithoutProjectInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   newBranch?: Prisma.StringFieldUpdateOperationsInput | string
   baseBranch?: Prisma.StringFieldUpdateOperationsInput | string
-  useTravailleMcp?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KanbanCardUncheckedUpdateWithoutProjectInput = {
@@ -687,7 +656,6 @@ export type KanbanCardUncheckedUpdateWithoutProjectInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   newBranch?: Prisma.StringFieldUpdateOperationsInput | string
   baseBranch?: Prisma.StringFieldUpdateOperationsInput | string
-  useTravailleMcp?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type KanbanCardUncheckedUpdateManyWithoutProjectInput = {
@@ -701,7 +669,6 @@ export type KanbanCardUncheckedUpdateManyWithoutProjectInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   newBranch?: Prisma.StringFieldUpdateOperationsInput | string
   baseBranch?: Prisma.StringFieldUpdateOperationsInput | string
-  useTravailleMcp?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -718,7 +685,6 @@ export type KanbanCardSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   updatedAt?: boolean
   newBranch?: boolean
   baseBranch?: boolean
-  useTravailleMcp?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["kanbanCard"]>
 
@@ -734,7 +700,6 @@ export type KanbanCardSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   updatedAt?: boolean
   newBranch?: boolean
   baseBranch?: boolean
-  useTravailleMcp?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["kanbanCard"]>
 
@@ -750,7 +715,6 @@ export type KanbanCardSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   updatedAt?: boolean
   newBranch?: boolean
   baseBranch?: boolean
-  useTravailleMcp?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["kanbanCard"]>
 
@@ -766,10 +730,9 @@ export type KanbanCardSelectScalar = {
   updatedAt?: boolean
   newBranch?: boolean
   baseBranch?: boolean
-  useTravailleMcp?: boolean
 }
 
-export type KanbanCardOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "sessionId" | "title" | "description" | "column" | "position" | "createdAt" | "updatedAt" | "newBranch" | "baseBranch" | "useTravailleMcp", ExtArgs["result"]["kanbanCard"]>
+export type KanbanCardOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "projectId" | "sessionId" | "title" | "description" | "column" | "position" | "createdAt" | "updatedAt" | "newBranch" | "baseBranch", ExtArgs["result"]["kanbanCard"]>
 export type KanbanCardInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }
@@ -797,7 +760,6 @@ export type $KanbanCardPayload<ExtArgs extends runtime.Types.Extensions.Internal
     updatedAt: Date
     newBranch: string
     baseBranch: string
-    useTravailleMcp: boolean
   }, ExtArgs["result"]["kanbanCard"]>
   composites: {}
 }
@@ -1233,7 +1195,6 @@ export interface KanbanCardFieldRefs {
   readonly updatedAt: Prisma.FieldRef<"KanbanCard", 'DateTime'>
   readonly newBranch: Prisma.FieldRef<"KanbanCard", 'String'>
   readonly baseBranch: Prisma.FieldRef<"KanbanCard", 'String'>
-  readonly useTravailleMcp: Prisma.FieldRef<"KanbanCard", 'Boolean'>
 }
     
 

@@ -7,14 +7,7 @@ const adapter = new PrismaLibSql({
   url: getDatabaseUrl(),
 });
 
-export const prisma = new PrismaClient({
-  adapter,
-  omit: {
-    kanbanCard: {
-      useTravailleMcp: true,
-    },
-  },
-});
+export const prisma = new PrismaClient({ adapter });
 
 function getDatabaseUrl() {
   const url = process.env.DATABASE_URL ?? 'file:./dev.db';

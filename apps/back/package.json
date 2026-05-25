@@ -10,6 +10,7 @@
   },
   "scripts": {
     "dev": "bun run --watch src/index.ts --env-file=../../.env",
+    "mcp:git": "bun run src/mcp/git-tools.mcp.ts",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "build": "bunx tsc -p ./tsconfig.json",
@@ -22,6 +23,7 @@
   "dependencies": {
     "@elysiajs/cors": "^1.4.1",
     "@libsql/client": "^0.17.3",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@notionhq/client": "^5.17.0",
     "@opencode-ai/sdk": "^1.14.25",
     "@prisma/adapter-libsql": "^7.8.0",
