@@ -16,6 +16,7 @@ import { ReviewContent } from './ReviewContent';
 import { ReviewHeader } from './ReviewHeader';
 import { splitGitDiff, type ReviewComment } from './review.utils';
 import { ProjectList } from '#/components/opencode/ProjectList';
+import { useReviewComments } from './useReviewComments';
 
 function formatComments(comments: ReviewComment[]) {
   const PREPROMPT = `Modifie les fichiers dans le workspace courant afin de répondre aux commentaires que t'a fait l'utilisateur.
@@ -44,7 +45,7 @@ export function ReviewPage({ cardId }: { cardId: string }) {
   const checkedOutBranchQuery = useGetProjectCheckedOutBranch(projectId);
   const projectFirstChar = Array.from(project?.name ?? '')[0];
   const [mode, setMode] = useState<DiffModeEnum>(DiffModeEnum.Unified);
-  const [comments, setComments] = useState<ReviewComment[]>([]);
+  const [comments, setComments] = useReviewComments(cardId);
   const { mutate: checkoutBranch, isPending: isCheckingOutBranch } =
     useCheckoutKanbanCardBranch(cardId);
   const { mutate: mergeBranch, isPending: isMergingBranch } =
