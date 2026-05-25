@@ -157,7 +157,7 @@ export const OPENCODE_CONTROLLER = new Elysia({ prefix: 'opencode' })
     },
   )
   .post(
-    'card/message',
+    'card/create-session',
     async ({ body }) => await createSessionFromCard(body),
     {
       body: SEND_MESSAGE_TO_CARD_SCHEMA,

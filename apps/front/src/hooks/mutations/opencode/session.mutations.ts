@@ -32,12 +32,12 @@ export function useSendSessionMessage() {
   );
 }
 
-export function useSendCardMessage() {
+export function useCreateCardSession() {
   const eden = useEden();
   const invalidateSessionMessages = useInvalidateSessionMessages();
 
   return useMutation(
-    eden.opencode.card.message.post.mutationOptions({
+    eden.opencode.card['create-session'].post.mutationOptions({
       onSuccess({ sessionId }) {
         invalidateSessionMessages(sessionId);
       },

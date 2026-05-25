@@ -1,7 +1,7 @@
 import { ProjectList } from '#/components/opencode/ProjectList';
 import {
+  useCreateCardSession,
   useCreateProjectSession,
-  useSendCardMessage,
 } from '#/hooks/mutations/opencode/session.mutations';
 import {
   type KanbanCard,
@@ -29,11 +29,9 @@ export function ProjectPage({
   const { data: cards } = useGetKanbanCards(projectId);
   const { data: projects = [] } = useGetProjects();
   const { mutate: moveCards } = useMoveKanbanCards(projectId);
-  const { mutate: sendCardMessage } = useSendCardMessage();
-  const {
-    isPending: isCreatingProjectSession,
-    mutate: createProjectSession,
-  } = useCreateProjectSession();
+  const { mutate: createCardSession } = useCreateCardSession();
+  const { isPending: isCreatingProjectSession, mutate: createProjectSession } =
+    useCreateProjectSession();
   const project = projects.find((project) => project.id === projectId);
   const projectFirstChar = Array.from(project?.name ?? '')[0];
 
@@ -43,12 +41,6 @@ export function ProjectPage({
       ? `${projectFirstChar} - ${page}`
       : `Travaille - ${page}`;
   }, [projectFirstChar, sessionId]);
-
-  function startAgentSession(card: KanbanCard) {
-    sendCardMessage({
-      cardId: card.id,
-    });
-  }
 
   function startProjectSession() {
     createProjectSession(
@@ -65,7 +57,7 @@ export function ProjectPage({
 
   function onCardMoved({ card, cards }: CardMovedEvent) {
     if (card.column === 'AI') {
-      startAgentSession(card);
+      createCardSession({ cardId: card.id });
     }
     moveCards(
       cards.map((card, position) => ({
@@ -79,7 +71,7 @@ export function ProjectPage({
 
   function onCardCreated(card: KanbanCard) {
     if (card.column === 'AI') {
-      startAgentSession(card);
+      createCardSession({ cardId: card.id });
     }
   }
 
