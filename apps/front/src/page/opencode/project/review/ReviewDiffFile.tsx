@@ -2,8 +2,6 @@ import { DiffModeEnum, DiffView, SplitSide } from '@git-diff-view/react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { DiffFilePatch, ReviewComment } from './review.utils';
 import { ReviewCommentCreator } from './ReviewCommentCreator';
-import MarkdownPreview from '@uiw/react-markdown-preview';
-import './ReviewDiffFile.css';
 import { format } from 'date-fns';
 
 function buildExtendedData(comments: ReviewComment[], side: SplitSide) {
@@ -70,15 +68,9 @@ export function ReviewDiffFile({
                   <div className="text-white!">
                     {format(curr.date, 'dd-MM-yyyy HH:mm:ss')}
                   </div>
-                  <MarkdownPreview
-                    className="review-comment-markdown"
-                    source={curr.comment}
-                    style={{
-                      background: 'transparent',
-                      fontSize: 14,
-                      color: 'white',
-                    }}
-                  />
+                  <div className="whitespace-pre-wrap break-words text-sm text-white [overflow-wrap:anywhere]">
+                    {curr.comment}
+                  </div>
                 </div>
               ))}
             </div>

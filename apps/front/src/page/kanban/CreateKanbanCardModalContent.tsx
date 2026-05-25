@@ -8,7 +8,6 @@ import { Button } from '#/components/ui/button';
 import { DialogDescription, DialogTitle } from '#/components/ui/dialog';
 import { useEffect, useState } from 'react';
 import { LinkedSession } from './LinkedSession';
-import { MarkdownDescriptionEditor } from './MarkdownDescriptionEditor';
 import type { Column } from './kanban.types';
 
 export function CreateKanbanCardModalContent({
@@ -154,11 +153,18 @@ export function CreateKanbanCardModalContent({
 
         <label className="block space-y-2 text-sm font-medium text-gray-100">
           <span>Description</span>
-          <MarkdownDescriptionEditor
-            initialValue={description}
-            key={card?.id ?? 'new-card'}
-            onChange={setDescription}
-            onSubmit={handleSubmit}
+          <textarea
+            className="min-h-56 w-full resize-y rounded-lg border border-white/20 bg-gray-800 px-3 py-2 text-sm leading-6 text-white outline-none placeholder:text-gray-500 focus:border-cyan-400"
+            onChange={(event) => setDescription(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+                event.preventDefault();
+                handleSubmit();
+              }
+            }}
+            placeholder="Write a description"
+            spellCheck={false}
+            value={description}
           />
         </label>
 

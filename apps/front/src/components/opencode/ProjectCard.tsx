@@ -1,6 +1,6 @@
 import type { Project } from '#/hooks/queries/opencode/project.queries';
 import { cn } from '#/lib/utils';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 
 export function ProjectCard({
   project,

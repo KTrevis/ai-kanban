@@ -1,6 +1,5 @@
 import type { MessagePart } from '#/hooks/queries/opencode/session.queries';
 import { cn } from '#/lib/utils';
-import MarkdownPreview from '@uiw/react-markdown-preview';
 
 export function SessionMessagePart({
   count = 1,
@@ -13,10 +12,9 @@ export function SessionMessagePart({
 }) {
   if (part.type === 'text' && part.synthetic !== true) {
     return (
-      <MarkdownPreview
-        source={part.text}
-        style={{ background: 'transparent', fontSize: 14, color: 'white' }}
-      />
+      <div className="whitespace-pre-wrap break-words text-sm text-white [overflow-wrap:anywhere]">
+        {part.text}
+      </div>
     );
   }
   if (part.type === 'reasoning') {

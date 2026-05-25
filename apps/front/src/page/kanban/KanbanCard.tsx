@@ -1,6 +1,5 @@
 import type { KanbanCard as KanbanCardType } from '#/hooks/queries/kanban/kanban.queries';
 import { Link } from '@tanstack/react-router';
-import MarkdownPreview from '@uiw/react-markdown-preview';
 
 export function KanbanCard({
   card,
@@ -19,13 +18,11 @@ export function KanbanCard({
       }`}
     >
       <h3 className="break-words font-medium text-gray-50">{card.title}</h3>
-      <div className="mt-2 max-h-64 overflow-y-auto break-words pr-1 [overflow-wrap:anywhere]">
-        <MarkdownPreview
-          className="kanban-card-markdown"
-          source={card.description}
-          style={{ background: 'transparent', fontSize: 14 }}
-        />
-      </div>
+      {card.description && (
+        <p className="mt-2 max-h-64 overflow-y-auto whitespace-pre-wrap break-words pr-1 text-gray-400 [overflow-wrap:anywhere]">
+          {card.description}
+        </p>
+      )}
       <div className="mt-3 flex flex-wrap gap-3">
         {card.sessionId && (
           <Link
