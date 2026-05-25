@@ -1,5 +1,5 @@
 import { GitRunError, runGit } from '../../git/git-runner';
-import { normalizeBranchRef } from '../../git/virtual-branch-writer';
+import { normalizeBranchRef } from '../../git/git-refs';
 import { HttpError } from '../../lib/http-error';
 import { prisma } from '../../lib/prisma';
 

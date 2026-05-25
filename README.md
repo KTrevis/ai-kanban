@@ -157,10 +157,6 @@ Important : Dans "Contenu" il faut cocher uniqument "Projet" et "Session"
    - **Review** si c'est fini
    - **Human** si une information manque
 
-## Documentation technique
-
-- [Comment le MCP écrit sur une branche sans la checkout](docs/mcp-git-virtual-branches.md)
-
 ## Dépannage rapide
 
 - **Erreur de webhook** : vérifiez que ngrok est bien lancé et que l'URL n'a pas changé.

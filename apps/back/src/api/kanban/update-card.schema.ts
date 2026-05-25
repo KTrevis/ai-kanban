@@ -9,7 +9,6 @@ export const UPDATE_KANBAN_CARD_SCHEMA = z.object({
   sessionId: z.string().nullable().optional(),
   baseBranch: z.string().optional(),
   newBranch: z.string().optional(),
-  useTravailleMcp: z.boolean().optional(),
 });
 
 export type UpdateKanbanCard = z.infer<typeof UPDATE_KANBAN_CARD_SCHEMA>;

@@ -2,7 +2,7 @@ import { opencodeClient } from './opencode.controller';
 import { notifyAgentTaskStarted } from '../../lib/notifications';
 import { patchCard } from '../kanban/patch-card';
 import { prisma } from '../../lib/prisma';
-import { getCheckedOutBranch } from '../../git/virtual-branch-writer';
+import { getCheckedOutBranch } from '../../git/git-refs';
 import type {
   SendMessageToCardData,
   SendMessageToSessionData,
@@ -14,16 +14,11 @@ function buildPrompt(card: {
   description: string;
   branch: string;
   id: string;
-  useTravailleMcp: boolean;
 }) {
-  const TRAVAILLE_MCP_PROMPT = [
-    'Utilise le MCP travaille pour réaliser cette tâche.',
-    "Interdiction stricte : ne crée pas et n'utilise pas de git worktree.",
-    'Pour lire, modifier, committer ou comparer du code sur la branche cible, utilise les outils MCP travaille : travaille_read_file, travaille_write_file, travaille_commit_changes et travaille_get_diff.',
+  const WORKTREE_PROMPT = [
+    "Crée et utilise un git worktree dédié pour travailler sur cette tâche, afin de ne pas perturber le workspace principal.",
     'Choisis un nom de branche court et descriptif au format ai/<slug>, par exemple ai/fix-login ou ai/add-kanban-filter.',
-    'Avant de modifier le code, mets à jour la carte Kanban avec travaille_patch_kanban_card en définissant newBranch avec le nom de branche choisi.',
-    "Fais attention à ne rien faire d'autre que changer newBranch.",
-    'Utilise ensuite exactement ce même nom de branche pour tous les outils MCP travaille qui demandent branchRef.',
+    'Avant de modifier le code, mets à jour la carte Kanban en définissant newBranch avec le nom de branche choisi.',
     'Si jamais la carte te demande explicitement de ne pas écrire de code, ne crée pas la branche, réponds juste dans la conversation au message.',
     'Tu dois tout de même lire le code si tu en as besoin pour répondre à la question.',
   ].join('\n\n');
@@ -34,7 +29,7 @@ function buildPrompt(card: {
     `Description de la tâches : ${card.description}`,
     `Branche sur laquelle te baser : ${card.branch}`,
     `ID de la carte Kanban : ${card.id}`,
-    card.useTravailleMcp ? TRAVAILLE_MCP_PROMPT : '',
+    WORKTREE_PROMPT,
     `Quand tu as fini, place la carte dans la colonne REVIEW.`,
   ].join('\n\n');
 
@@ -50,7 +45,6 @@ async function createSessionFromCard({ cardId }: SendMessageToCardData) {
       sessionId: true,
       title: true,
       description: true,
-      useTravailleMcp: true,
       baseBranch: true,
       id: true,
       project: {

@@ -22,7 +22,6 @@ const KANBAN_CARD_SCHEMA = z.object({
   column: KANBAN_COLUMNS_SCHEMA,
   position: z.number().int().optional(),
   baseBranch: z.string().optional(),
-  useTravailleMcp: z.boolean().optional(),
 });
 
 export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
@@ -177,7 +176,6 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
           projectId: body.projectId,
           sessionId: body.sessionId,
           title: body.title,
-          useTravailleMcp: body.useTravailleMcp ?? true,
         },
       });
     },

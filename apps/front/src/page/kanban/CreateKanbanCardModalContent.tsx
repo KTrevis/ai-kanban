@@ -28,9 +28,6 @@ export function CreateKanbanCardModalContent({
   const [description, setDescription] = useState(card?.description ?? '');
   const [baseBranch, setBaseBranch] = useState(card?.baseBranch ?? 'HEAD');
   const [newBranch, setNewBranch] = useState(card?.newBranch ?? '');
-  const [useTravailleMcp, setUseTravailleMcp] = useState(
-    card?.useTravailleMcp ?? true,
-  );
   const { isPending: isCreating, mutate: createCard } =
     useCreateKanbanCard(projectId);
   const { isPending: isUpdating, mutate: updateCard } = useUpdateKanbanCard(
@@ -57,7 +54,6 @@ export function CreateKanbanCardModalContent({
     setDescription(nextDescription);
     setBaseBranch(card?.baseBranch ?? 'HEAD');
     setNewBranch(card?.newBranch ?? '');
-    setUseTravailleMcp(card?.useTravailleMcp ?? true);
   }, [card]);
 
   const handleSubmit = () => {
@@ -81,7 +77,6 @@ export function CreateKanbanCardModalContent({
       id: card?.id ?? crypto.randomUUID(),
       projectId,
       title: trimmedTitle,
-      useTravailleMcp,
       ...(isEditing ? { newBranch: trimmedNewBranch } : {}),
     };
 
@@ -90,7 +85,6 @@ export function CreateKanbanCardModalContent({
       setDescription('');
       setBaseBranch('HEAD');
       setNewBranch('');
-      setUseTravailleMcp(true);
       onOpenChange(false);
     };
 
@@ -197,22 +191,6 @@ export function CreateKanbanCardModalContent({
             />
           </>
         )}
-        <label className="flex items-start gap-3 rounded-lg border border-white/10 bg-gray-800/60 p-3 text-sm text-gray-100">
-          <input
-            checked={useTravailleMcp}
-            className="mt-0.5 h-4 w-4 rounded border-white/20 bg-gray-900 text-cyan-400 accent-cyan-400"
-            onChange={(event) => setUseTravailleMcp(event.target.checked)}
-            type="checkbox"
-          />
-          <span className="space-y-1">
-            <span className="block font-medium">Use MCP travaille</span>
-            <span className="block text-xs leading-5 text-gray-400">
-              Inject instructions asking the agent to read, edit, commit and
-              update this card through MCP travaille.
-            </span>
-          </span>
-        </label>
-
         <div className="flex justify-between gap-2 pt-2">
           {isEditing ? (
             <Button

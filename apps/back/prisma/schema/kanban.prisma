@@ -27,7 +27,6 @@ model KanbanCard {
   updatedAt       DateTime     @updatedAt
   newBranch       String
   baseBranch      String
-  useTravailleMcp Boolean      @default(true)
 
   @@index([projectId, column, position])
 }

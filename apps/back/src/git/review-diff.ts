@@ -3,7 +3,7 @@ import {
   getCheckedOutBranch,
   getShortBranchName,
   normalizeBranchRef,
-} from './virtual-branch-writer';
+} from './git-refs';
 
 export async function getCommittedReviewDiff({
   baseRef,
