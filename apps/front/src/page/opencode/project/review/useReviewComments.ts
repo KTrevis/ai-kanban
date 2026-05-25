@@ -1,21 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useLocalStorage } from 'usehooks-ts';
 import type { ReviewComment } from './review.utils';
 
 function getReviewCommentsStorageKey(cardId: string) {
   return `review:${cardId}`;
 }
 
-function loadReviewComments(cardId: string): ReviewComment[] {
+function deserializeReviewComments(value: string): ReviewComment[] {
   try {
-    const storedComments = window.localStorage.getItem(
-      getReviewCommentsStorageKey(cardId),
-    );
-
-    if (!storedComments) {
-      return [];
-    }
-
-    const comments = JSON.parse(storedComments) as ReviewComment[];
+    const comments = JSON.parse(value) as ReviewComment[];
     return comments.map((comment) => ({
       ...comment,
       date: new Date(comment.date),
@@ -26,31 +18,13 @@ function loadReviewComments(cardId: string): ReviewComment[] {
 }
 
 export function useReviewComments(cardId: string) {
-  const hasLoadedCardComments = useRef(true);
-  const [comments, setComments] = useState<ReviewComment[]>(() =>
-    loadReviewComments(cardId),
+  const [comments, setComments] = useLocalStorage<ReviewComment[]>(
+    getReviewCommentsStorageKey(cardId),
+    [],
+    {
+      deserializer: deserializeReviewComments,
+    },
   );
-
-  useEffect(() => {
-    hasLoadedCardComments.current = false;
-    setComments(loadReviewComments(cardId));
-  }, [cardId]);
-
-  useEffect(() => {
-    if (!hasLoadedCardComments.current) {
-      hasLoadedCardComments.current = true;
-      return;
-    }
-
-    try {
-      window.localStorage.setItem(
-        getReviewCommentsStorageKey(cardId),
-        JSON.stringify(comments),
-      );
-    } catch {
-      // Ignore storage failures so review comments still work in memory.
-    }
-  }, [cardId, comments]);
 
   return [comments, setComments] as const;
 }
