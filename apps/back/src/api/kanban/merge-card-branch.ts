@@ -1,5 +1,6 @@
 import { GitRunError, runGit } from '../../git/git-runner';
 import { normalizeBranchRef } from '../../git/git-refs';
+import { KanbanColumn } from '../../generated/prisma/enums';
 import { HttpError } from '../../lib/http-error';
 import { prisma } from '../../lib/prisma';
 
@@ -13,6 +14,7 @@ export async function mergeKanbanCardBranch({
     select: {
       baseBranch: true,
       newBranch: true,
+      projectId: true,
       project: {
         select: {
           worktree: true,
@@ -31,11 +33,37 @@ export async function mergeKanbanCardBranch({
   }
 
   try {
-    return await rebaseBranchIntoBase({
+    const result = await rebaseBranchIntoBase({
       baseBranch: card.baseBranch,
       branchRef: newBranch,
       repoPath: card.project.worktree,
     });
+
+    const lastDoneCard = await prisma.kanbanCard.findFirst({
+      where: {
+        column: KanbanColumn.DONE,
+        projectId: card.projectId,
+      },
+      orderBy: {
+        position: 'desc',
+      },
+      select: {
+        position: true,
+      },
+    });
+    const updatedCard = await prisma.kanbanCard.update({
+      where: { id: cardId },
+      data: {
+        column: KanbanColumn.DONE,
+        position: (lastDoneCard?.position ?? -1) + 1,
+      },
+    });
+
+    return {
+      ...result,
+      card: updatedCard,
+      projectId: card.projectId,
+    };
   } catch (error) {
     let message = 'Failed to rebase branch';
     if (error instanceof GitRunError) {
@@ -107,12 +135,10 @@ async function rebaseBranchIntoBase({
   });
   const commitOid = stdout.trim();
   await runGit(['update-ref', targetRef, commitOid], { cwd: repoPath });
-  await runGit(['switch', getLocalBranchName(targetRef)], { cwd: repoPath });
 
   return {
     baseBranch,
     branch: branchRef,
-    checkedOutBranch: baseBranch,
     commitOid,
     rebased: true,
   };
@@ -140,8 +166,4 @@ function getUpdatableBranchRef(ref: string) {
   }
 
   return normalizeBranchRef(ref);
-}
-
-function getLocalBranchName(ref: string) {
-  return ref.replace(/^refs\/heads\//, '');
 }

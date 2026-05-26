@@ -88,9 +88,12 @@ export function useMergeKanbanCardBranch(cardId: string) {
 
   return useMutation(
     eden.kanban.card({ cardId }).merge.post.mutationOptions({
-      onSuccess() {
+      onSuccess(result) {
         queryClient.invalidateQueries(
           eden.kanban.card({ cardId }).review.get.queryOptions(),
+        );
+        queryClient.invalidateQueries(
+          eden.kanban.cards({ projectId: result.projectId }).get.queryOptions(),
         );
       },
     }),
