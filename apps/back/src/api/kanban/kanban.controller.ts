@@ -4,6 +4,7 @@ import {
   getCommittedReviewDiff,
   getUncommittedReviewDiff,
 } from '../../git/review-diff';
+import { getShortBranchName, normalizeBranchRef } from '../../git/git-refs';
 import { GitRunError, runGit } from '../../git/git-runner';
 import { HttpError } from '../../lib/http-error';
 import { getProjectById } from '../projects/projects.service';
@@ -199,7 +200,28 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
       body: UPDATE_KANBAN_CARD_SCHEMA,
     },
   )
-  .delete('card/:cardId', ({ params: { cardId } }) => {
+  .delete('card/:cardId', async ({ params: { cardId } }) => {
+    const card = await prisma.kanbanCard.findUnique({
+      where: { id: cardId },
+      select: {
+        newBranch: true,
+        project: {
+          select: {
+            worktree: true,
+          },
+        },
+      },
+    });
+
+    if (!card) {
+      throw new HttpError(404, 'Kanban card not found');
+    }
+
+    await deleteLinkedLocalBranch({
+      branch: card.newBranch,
+      repoPath: card.project.worktree,
+    });
+
     return prisma.kanbanCard.delete({
       where: { id: cardId },
     });
@@ -212,4 +234,41 @@ function getProjectCards(projectId: string) {
     },
     orderBy: [{ column: 'asc' }, { position: 'asc' }],
   });
+}
+
+async function deleteLinkedLocalBranch({
+  branch,
+  repoPath,
+}: {
+  branch: string;
+  repoPath: string;
+}) {
+  const linkedBranch = branch.trim();
+  if (!linkedBranch) {
+    return;
+  }
+
+  const localBranch = getShortBranchName(linkedBranch);
+  const localBranchRef = normalizeBranchRef(localBranch);
+
+  try {
+    await runGit(['rev-parse', '--verify', localBranchRef], { cwd: repoPath });
+  } catch (error) {
+    if (error instanceof GitRunError) {
+      return;
+    }
+
+    throw error;
+  }
+
+  try {
+    await runGit(['branch', '-D', localBranch], { cwd: repoPath });
+  } catch (error) {
+    throw new HttpError(
+      400,
+      error instanceof GitRunError
+        ? error.result.stderr.trim() || error.message
+        : 'Failed to delete linked branch',
+    );
+  }
 }
