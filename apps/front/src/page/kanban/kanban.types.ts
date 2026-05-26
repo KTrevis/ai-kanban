@@ -1,4 +1,4 @@
-import type { KanbanColumn } from '#/hooks/queries/kanban/kanban.queries';
+import type { KanbanColumn } from '#/hooks/mutations/kanban copy/kanban.queries';
 
 export const KANBAN_COLUMNS = [
   'TODO',

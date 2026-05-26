@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import type { KanbanCard as KanbanCardType } from '#/hooks/queries/kanban/kanban.queries';
+import type { KanbanCard as KanbanCardType } from '#/hooks/mutations/kanban/kanban.mutations';
 import { KanbanCard } from './KanbanCard';
 
 export function SortableKanbanCard({

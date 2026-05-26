@@ -1,5 +1,5 @@
 import { Button } from '#/components/ui/button';
-import type { KanbanCard } from '#/hooks/queries/kanban/kanban.queries';
+import type { KanbanCard } from '#/hooks/mutations/kanban copy/kanban.queries';
 import { Link } from '@tanstack/react-router';
 
 export function ProjectSessionReviewBar({ card }: { card?: KanbanCard }) {

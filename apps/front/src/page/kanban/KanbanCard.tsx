@@ -1,4 +1,4 @@
-import type { KanbanCard as KanbanCardType } from '#/hooks/queries/kanban/kanban.queries';
+import type { KanbanCard as KanbanCardType } from '#/hooks/mutations/kanban/kanban.mutations';
 import { Link } from '@tanstack/react-router';
 
 export function KanbanCard({

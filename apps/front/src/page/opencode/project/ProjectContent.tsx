@@ -1,4 +1,4 @@
-import type { KanbanCard } from '#/hooks/queries/kanban/kanban.queries';
+import type { KanbanCard } from '#/hooks/mutations/kanban/kanban.mutations';
 import { KanbanPage, type CardMovedEvent } from '#/page/kanban/KanbanPage';
 import { ProjectSessionPanel } from './ProjectSessionPanel';
 

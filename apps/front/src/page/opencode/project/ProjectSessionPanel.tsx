@@ -1,4 +1,4 @@
-import type { KanbanCard } from '#/hooks/queries/kanban/kanban.queries';
+import type { KanbanCard } from '#/hooks/mutations/kanban copy/kanban.queries';
 import { SessionMessages } from '#/components/opencode/messages/SessionMessages';
 import { useAppEvent } from '#/hooks/use-app-event';
 import { useEffect, useState } from 'react';

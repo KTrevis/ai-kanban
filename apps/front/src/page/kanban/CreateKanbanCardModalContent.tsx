@@ -3,7 +3,7 @@ import {
   useCreateKanbanCard,
   useDeleteKanbanCard,
   useUpdateKanbanCard,
-} from '#/hooks/queries/kanban/kanban.queries';
+} from '#/hooks/mutations/kanban/kanban.mutations';
 import { Button } from '#/components/ui/button';
 import { DialogDescription, DialogTitle } from '#/components/ui/dialog';
 import { useEffect, useState } from 'react';

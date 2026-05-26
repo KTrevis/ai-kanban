@@ -11,7 +11,11 @@ import z from 'zod';
 import { patchCard } from './patch-card';
 import { UPDATE_KANBAN_CARD_SCHEMA } from './update-card.schema';
 import { KANBAN_COLUMNS_SCHEMA } from './kanban-columns.schema';
-import { getRebaseBranchStatus, mergeKanbanCardBranch } from './merge-card-branch';
+import {
+  getRebaseBranchStatus,
+  mergeKanbanCardBranch,
+} from './merge-card-branch';
+import { websockets } from '../ws/ws.controller';
 
 const KANBAN_CARD_SCHEMA = z.object({
   id: z.string().optional(),
@@ -128,17 +132,22 @@ export const KANBAN_CONTROLLER = new Elysia({ prefix: 'kanban' })
   .patch(
     'cards',
     async ({ body }) => {
-      await prisma.$transaction(
-        body.map((card) =>
-          prisma.kanbanCard.update({
-            where: { id: card.id },
-            data: {
-              column: card.column,
-              position: card.position,
-            },
-          }),
-        ),
-      );
+      for (const card of body) {
+        const { projectId } = await prisma.kanbanCard.update({
+          where: { id: card.id },
+          data: {
+            column: card.column,
+            position: card.position,
+          },
+          select: {
+            projectId: true,
+          },
+        });
+        websockets.sendMessage({
+          projectId,
+          type: 'cards.updated',
+        });
+      }
     },
     {
       body: z

@@ -1,5 +1,5 @@
 import { arrayMove } from '@dnd-kit/sortable';
-import type { KanbanCard } from '#/hooks/queries/kanban/kanban.queries';
+import type { KanbanCard } from '#/hooks/mutations/kanban copy/kanban.queries';
 import type { Column } from './kanban.types';
 import { isColumn } from './kanban.utils';
 

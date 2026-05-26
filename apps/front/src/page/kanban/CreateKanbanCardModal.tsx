@@ -1,5 +1,5 @@
 import { Modal } from '#/components/Modal';
-import type { KanbanCard } from '#/hooks/queries/kanban/kanban.queries';
+import type { KanbanCard } from '#/hooks/mutations/kanban/kanban.mutations';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import type { Column } from './kanban.types';

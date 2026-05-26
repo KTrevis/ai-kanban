@@ -12,7 +12,7 @@ import type {
   DragEndEvent,
   DragStartEvent,
 } from '@dnd-kit/core';
-import type { KanbanCard as KanbanCardType } from '#/hooks/queries/kanban/kanban.queries';
+import type { KanbanCard as KanbanCardType } from '#/hooks/mutations/kanban/kanban.mutations';
 import { useEffect, useState } from 'react';
 import { Modal } from '#/components/Modal';
 import { Button } from '#/components/ui/button';

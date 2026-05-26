@@ -3,7 +3,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import type { KanbanCard as KanbanCardType } from '#/hooks/queries/kanban/kanban.queries';
+import type { KanbanCard as KanbanCardType } from '#/hooks/mutations/kanban/kanban.mutations';
 import { CreateKanbanCardDialog } from './CreateKanbanCardModal';
 import { SortableKanbanCard } from './SortableKanbanCard';
 import type { Column } from './kanban.types';

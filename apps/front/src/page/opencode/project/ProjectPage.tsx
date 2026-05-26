@@ -7,7 +7,7 @@ import {
   type KanbanCard,
   useGetKanbanCards,
   useMoveKanbanCards,
-} from '#/hooks/queries/kanban/kanban.queries';
+} from '#/hooks/mutations/kanban/kanban.mutations';
 import { useGetProjects } from '#/hooks/queries/opencode/project.queries';
 import type { CardMovedEvent } from '#/page/kanban/KanbanPage';
 import { useEffect } from 'react';

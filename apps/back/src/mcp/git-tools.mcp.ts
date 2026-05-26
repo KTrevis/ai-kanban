@@ -95,7 +95,8 @@ server.registerTool(
 server.registerTool(
   'list_kanban_cards',
   {
-    description: 'List Kanban cards for a project, ordered by column and position.',
+    description:
+      'List Kanban cards for a project, ordered by column and position.',
     inputSchema: {
       projectId: z.string(),
     },
@@ -117,7 +118,7 @@ server.registerTool(
   'patch_kanban_card',
   {
     description:
-      'Patch mutable fields on a Kanban card, such as column, sessionId, branches, title, description, or position.',
+      'Patch a card. Every fields are optional, expected for cardId.',
     inputSchema: {
       baseBranch: z.string().optional(),
       cardId: z.string(),
