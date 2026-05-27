@@ -31,3 +31,15 @@ export async function getProjectById(id: string) {
     where: { id },
   });
 }
+
+export async function deleteProject(id: string) {
+  return prisma.$transaction(async (tx) => {
+    await tx.kanbanCard.deleteMany({
+      where: { projectId: id },
+    });
+
+    return tx.project.delete({
+      where: { id },
+    });
+  });
+}

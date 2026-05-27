@@ -2,7 +2,12 @@ import Elysia from 'elysia';
 import z from 'zod/v3';
 import { GitRunError, runGit } from '../../git/git-runner';
 import { HttpError } from '../../lib/http-error';
-import { createProject, getProjectById, listProjects } from './projects.service';
+import {
+  createProject,
+  deleteProject,
+  getProjectById,
+  listProjects,
+} from './projects.service';
 
 export const PROJECTS_CONTROLLER = new Elysia()
   .get('projects', async () => {
@@ -29,6 +34,15 @@ export const PROJECTS_CONTROLLER = new Elysia()
           : 'Failed to get checked out branch',
       );
     }
+  })
+  .delete('projects/:projectId', async ({ params }) => {
+    const project = await getProjectById(params.projectId);
+
+    if (!project) {
+      throw new HttpError(404, 'Project not found');
+    }
+
+    return deleteProject(params.projectId);
   })
   .post(
     'projects',

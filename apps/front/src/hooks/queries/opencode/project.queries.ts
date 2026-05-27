@@ -19,7 +19,9 @@ export const useGetProjectCheckedOutBranch = (projectId?: string) => {
   const eden = useEden();
 
   return useQuery({
-    ...eden.projects({ projectId: projectId ?? '' })['checked-out-branch'].get.queryOptions(),
+    ...eden
+      .projects({ projectId: projectId ?? '' })
+      ['checked-out-branch'].get.queryOptions(),
     enabled: Boolean(projectId),
   });
 };
@@ -30,6 +32,19 @@ export const useCreateProject = () => {
 
   return useMutation(
     eden.projects.post.mutationOptions({
+      onSuccess() {
+        queryClient.invalidateQueries(eden.projects.get.queryOptions());
+      },
+    }),
+  );
+};
+
+export const useDeleteProject = (id: string) => {
+  const eden = useEden();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    eden.projects({ projectId: id }).delete.mutationOptions({
       onSuccess() {
         queryClient.invalidateQueries(eden.projects.get.queryOptions());
       },
