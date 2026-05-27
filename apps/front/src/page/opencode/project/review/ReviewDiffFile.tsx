@@ -3,6 +3,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import type { DiffFilePatch, ReviewComment } from './review.utils';
 import { ReviewCommentCreator } from './ReviewCommentCreator';
 import { format } from 'date-fns';
+import { Button } from '#/components/ui/button';
 
 function buildExtendedData(comments: ReviewComment[], side: SplitSide) {
   return comments.reduce(
@@ -17,6 +18,16 @@ function buildExtendedData(comments: ReviewComment[], side: SplitSide) {
       return acc;
     },
     {} as Record<string, { data: ReviewComment[] }>,
+  );
+}
+
+function isSameComment(left: ReviewComment, right: ReviewComment) {
+  return (
+    left.file === right.file &&
+    left.line === right.line &&
+    left.side === right.side &&
+    left.comment === right.comment &&
+    left.date.getTime() === right.date.getTime()
   );
 }
 
@@ -62,11 +73,29 @@ export function ReviewDiffFile({
         renderExtendLine={({ data }) => (
           <div className="flex border-y border-gray-700 py-2">
             <div className="w-[1%] min-w-25" />
-            <div>
+            <div className="flex-1 space-y-3 pr-4">
               {data.map((curr) => (
-                <div>
-                  <div className="text-white!">
-                    {format(curr.date, 'dd-MM-yyyy HH:mm:ss')}
+                <div
+                  key={`${curr.file}:${curr.side}:${curr.line}:${curr.date.getTime()}`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-xs text-white!">
+                      {format(curr.date, 'dd-MM-yyyy HH:mm:ss')}
+                    </div>
+                    <Button
+                      className="px-2 py-1 text-xs"
+                      onClick={() =>
+                        onCommentsChange((current) =>
+                          current.filter(
+                            (comment) => !isSameComment(comment, curr),
+                          ),
+                        )
+                      }
+                      type="button"
+                      variant="destructive"
+                    >
+                      Delete
+                    </Button>
                   </div>
                   <div className="whitespace-pre-wrap text-xs text-white! wrap-anywhere">
                     {curr.comment}
