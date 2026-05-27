@@ -62,94 +62,103 @@ export function ReviewPage({ cardId }: { cardId: string }) {
       : 'Travaille - Review';
   }, [projectFirstChar]);
 
+  function handleCheckoutBranch() {
+    if (!data?.newBranch) {
+      toast.error('No branch linked to the card');
+      return;
+    }
+
+    checkoutBranch(undefined, {
+      onError(error) {
+        toast.error(
+          error instanceof Error ? error.message : 'Failed to checkout branch',
+        );
+      },
+      onSuccess() {
+        toast.success(`Checked out ${data.newBranch}`);
+        checkedOutBranchQuery.refetch();
+      },
+    });
+  }
+
+  function handleMergeBranch() {
+    if (!data?.newBranch) {
+      toast.error('No branch linked to the card');
+      return;
+    }
+
+    if (!data.canRebase) {
+      toast.error(data.cannotMergeReason ?? 'Rebase has conflicts');
+      return;
+    }
+
+    mergeBranch(undefined, {
+      onError(error) {
+        toast.error(
+          error instanceof Error ? error.message : 'Failed to rebase branch',
+        );
+      },
+      onSuccess() {
+        toast.success('Branch rebased and merged');
+        checkedOutBranchQuery.refetch();
+      },
+    });
+  }
+
+  function handleSendReview() {
+    if (!projectId) {
+      toast.error('No project id linked to the card');
+      return;
+    }
+
+    if (!sessionId) {
+      toast.error('No session id linked to the card');
+      return;
+    }
+
+    sendMessage(
+      {
+        message: formatComments(comments),
+        projectId,
+        sessionId,
+      },
+      {
+        onSuccess() {
+          removeComments();
+          toast.success('Review comments sent');
+          navigate({
+            to: '/project/$id',
+            params: { id: projectId },
+            search: {
+              sessionId,
+            },
+          });
+        },
+      },
+    );
+  }
+
   return (
     <div className="flex h-screen">
       <ProjectList selectedProject={projectId} />
       <section className="flex h-full min-w-0 flex-1 flex-col text-gray-100">
         <ReviewHeader
-          baseBranch={data?.baseBranch}
-          canRebase={data?.canRebase ?? false}
-          checkedOutBranch={checkedOutBranchQuery.data?.branch ?? undefined}
-          isCheckingOutBranch={isCheckingOutBranch}
-          mode={mode}
-          newBranch={data?.newBranch}
-          onModeChange={setMode}
-          onCheckoutBranch={() => {
-            if (!data?.newBranch) {
-              toast.error('No branch linked to the card');
-              return;
-            }
-
-            checkoutBranch(undefined, {
-              onError(error) {
-                toast.error(
-                  error instanceof Error
-                    ? error.message
-                    : 'Failed to checkout branch',
-                );
-              },
-              onSuccess() {
-                toast.success(`Checked out ${data.newBranch}`);
-                checkedOutBranchQuery.refetch();
-              },
-            });
+          actions={{
+            onCheckoutBranch: handleCheckoutBranch,
+            onMergeBranch: handleMergeBranch,
+            onSendReview: handleSendReview,
           }}
-          onMergeBranch={() => {
-            if (!data?.newBranch) {
-              toast.error('No branch linked to the card');
-              return;
-            }
-
-            if (!data.canRebase) {
-              toast.error(data.cannotMergeReason ?? 'Rebase has conflicts');
-              return;
-            }
-
-            mergeBranch(undefined, {
-              onError(error) {
-                toast.error(
-                  error instanceof Error
-                    ? error.message
-                    : 'Failed to rebase branch',
-                );
-              },
-              onSuccess() {
-                toast.success('Branch rebased and merged');
-                checkedOutBranchQuery.refetch();
-              },
-            });
+          branch={{
+            baseBranch: data?.baseBranch,
+            canMerge: data?.canRebase ?? false,
+            cannotMergeReason: data?.cannotMergeReason,
+            checkedOutBranch: checkedOutBranchQuery.data?.branch ?? undefined,
+            isCheckingOut: isCheckingOutBranch,
+            newBranch: data?.newBranch,
           }}
-          onSendReview={() => {
-            if (!projectId) {
-              toast.error('No project id linked to the card');
-              return;
-            }
-
-            if (!sessionId) {
-              toast.error('No session id linked to the card');
-              return;
-            }
-
-            sendMessage(
-              {
-                message: formatComments(comments),
-                projectId,
-                sessionId,
-              },
-              {
-                onSuccess() {
-                  removeComments();
-                  toast.success('Review comments sent');
-                  navigate({
-                    to: '/project/$id',
-                    params: { id: projectId },
-                    search: {
-                      sessionId,
-                    },
-                  });
-                },
-              },
-            );
+          diffMode={{
+            value: mode,
+            onChange: setMode,
           }}
         />
 
