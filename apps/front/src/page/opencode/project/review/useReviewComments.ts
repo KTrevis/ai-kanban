@@ -1,4 +1,5 @@
 import { useLocalStorage } from 'usehooks-ts';
+import type { Dispatch, SetStateAction } from 'react';
 import type { ReviewComment } from './review.utils';
 
 function getReviewCommentsStorageKey(cardId: string) {
@@ -17,14 +18,21 @@ function deserializeReviewComments(value: string): ReviewComment[] {
   }
 }
 
-export function useReviewComments(cardId: string) {
+export function useReviewComments(
+  cardId: string,
+): [ReviewComment[], Dispatch<SetStateAction<ReviewComment[]>>, () => void] {
+  const storageKey = getReviewCommentsStorageKey(cardId);
   const [comments, setComments] = useLocalStorage<ReviewComment[]>(
-    getReviewCommentsStorageKey(cardId),
+    storageKey,
     [],
     {
       deserializer: deserializeReviewComments,
     },
   );
 
-  return [comments, setComments];
+  return [
+    comments,
+    setComments,
+    () => window.localStorage.removeItem(storageKey),
+  ];
 }

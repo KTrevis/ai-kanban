@@ -45,7 +45,7 @@ export function ReviewPage({ cardId }: { cardId: string }) {
   const checkedOutBranchQuery = useGetProjectCheckedOutBranch(projectId);
   const projectFirstChar = Array.from(project?.name ?? '')[0];
   const [mode, setMode] = useState<DiffModeEnum>(DiffModeEnum.Unified);
-  const [comments, setComments] = useReviewComments(cardId);
+  const [comments, setComments, removeComments] = useReviewComments(cardId);
   const { mutate: checkoutBranch, isPending: isCheckingOutBranch } =
     useCheckoutKanbanCardBranch(cardId);
   const { mutate: mergeBranch, isPending: isMergingBranch } =
@@ -156,6 +156,7 @@ export function ReviewPage({ cardId }: { cardId: string }) {
               },
               {
                 onSuccess() {
+                  removeComments();
                   toast.success('Review comments sent');
                   navigate({
                     to: '/project/$id',
