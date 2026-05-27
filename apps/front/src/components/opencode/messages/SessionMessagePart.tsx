@@ -1,5 +1,6 @@
 import type { MessagePart } from '#/hooks/queries/opencode/session.queries';
 import { cn } from '#/lib/utils';
+import { format } from 'date-fns';
 
 export function SessionMessagePart({
   count = 1,
@@ -11,9 +12,15 @@ export function SessionMessagePart({
   pulse: boolean;
 }) {
   if (part.type === 'text' && part.synthetic !== true) {
+    const date = new Date(part.time?.start ?? '');
     return (
-      <div className="whitespace-pre-wrap break-words text-sm text-white [overflow-wrap:anywhere]">
-        {part.text}
+      <div>
+        <div className="text-xs text-gray-500">
+          {!isNaN(date.getTime()) && format(date, 'dd/LL/yyyy hh:mm:ss')}
+        </div>
+        <div className="whitespace-pre-wrap wrap-break-word text-sm text-white">
+          {part.text}
+        </div>
       </div>
     );
   }

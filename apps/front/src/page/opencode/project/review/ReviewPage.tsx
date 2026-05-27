@@ -1,8 +1,3 @@
-import {
-  useCheckoutKanbanCardBranch,
-  useGetKanbanCardReview,
-  useMergeKanbanCardBranch,
-} from '#/hooks/mutations/kanban copy/kanban.queries';
 import { useSendSessionMessage } from '#/hooks/mutations/opencode/session.mutations';
 import {
   useGetProjectCheckedOutBranch,
@@ -17,6 +12,11 @@ import { ReviewHeader } from './ReviewHeader';
 import { splitGitDiff, type ReviewComment } from './review.utils';
 import { ProjectList } from '#/components/opencode/ProjectList';
 import { useReviewComments } from './useReviewComments';
+import {
+  useCheckoutKanbanCardBranch,
+  useGetKanbanCardReview,
+  useMergeKanbanCardBranch,
+} from '#/hooks/mutations/kanban/kanban.mutations';
 
 function formatComments(comments: ReviewComment[]) {
   const PREPROMPT = `Modifie les fichiers dans le workspace courant afin de répondre aux commentaires que t'a fait l'utilisateur.
