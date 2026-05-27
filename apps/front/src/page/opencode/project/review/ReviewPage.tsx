@@ -48,8 +48,7 @@ export function ReviewPage({ cardId }: { cardId: string }) {
   const [comments, setComments, removeComments] = useReviewComments(cardId);
   const { mutate: checkoutBranch, isPending: isCheckingOutBranch } =
     useCheckoutKanbanCardBranch(cardId);
-  const { mutate: mergeBranch, isPending: isMergingBranch } =
-    useMergeKanbanCardBranch(cardId);
+  const { mutate: mergeBranch } = useMergeKanbanCardBranch(cardId);
   const { mutate: sendMessage } = useSendSessionMessage();
   const navigate = useNavigate();
   const files = useMemo(
@@ -63,34 +62,18 @@ export function ReviewPage({ cardId }: { cardId: string }) {
       : 'Travaille - Review';
   }, [projectFirstChar]);
 
-  function goBack() {
-    if (window.history.length > 1) {
-      window.history.back();
-      return;
-    }
-
-    if (projectId) {
-      navigate({
-        to: '/project/$id',
-        params: { id: projectId },
-      });
-    }
-  }
-
   return (
     <div className="flex h-screen">
       <ProjectList selectedProject={projectId} />
       <section className="flex h-full min-w-0 flex-1 flex-col text-gray-100">
         <ReviewHeader
           baseBranch={data?.baseBranch}
-          canRebase={data?.canRebase}
-          cannotMergeReason={data?.cannotMergeReason}
+          canRebase={data?.canRebase ?? false}
           checkedOutBranch={checkedOutBranchQuery.data?.branch ?? undefined}
           isCheckingOutBranch={isCheckingOutBranch}
-          isMergingBranch={isMergingBranch}
           mode={mode}
           newBranch={data?.newBranch}
-          onBack={goBack}
+          onModeChange={setMode}
           onCheckoutBranch={() => {
             if (!data?.newBranch) {
               toast.error('No branch linked to the card');
@@ -136,7 +119,6 @@ export function ReviewPage({ cardId }: { cardId: string }) {
               },
             });
           }}
-          onModeChange={setMode}
           onSendReview={() => {
             if (!projectId) {
               toast.error('No project id linked to the card');
