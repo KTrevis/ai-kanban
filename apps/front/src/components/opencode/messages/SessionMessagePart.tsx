@@ -1,6 +1,7 @@
 import type { MessagePart } from '#/hooks/queries/opencode/session.queries';
 import { cn } from '#/lib/utils';
 import { format } from 'date-fns';
+import rehypeHighlight from 'rehype-highlight';
 import type { Components } from 'react-markdown';
 import ReactMarkdown from 'react-markdown';
 import remarkBreaks from 'remark-breaks';
@@ -90,6 +91,7 @@ export function SessionMessagePart({
         <div className="wrap-break-word space-y-2 text-sm text-white">
           <ReactMarkdown
             components={markdownComponents}
+            rehypePlugins={[rehypeHighlight]}
             remarkPlugins={[remarkGfm, remarkBreaks]}
           >
             {part.text}
