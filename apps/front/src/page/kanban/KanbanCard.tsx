@@ -15,7 +15,7 @@ export function KanbanCard({
   projectWorktree?: string;
 }) {
   const actionClassName =
-    'inline-flex size-8 items-center justify-center rounded-lg text-gray-300 transition hover:bg-white/10 hover:text-white';
+    'inline-flex size-8 items-center justify-center rounded-lg transition hover:bg-white/10';
   const sessionUrl =
     card.sessionId && projectWorktree
       ? getOpencodeSessionUrl({
@@ -38,7 +38,7 @@ export function KanbanCard({
             target="_blank"
             rel="noreferrer"
             aria-label="Open session"
-            className={actionClassName}
+            className={`${actionClassName} text-cyan-300 hover:text-cyan-200`}
             onClick={(event) => event.stopPropagation()}
             title="Open session"
           >
@@ -50,7 +50,7 @@ export function KanbanCard({
             to="/review/$cardId"
             params={{ cardId: card.id }}
             aria-label="Review changes"
-            className={actionClassName}
+            className={`${actionClassName} text-purple-300 hover:text-purple-200`}
             onClick={(event) => event.stopPropagation()}
             title="Review changes"
           >
