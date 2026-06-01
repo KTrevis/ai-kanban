@@ -1,18 +1,21 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { z } from 'zod';
+import type { AnySchema } from '@modelcontextprotocol/sdk/server/zod-compat.js';
+import { z } from 'zod/v3';
 import { KanbanColumn } from '../generated/prisma/enums';
 
-const KANBAN_COLUMNS_SCHEMA = z.union([
-  z.literal(KanbanColumn.AI),
-  z.literal(KanbanColumn.DONE),
-  z.literal(KanbanColumn.REVIEW),
-  z.literal(KanbanColumn.TODO),
+type KanbanColumnValue = (typeof KanbanColumn)[keyof typeof KanbanColumn];
+
+const KANBAN_COLUMNS_SCHEMA = z.enum([
+  KanbanColumn.AI,
+  KanbanColumn.DONE,
+  KanbanColumn.REVIEW,
+  KanbanColumn.TODO,
 ]);
 
 type KanbanCardPatch = {
   baseBranch?: string;
-  column?: z.infer<typeof KANBAN_COLUMNS_SCHEMA>;
+  column?: KanbanColumnValue;
   description?: string;
   newBranch?: string;
   position?: number;
@@ -22,7 +25,7 @@ type KanbanCardPatch = {
 
 type KanbanCardCreate = {
   baseBranch?: string;
-  column: z.infer<typeof KANBAN_COLUMNS_SCHEMA>;
+  column: KanbanColumnValue;
   description: string;
   id?: string;
   position?: number;
@@ -126,7 +129,7 @@ server.registerTool(
       description: z.string().optional(),
       newBranch: z.string().optional(),
       position: z.number().int().optional(),
-      sessionId: z.string().nullable().optional(),
+      sessionId: z.string().optional(),
       title: z.string().optional(),
     },
   },
