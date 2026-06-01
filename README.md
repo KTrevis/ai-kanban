@@ -1,164 +1,73 @@
-# Travaille - Assistant Notion -> OpenCode
+# Travaille - Kanban pour OpenCode
 
-Ce projet connecte **Notion** à **OpenCode**.
+Travaille est une interface Kanban locale pour piloter des tâches OpenCode sur plusieurs projets Git.
 
-Quand une tâche est mise à jour dans Notion, un webhook appelle ce service. Le service envoie ensuite la tâche à OpenCode pour que l'agent la traite, puis la carte Notion est remise dans la bonne colonne.
+Le backend stocke les projets et les cartes dans une base SQLite, expose une API HTTP/WebSocket, et communique avec OpenCode. Le frontend affiche les projets, les colonnes Kanban, les sessions OpenCode et les écrans de review Git.
 
-## 1) Ce qu'il faut installer
+## Prérequis
 
-Installez ces 3 outils avant de commencer :
+Installez ces outils avant de démarrer :
 
-1. **Bun** (runtime JavaScript)
-2. **ngrok** (pour exposer votre serveur local à Internet)
-3. **OpenCode** (l'agent qui exécutera les tâches)
+1. **Bun** pour lancer le monorepo.
+2. **OpenCode** pour exécuter les tâches agent.
+3. **Git** pour les worktrees, branches et reviews.
 
-### Bun
+Commandes utiles :
 
-Installation :
+- `bun install` : installe les dépendances
+- `bun run dev` : démarre le frontend et le backend via Turbo.
+
+URLs locales :
+
+- Frontend : `http://localhost:6969`
+- Backend : `http://localhost:420`
+- OpenCode : `http://localhost:4096`
+
+## Utilisation
+
+1. Ouvrez le frontend.
+2. Ajoutez un projet avec son nom et le chemin local de son dépôt Git.
+3. Créez des cartes dans le Kanban du projet.
+4. Lancez une tâche depuis une carte pour créer une session OpenCode liée.
+5. L'agent choisit une branche `ai/<slug>`, met à jour la carte, travaille dans un worktree dédié puis place la carte en `REVIEW`.
+6. Depuis l'écran de review, consultez le diff, checkout la branche si besoin, puis mergez ou reprenez la tâche.
+
+Colonnes disponibles :
+
+- `TODO` : tâche à faire.
+- `AI` : tâche prise par l'agent.
+- `REVIEW` : tâche terminée à vérifier.
+- `DONE` : tâche validée.
+
+## MCP Travaille
+
+Le backend fournit un serveur MCP pour permettre à OpenCode de manipuler les cartes Kanban.
+
+Commande du serveur MCP :
+
 ```bash
-curl -fsSL https://bun.com/install | bash
+bun run --cwd apps/back mcp:git
 ```
 
-Vérification :
-
-```bash
-bun --version
-```
-
-### ngrok
-
-Suivre la doc officielle : <https://ngrok.com/docs/getting-started/>
-
-Vérification :
-
-```bash
-ngrok version
-```
-
-### OpenCode
-
-Installation :
-```bash
-curl -fsSL https://opencode.ai/install | bash
-```
-
-## 2) Récupérer le projet
-
-Dans un terminal :
-
-```bash
-git clone <URL_DU_REPO>
-cd travaille
-bun install
-```
-
-## 3) Configurer les variables d'environnement
-
-Créez un fichier `.env` à la racine du projet avec :
+Variable optionnelle :
 
 ```dotenv
-OPENCODE_URL=http://localhost:4096
-NOTION_CLIENT_ID=...
-NOTION_CLIENT_SECRET=...
-NOTION_REDIRECT_URI=https://VOTRE-URL-NGROK/notion/oauth
+TRAVAILLE_API_URL=http://localhost:420/
 ```
 
-Explication :
+Outils exposés :
 
-- `OPENCODE_URL` : adresse de votre serveur OpenCode
-- `NOTION_CLIENT_ID` et `NOTION_CLIENT_SECRET` : identifiants de votre intégration Notion OAuth
-- `NOTION_REDIRECT_URI` : URL publique ngrok + chemin `/notion/oauth`
+- `create_kanban_card`
+- `get_kanban_card`
+- `list_kanban_cards`
+- `patch_kanban_card`
 
-Par défaut, utilisez : `OPENCODE_URL=http://localhost:4096`.
+Configurez ce serveur MCP dans OpenCode si vous voulez que l'agent puisse créer, lire et mettre à jour les cartes Travaille directement.
 
-## 4) Démarrer le service
+## Dépannage
 
-Dans le dossier du projet :
-
-```bash
-bun run dev
-```
-
-Ou seulement le backend avec Turbo :
-
-```bash
-bun run dev:back
-```
-
-Ou seulement le frontend :
-
-```bash
-bun run dev:front
-```
-
-Le serveur démarre sur le port `420`.
-Le frontend utilise `VITE_BACK_URL` pour joindre le backend, avec `http://localhost:420` par défaut.
-
-## 5) Ouvrir un tunnel ngrok
-
-Dans un autre terminal :
-
-```bash
-ngrok http 420
-```
-
-ngrok vous donne une URL publique, par exemple :
-
-`https://abcd-12-34-56-78.ngrok-free.app`
-
-Gardez cette URL, vous en aurez besoin à deux endroits :
-
-1. `NOTION_REDIRECT_URI` (avec `/notion/oauth`)
-2. URL du webhook Notion (avec `/notion/webhook/ai`)
-
-## 6) Démarrer opencode
-
-Dans un autre terminal :
-```bash
-opencode web
-```
-
-## 7) Configurer Notion
-
-### A. OAuth de l'intégration Notion
-
-Dans les réglages de votre intégration Notion :
-
-- mettez la redirect URI : `https://VOTRE-URL-NGROK/notion/oauth`
-
-Ensuite, ouvrez l'URL d'autorisation OAuth de votre app Notion, autorisez l'accès, et vérifiez que le token est bien récupéré par le serveur.
-
-### B. Base de données Notion (obligatoire)
-
-Votre database de tâches doit contenir au minimum :
-
-- une propriété **Projet** (type `Select`) -> nom du projet OpenCode cible
-- une propriété **Session** (type `Text`) -> id de session OpenCode (la laisser vide, le LLM se chargera de la mettre à jour)
-- une propriété **État** (type `Status`) avec **au minimum les deux statuts suivants** :
-  - **Human** : l'agent est bloqué et a besoin d'une réponse humaine
-  - **Review** : l'agent a terminé la tâche et attend votre vérification
-
-Important : sans les statuts **Human** et **Review**, le flux automatique ne peut pas fonctionner correctement.
-
-### C. Webhook Notion
-
-Configurez le webhook Notion vers :
-
-`https://VOTRE-URL-NGROK/notion/webhook/ai`
-
-Important : Dans "Contenu" il faut cocher uniqument "Projet" et "Session"
-
-## Comment ça fonctionne au quotidien
-
-1. Une tâche Notion est envoyée au webhook.
-2. Le service lit la carte (titre, description, commentaires).
-3. Le service envoie la consigne à OpenCode.
-4. OpenCode travaille puis remet la carte en :
-   - **Review** si c'est fini
-   - **Human** si une information manque
-
-## Dépannage rapide
-
-- **Erreur de webhook** : vérifiez que ngrok est bien lancé et que l'URL n'a pas changé.
-- **Erreur Notion OAuth** : vérifiez `NOTION_CLIENT_ID`, `NOTION_CLIENT_SECRET`, `NOTION_REDIRECT_URI`.
-- **Aucune action côté agent** : vérifiez que `OPENCODE_URL` est correct et que OpenCode est démarré.
+- **Le backend ne démarre pas** : vérifiez que `OPENCODE_URL` est défini dans `.env` et que les dépendances sont installées.
+- **OpenCode ne répond pas** : lancez `opencode web` ou vérifiez que `OPENCODE_URL` pointe vers le bon port.
+- **Le frontend n'appelle pas le bon backend** : définissez `VITE_BACK_URL=http://localhost:420`.
+- **La base est vide ou non initialisée** : lancez `bun run --filter=back db:generate` puis `bun run --filter=back db:push`.
+- **Les actions Git échouent** : vérifiez que le chemin `worktree` du projet existe, est un dépôt Git valide, et que la branche de base existe.

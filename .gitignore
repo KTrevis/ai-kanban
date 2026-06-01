@@ -32,6 +32,7 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+src/api/notion/notion-token.txt
 
 # vercel
 .vercel
@@ -49,3 +50,7 @@ package-lock.json
 # local databases
 *.db
 *.db-journal
+*.sqlite
+*.sqlite3
+*-shm
+*-wal
