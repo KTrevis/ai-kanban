@@ -26,11 +26,11 @@ URLs locales :
 ## Utilisation
 
 1. Ouvrez le frontend.
-2. Ajoutez un projet avec son nom et le chemin local de son dépôt Git.
+2. Ajoutez un projet depuis la sidebar avec son nom et le chemin local de son dépôt Git.
 3. Créez des cartes dans le Kanban du projet.
-4. Lancez une tâche depuis une carte pour créer une session OpenCode liée.
+4. Lancez une tâche en mettant une carte dans la colonne AI pour créer une session OpenCode liée.
 5. L'agent choisit une branche `ai/<slug>`, met à jour la carte, travaille dans un worktree dédié puis place la carte en `REVIEW`.
-6. Depuis l'écran de review, consultez le diff, checkout la branche si besoin, puis mergez ou reprenez la tâche.
+6. Depuis l'écran de review, consultez le diff, checkout la branche pour tester ce qui a été fait, envoyez des feedbacks à l'agent si des changements sont nécessaires, puis mergez ou reprenez la tâche.
 
 Colonnes disponibles :
 
@@ -63,11 +63,3 @@ Outils exposés :
 - `patch_kanban_card`
 
 Configurez ce serveur MCP dans OpenCode si vous voulez que l'agent puisse créer, lire et mettre à jour les cartes Travaille directement.
-
-## Dépannage
-
-- **Le backend ne démarre pas** : vérifiez que `OPENCODE_URL` est défini dans `.env` et que les dépendances sont installées.
-- **OpenCode ne répond pas** : lancez `opencode web` ou vérifiez que `OPENCODE_URL` pointe vers le bon port.
-- **Le frontend n'appelle pas le bon backend** : définissez `VITE_BACK_URL=http://localhost:420`.
-- **La base est vide ou non initialisée** : lancez `bun run --filter=back db:generate` puis `bun run --filter=back db:push`.
-- **Les actions Git échouent** : vérifiez que le chemin `worktree` du projet existe, est un dépôt Git valide, et que la branche de base existe.
