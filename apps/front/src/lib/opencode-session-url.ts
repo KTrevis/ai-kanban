@@ -6,7 +6,7 @@ function toBase64(value: string) {
     binary += String.fromCharCode(byte);
   }
 
-  return btoa(binary);
+  return btoa(binary).replace(/=+$/, '');
 }
 
 export function getOpencodeSessionUrl({
