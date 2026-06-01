@@ -1,5 +1,7 @@
 import type { KanbanCard as KanbanCardType } from '#/hooks/mutations/kanban/kanban.mutations';
 import { getOpencodeSessionUrl } from '#/lib/opencode-session-url';
+import { Link } from '@tanstack/react-router';
+import { GitPullRequest, MessageCircle } from 'lucide-react';
 
 export function KanbanCard({
   card,
@@ -40,10 +42,21 @@ export function KanbanCard({
             target="_blank"
             rel="noreferrer"
             className="inline-flex font-medium text-cyan-300 hover:text-cyan-200"
-            onClick={(event) => event.stopPropagation()}
           >
-            Open session
+            <MessageCircle className="size-4" />
           </a>
+        )}
+        {card.newBranch && (
+          <Link
+            to="/review/$cardId"
+            params={{ cardId: card.id }}
+            aria-label="Review changes"
+            className="inline-flex size-8 items-center justify-center rounded-lg text-purple-300 transition hover:bg-white/10 hover:text-purple-200"
+            onClick={(event) => event.stopPropagation()}
+            title="Review changes"
+          >
+            <GitPullRequest className="size-4" />
+          </Link>
         )}
       </div>
     </article>
