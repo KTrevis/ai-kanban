@@ -41,6 +41,7 @@ type KanbanPageProps = {
   onProjectSessionStart?: () => void;
   cards: KanbanCardType[];
   projectId: string;
+  projectWorktree?: string;
 };
 
 const kanbanCollisionDetection: CollisionDetection = (args) => {
@@ -60,6 +61,7 @@ export function KanbanPage({
   onProjectSessionStart,
   cards,
   projectId,
+  projectWorktree,
 }: KanbanPageProps) {
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [visibleCards, setVisibleCards] = useState(cards);
@@ -166,6 +168,7 @@ export function KanbanPage({
                 onCardClick={(card) => onCardIdChange(card.id)}
                 onCardCreated={onCardCreated}
                 projectId={projectId}
+                projectWorktree={projectWorktree}
               />
             );
           })}
@@ -173,7 +176,13 @@ export function KanbanPage({
       </div>
 
       <DragOverlay>
-        {activeCard ? <KanbanCard card={activeCard} isOverlay /> : null}
+        {activeCard ? (
+          <KanbanCard
+            card={activeCard}
+            isOverlay
+            projectWorktree={projectWorktree}
+          />
+        ) : null}
       </DragOverlay>
 
       <Modal

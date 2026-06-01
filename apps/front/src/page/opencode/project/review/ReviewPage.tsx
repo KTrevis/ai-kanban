@@ -7,6 +7,7 @@ import { DiffModeEnum, SplitSide } from '@git-diff-view/react';
 import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { getOpencodeSessionUrl } from '#/lib/opencode-session-url';
 import { ReviewContent } from './ReviewContent';
 import { ReviewHeader } from './ReviewHeader';
 import { splitGitDiff, type ReviewComment } from './review.utils';
@@ -20,7 +21,7 @@ import {
 
 function formatComments(comments: ReviewComment[]) {
   const PREPROMPT = `Modifie les fichiers dans le workspace courant afin de répondre aux commentaires que t'a fait l'utilisateur.
-    S'il s'agit d'une question, réponds directement dans le tchat.\n\n`;
+    S'il s'agit d'une question, réponds directement dans la session opencode.\n\n`;
 
   return (
     PREPROMPT +
@@ -116,6 +117,13 @@ export function ReviewPage({ cardId }: { cardId: string }) {
       return;
     }
 
+    if (!project) {
+      toast.error('No project linked to the card');
+      return;
+    }
+
+    const sessionWindow = window.open('about:blank', '_blank');
+
     sendMessage(
       {
         message: formatComments(comments),
@@ -123,15 +131,27 @@ export function ReviewPage({ cardId }: { cardId: string }) {
         sessionId,
       },
       {
+        onError() {
+          sessionWindow?.close();
+        },
         onSuccess() {
           removeComments();
           toast.success('Review comments sent');
+          const sessionUrl = getOpencodeSessionUrl({
+            projectDirectory: project.worktree,
+            sessionId,
+          });
+
+          if (sessionWindow) {
+            sessionWindow.opener = null;
+            sessionWindow.location.href = sessionUrl;
+          } else {
+            window.open(sessionUrl, '_blank', 'noopener,noreferrer');
+          }
+
           navigate({
             to: '/project/$id',
             params: { id: projectId },
-            search: {
-              sessionId,
-            },
           });
         },
       },

@@ -6,9 +6,11 @@ import { KanbanCard } from './KanbanCard';
 export function SortableKanbanCard({
   card,
   onClick,
+  projectWorktree,
 }: {
   card: KanbanCardType;
   onClick?: (card: KanbanCardType) => void;
+  projectWorktree?: string;
 }) {
   const {
     attributes,
@@ -30,7 +32,11 @@ export function SortableKanbanCard({
       {...attributes}
       {...listeners}
     >
-      <KanbanCard card={card} onClick={() => onClick?.(card)} />
+      <KanbanCard
+        card={card}
+        onClick={() => onClick?.(card)}
+        projectWorktree={projectWorktree}
+      />
     </div>
   );
 }

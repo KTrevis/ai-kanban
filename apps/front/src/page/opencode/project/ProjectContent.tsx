@@ -1,6 +1,5 @@
 import type { KanbanCard } from '#/hooks/mutations/kanban/kanban.mutations';
 import { KanbanPage, type CardMovedEvent } from '#/page/kanban/KanbanPage';
-import { ProjectSessionPanel } from './ProjectSessionPanel';
 
 export function ProjectContent({
   cardId,
@@ -11,7 +10,7 @@ export function ProjectContent({
   onCardMoved,
   onProjectSessionStart,
   projectId,
-  sessionId,
+  projectWorktree,
 }: {
   cardId?: string;
   cards: KanbanCard[];
@@ -21,26 +20,15 @@ export function ProjectContent({
   onCardMoved: (event: CardMovedEvent) => void;
   onProjectSessionStart: () => void;
   projectId: string;
-  sessionId?: string;
+  projectWorktree?: string;
 }) {
-  if (sessionId) {
-    const sessionCard = cards.find((card) => card.sessionId === sessionId);
-
-    return (
-      <ProjectSessionPanel
-        card={sessionCard}
-        projectId={projectId}
-        sessionId={sessionId}
-      />
-    );
-  }
-
   return (
     <KanbanPage
       cards={cards}
       cardId={cardId}
       isProjectSessionStarting={isProjectSessionStarting}
       projectId={projectId}
+      projectWorktree={projectWorktree}
       onCardIdChange={onCardIdChange}
       onCardCreated={onCardCreated}
       onCardMoved={onCardMoved}

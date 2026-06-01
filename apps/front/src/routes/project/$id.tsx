@@ -6,13 +6,12 @@ export const Route = createFileRoute('/project/$id')({
   component: RouteComponent,
   validateSearch: z.object({
     cardId: z.string().optional(),
-    sessionId: z.string().optional(),
   }),
 });
 
 function RouteComponent() {
   const { id } = Route.useParams();
-  const { cardId, sessionId } = Route.useSearch();
+  const { cardId } = Route.useSearch();
   const navigate = Route.useNavigate();
 
   function setCardId(nextCardId?: string) {
@@ -22,24 +21,11 @@ function RouteComponent() {
     });
   }
 
-  function setSessionId(nextSessionId: string) {
-    navigate({
-      search: (search) => ({
-        ...search,
-        cardId: undefined,
-        sessionId: nextSessionId,
-      }),
-      replace: true,
-    });
-  }
-
   return (
     <ProjectPage
       cardId={cardId}
       projectId={id}
-      sessionId={sessionId}
       onCardIdChange={setCardId}
-      onSessionIdChange={setSessionId}
     />
   );
 }

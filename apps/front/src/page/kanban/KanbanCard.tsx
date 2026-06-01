@@ -1,15 +1,25 @@
 import type { KanbanCard as KanbanCardType } from '#/hooks/mutations/kanban/kanban.mutations';
-import { Link } from '@tanstack/react-router';
+import { getOpencodeSessionUrl } from '#/lib/opencode-session-url';
 
 export function KanbanCard({
   card,
   isOverlay,
   onClick,
+  projectWorktree,
 }: {
   card: KanbanCardType;
   isOverlay?: boolean;
   onClick?: () => void;
+  projectWorktree?: string;
 }) {
+  const sessionUrl =
+    card.sessionId && projectWorktree
+      ? getOpencodeSessionUrl({
+          projectDirectory: projectWorktree,
+          sessionId: card.sessionId,
+        })
+      : undefined;
+
   return (
     <article
       onClick={onClick}
@@ -24,16 +34,16 @@ export function KanbanCard({
         </p>
       )}
       <div className="mt-3 flex flex-wrap gap-3">
-        {card.sessionId && (
-          <Link
-            to={`/project/$id`}
-            params={{ id: card.projectId }}
-            search={{ sessionId: card.sessionId }}
+        {sessionUrl && (
+          <a
+            href={sessionUrl}
+            target="_blank"
+            rel="noreferrer"
             className="inline-flex font-medium text-cyan-300 hover:text-cyan-200"
             onClick={(event) => event.stopPropagation()}
           >
             Open session
-          </Link>
+          </a>
         )}
       </div>
     </article>

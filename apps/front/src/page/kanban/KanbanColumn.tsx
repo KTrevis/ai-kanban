@@ -14,12 +14,14 @@ export function KanbanColumn({
   onCardClick,
   onCardCreated,
   projectId,
+  projectWorktree,
 }: {
   cards: KanbanCardType[];
   column: Column;
   onCardClick?: (card: KanbanCardType) => void;
   onCardCreated?: (card: KanbanCardType) => void;
   projectId: string;
+  projectWorktree?: string;
 }) {
   const { isOver, setNodeRef } = useDroppable({ id: column });
 
@@ -56,6 +58,7 @@ export function KanbanColumn({
               card={card}
               key={card.id}
               onClick={onCardClick}
+              projectWorktree={projectWorktree}
             />
           ))}
 

@@ -9,23 +9,19 @@ import {
   useMoveKanbanCards,
 } from '#/hooks/mutations/kanban/kanban.mutations';
 import { useGetProjects } from '#/hooks/queries/opencode/project.queries';
+import { getOpencodeSessionUrl } from '#/lib/opencode-session-url';
 import type { CardMovedEvent } from '#/page/kanban/KanbanPage';
 import { useEffect } from 'react';
 import { ProjectContent } from './ProjectContent';
-import { cn } from '#/lib/utils';
 
 export function ProjectPage({
   cardId,
   onCardIdChange,
-  onSessionIdChange,
   projectId,
-  sessionId,
 }: {
   cardId?: string;
   onCardIdChange: (cardId?: string) => void;
-  onSessionIdChange: (sessionId: string) => void;
   projectId: string;
-  sessionId?: string;
 }) {
   const { data: cards } = useGetKanbanCards(projectId);
   const { data: projects = [] } = useGetProjects();
@@ -37,20 +33,50 @@ export function ProjectPage({
   const projectFirstChar = Array.from(project?.name ?? '')[0];
 
   useEffect(() => {
-    const page = sessionId ? 'Chat' : 'Kanban';
     document.title = projectFirstChar
-      ? `${projectFirstChar} - ${page}`
-      : `Travaille - ${page}`;
-  }, [projectFirstChar, sessionId]);
+      ? `${projectFirstChar} - Kanban`
+      : 'Travaille - Kanban';
+  }, [projectFirstChar]);
+
+  function openSession(sessionId: string, targetWindow?: Window | null) {
+    if (!project) {
+      return;
+    }
+
+    const sessionUrl = getOpencodeSessionUrl({
+      projectDirectory: project.worktree,
+      sessionId,
+    });
+
+    if (targetWindow) {
+      targetWindow.opener = null;
+      targetWindow.location.href = sessionUrl;
+      return;
+    }
+
+    window.open(sessionUrl, '_blank', 'noopener,noreferrer');
+  }
 
   function startProjectSession() {
+    if (!project) {
+      return;
+    }
+
+    const sessionWindow = window.open('about:blank', '_blank');
+
     createProjectSession(
       { projectId },
       {
+        onError() {
+          sessionWindow?.close();
+        },
         onSuccess(result) {
           if ('sessionId' in result && result.sessionId) {
-            onSessionIdChange(result.sessionId);
+            openSession(result.sessionId, sessionWindow);
+            return;
           }
+
+          sessionWindow?.close();
         },
       },
     );
@@ -84,7 +110,7 @@ export function ProjectPage({
         cardId={cardId}
         isProjectSessionStarting={isCreatingProjectSession}
         projectId={projectId}
-        sessionId={sessionId}
+        projectWorktree={project?.worktree}
         onCardCreated={onCardCreated}
         onCardIdChange={onCardIdChange}
         onCardMoved={onCardMoved}
