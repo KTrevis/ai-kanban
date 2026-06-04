@@ -31,40 +31,36 @@ export function KanbanCard({
         isOverlay ? 'rotate-2 ring-2 ring-cyan-300' : ''
       }`}
     >
-      <div className="absolute top-3 right-3 flex items-center gap-1">
-        {sessionUrl && (
-          <a
-            href={sessionUrl}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Open session"
-            className={`${actionClassName} text-cyan-300 hover:text-cyan-200`}
-            onClick={(event) => event.stopPropagation()}
-            title="Open session"
-          >
-            <MessageCircle className="size-4" />
-          </a>
-        )}
-        {card.newBranch && (
-          <Link
-            to="/review/$cardId"
-            params={{ cardId: card.id }}
-            aria-label="Review changes"
-            className={`${actionClassName} text-purple-300 hover:text-purple-200`}
-            onClick={(event) => event.stopPropagation()}
-            title="Review changes"
-          >
-            <GitPullRequest className="size-4" />
-          </Link>
-        )}
-      </div>
-      <h3 className="break-words pr-20 font-medium text-gray-50">
-        {card.title}
-      </h3>
+      <h3 className="wrap-break-word font-medium text-gray-50">{card.title}</h3>
       {card.description && (
-        <p className="mt-2 max-h-64 overflow-y-auto whitespace-pre-wrap break-words pr-1 text-gray-400 [overflow-wrap:anywhere]">
+        <p className="mt-2 max-h-64 overflow-y-auto whitespace-pre-wrap wrap-break-word pr-1 text-gray-400">
           {card.description}
         </p>
+      )}
+      {sessionUrl && (
+        <a
+          href={sessionUrl}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Open session"
+          className={`${actionClassName} text-cyan-300 hover:text-cyan-200`}
+          onClick={(event) => event.stopPropagation()}
+          title="Open session"
+        >
+          <MessageCircle className="size-4" />
+        </a>
+      )}
+      {card.newBranch && (
+        <Link
+          to="/review/$cardId"
+          params={{ cardId: card.id }}
+          aria-label="Review changes"
+          className={`${actionClassName} text-purple-300 hover:text-purple-200`}
+          onClick={(event) => event.stopPropagation()}
+          title="Review changes"
+        >
+          <GitPullRequest className="size-4" />
+        </Link>
       )}
     </article>
   );
