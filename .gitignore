@@ -33,6 +33,7 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 src/api/notion/notion-token.txt
+apps/back/src/api/notion/notion-token.txt
 
 # vercel
 .vercel

@@ -5,6 +5,7 @@ import { startOpencodeEventRelay } from './api/opencode/opencode.event-relay';
 import { PROJECTS_CONTROLLER } from './api/projects/projects.controller';
 import { WS_CONTROLLER } from './api/ws/ws.controller';
 import { KANBAN_CONTROLLER } from './api/kanban/kanban.controller';
+import { NOTION_CONTROLLER } from './api/notion/notion.controller';
 import { HttpError } from './lib/http-error';
 
 export const app = new Elysia()
@@ -23,6 +24,7 @@ export const app = new Elysia()
   .use(OPENCODE_CONTROLLER)
   .use(PROJECTS_CONTROLLER)
   .use(WS_CONTROLLER)
-  .use(KANBAN_CONTROLLER);
+  .use(KANBAN_CONTROLLER)
+  .use(NOTION_CONTROLLER);
 
 startOpencodeEventRelay();
