@@ -19,7 +19,6 @@ type KanbanCardPatch = {
   description?: string;
   newBranch?: string;
   position?: number;
-  sessionId?: string | null;
   title?: string;
 };
 
@@ -129,7 +128,6 @@ server.registerTool(
       description: z.string().optional(),
       newBranch: z.string().optional(),
       position: z.number().int().optional(),
-      sessionId: z.string().optional(),
       title: z.string().optional(),
     },
   },
