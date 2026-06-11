@@ -88,19 +88,19 @@ export function ReviewPage({ cardId }: { cardId: string }) {
       return;
     }
 
-    if (!data.canRebase) {
-      toast.error(data.cannotMergeReason ?? 'Rebase has conflicts');
+    if (!data.canMerge) {
+      toast.error(data.cannotMergeReason ?? 'Merge has conflicts');
       return;
     }
 
     mergeBranch(undefined, {
       onError(error) {
         toast.error(
-          error instanceof Error ? error.message : 'Failed to rebase branch',
+          error instanceof Error ? error.message : 'Failed to merge branch',
         );
       },
       onSuccess() {
-        toast.success('Branch rebased and merged');
+        toast.success('Branch merged');
         checkedOutBranchQuery.refetch();
       },
     });
@@ -170,7 +170,7 @@ export function ReviewPage({ cardId }: { cardId: string }) {
           }}
           branch={{
             baseBranch: data?.baseBranch,
-            canMerge: data?.canRebase ?? false,
+            canMerge: data?.canMerge ?? false,
             cannotMergeReason: data?.cannotMergeReason,
             checkedOutBranch: checkedOutBranchQuery.data?.branch ?? undefined,
             isCheckingOut: isCheckingOutBranch,

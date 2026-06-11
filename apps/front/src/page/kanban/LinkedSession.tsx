@@ -11,7 +11,7 @@ export function LinkedSession({
   onRemove: () => void;
   sessionId?: string;
 }) {
-  if (sessionId === undefined) {
+  if (!sessionId) {
     return null;
   }
 

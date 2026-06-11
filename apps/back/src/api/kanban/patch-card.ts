@@ -18,11 +18,12 @@ export async function patchCard(cardId: string, data: UpdateKanbanCard) {
     card.column === KanbanColumn.REVIEW
   ) {
     notifyAgentTaskFinished(card.title);
-    websockets.sendMessage({
-      type: 'cards.updated',
-      projectId: card.projectId,
-    });
   }
+
+  websockets.sendMessage({
+    type: 'cards.updated',
+    projectId: card.projectId,
+  });
 
   return card;
 }

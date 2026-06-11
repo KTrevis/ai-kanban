@@ -33,7 +33,7 @@ export async function mergeKanbanCardBranch({
   }
 
   try {
-    const result = await rebaseBranchIntoBase({
+    const result = await mergeBranchIntoBase({
       baseBranch: card.baseBranch,
       branchRef: newBranch,
       repoPath: card.project.worktree,
@@ -65,7 +65,7 @@ export async function mergeKanbanCardBranch({
       projectId: card.projectId,
     };
   } catch (error) {
-    let message = 'Failed to rebase branch';
+    let message = 'Failed to merge branch';
     if (error instanceof GitRunError) {
       message = error.result.stderr.trim() || error.message;
     } else if (error instanceof Error) {
@@ -76,7 +76,7 @@ export async function mergeKanbanCardBranch({
   }
 }
 
-export async function getRebaseBranchStatus({
+export async function getMergeBranchStatus({
   baseBranch,
   branchRef,
   repoPath,
@@ -95,25 +95,25 @@ export async function getRebaseBranchStatus({
       ],
       { cwd: repoPath },
     );
-    return { canRebase: true };
+    return { canMerge: true };
   } catch (error) {
     return {
-      canRebase: false,
-      cannotMergeReason: getRebaseErrorMessage(error),
+      canMerge: false,
+      cannotMergeReason: getMergeErrorMessage(error),
     };
   }
 }
 
-export async function canRebaseBranch(params: {
+export async function canMergeBranch(params: {
   baseBranch: string;
   branchRef: string;
   repoPath: string;
 }) {
-  const status = await getRebaseBranchStatus(params);
-  return status.canRebase;
+  const status = await getMergeBranchStatus(params);
+  return status.canMerge;
 }
 
-async function rebaseBranchIntoBase({
+async function mergeBranchIntoBase({
   baseBranch,
   branchRef,
   repoPath,
@@ -123,28 +123,33 @@ async function rebaseBranchIntoBase({
   repoPath: string;
 }) {
   const targetRef = getUpdatableBranchRef(baseBranch);
+  const targetBranch = getSwitchableBranchName(baseBranch);
   const sourceRef = normalizeBranchRef(branchRef);
 
-  await runGit(['rebase', targetRef, sourceRef], {
+  await runGit(['switch', targetBranch], {
     cwd: repoPath,
     timeoutMs: 120_000,
   });
 
-  const { stdout } = await runGit(['rev-parse', '--verify', sourceRef], {
+  await runGit(['merge', '--no-edit', sourceRef], {
+    cwd: repoPath,
+    timeoutMs: 120_000,
+  });
+
+  const { stdout } = await runGit(['rev-parse', '--verify', targetRef], {
     cwd: repoPath,
   });
   const commitOid = stdout.trim();
-  await runGit(['update-ref', targetRef, commitOid], { cwd: repoPath });
 
   return {
     baseBranch,
     branch: branchRef,
     commitOid,
-    rebased: true,
+    merged: true,
   };
 }
 
-function getRebaseErrorMessage(error: unknown) {
+function getMergeErrorMessage(error: unknown) {
   if (error instanceof GitRunError) {
     return error.result.stderr.trim() || error.message;
   }
@@ -153,7 +158,7 @@ function getRebaseErrorMessage(error: unknown) {
     return error.message;
   }
 
-  return 'Rebase has conflicts';
+  return 'Merge has conflicts';
 }
 
 function getUpdatableBranchRef(ref: string) {
@@ -166,4 +171,16 @@ function getUpdatableBranchRef(ref: string) {
   }
 
   return normalizeBranchRef(ref);
+}
+
+function getSwitchableBranchName(ref: string) {
+  if (ref.startsWith('refs/heads/')) {
+    return ref.slice('refs/heads/'.length);
+  }
+
+  if (ref === 'HEAD' || ref.startsWith('refs/')) {
+    throw new Error('Base branch must be a local branch to merge into');
+  }
+
+  return ref;
 }
